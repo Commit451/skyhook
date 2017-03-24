@@ -1,82 +1,63 @@
-/* styles */
-/* called by your view template */
+/**
+ * Copyright 2015 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-/* You might want to try something fancier: */
-/* less: http://lesscss.org/ */
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  font-family: helvetica, arial, sans-serif;
-  margin: 25px;
-}
-
-h1 {
-  font-weight: bold;
-  color: pink;
-}
-
-.bold {
-  font-weight: bold;
-}
-
-p {
-  max-width: 600px;
-}
-
-form {
-  margin-bottom: 25px;
-  padding: 15px;
-  background-color: cyan;
-  display: inline-block;
+.demo-ribbon {
   width: 100%;
-  max-width: 340px;
-  border-radius: 3px;
+  height: 40vh;
+  background-color: #3F51B5;
+  -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+          flex-shrink: 0;
 }
 
-input {
-  display: block;
-  margin-bottom: 10px;
-  padding: 5px;
-  width: 100%;
-  border: 1px solid lightgrey;
-  border-radius: 3px;
-  font-size: 16px;
+.demo-main {
+  margin-top: -35vh;
+  -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+          flex-shrink: 0;
 }
 
-button {
-  font-size: 16px;
-  border-radius: 3px;
-  background-color: lightgrey;
-  border: 1px solid grey;
-  box-shadow: 2px 2px teal;
-  cursor: pointer;
+.demo-header .mdl-layout__header-row {
+  padding-left: 40px;
 }
 
-button:hover {
-  background-color: yellow;
+.demo-container {
+  max-width: 1600px;
+  width: calc(100% - 16px);
+  margin: 0 auto;
 }
 
-button:active {
-  box-shadow: none;
+.demo-content {
+  border-radius: 2px;
+  padding: 80px 56px;
+  margin-bottom: 80px;
 }
 
-li {
-  margin-bottom: 5px;
+.demo-layout.is-small-screen .demo-content {
+  padding: 40px 28px;
 }
 
-footer {
-  margin-top: 50px;
-  padding-top: 25px;
-  border-top: 1px solid lightgrey;
+.demo-content h3 {
+  margin-top: 48px;
 }
 
-footer > a {
-  color: #BBBBBB;
+.demo-footer {
+  padding-left: 40px;
 }
 
-.nicejob {
-  text-decoration: line-through;
+.demo-footer .mdl-mini-footer--link-list a {
+  font-size: 13px;
 }

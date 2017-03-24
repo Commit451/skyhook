@@ -7,20 +7,35 @@
 $(function() {
   console.log('hello world :o');
   
-  $.get('/dreams', function(dreams) {
-    dreams.forEach(function(dream) {
-      $('<li></li>').text(dream).appendTo('ul#dreams');
-    });
+  var currentLink = window.location.href
+  console.log(currentLink);
+  var link = getParameterByName("link", currentLink)
+  console.log("Passed link: " + link);
+  if (link != null) {
+    $("#bytes").val(link);
+  }
+  $( "#follow" ).click(function() {
+      goToLink();
   });
-
-  $('form').submit(function(event) {
-    event.preventDefault();
-    var dream = $('input').val();
-    $.post('/dreams?' + $.param({dream: dream}), function() {
-      $('<li></li>').text(dream).appendTo('ul#dreams');
-      $('input').val('');
-      $('input').focus();
-    });
+  $("#bytes").keyup(function(event){
+    if(event.keyCode == 13){
+      goToLink();
+    }
   });
+  function goToLink() {
+    var link = $("#bytes").val();
+    var win = window.open(link, "_blank");
+  }
+  function getParameterByName(name, url) {
+      if (!url) {
+        url = window.location.href;
+      }
+      name = name.replace(/[\[\]]/g, "\\$&");
+      var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+          results = regex.exec(url);
+      if (!results) return null;
+      if (!results[2]) return '';
+      return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
 
 });

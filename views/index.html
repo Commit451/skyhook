@@ -1,54 +1,87 @@
-<!-- This is a static file -->
-<!-- served from your routes in server.js -->
-
-<!-- You might want to try something fancier: -->
-<!-- html/nunjucks docs: https://mozilla.github.io/nunjucks/ -->
-<!-- pug: https://pugjs.org/ -->
-<!-- haml: http://haml.info/ -->
-<!-- hbs(handlebars): http://handlebarsjs.com/ -->
-
 <!DOCTYPE html>
-<html>
+<html class="mdc-typography">
   <head>
-    <title>Skyhook</title>
-    <meta name="description" content="Webhooks to Discord webhook">
-    <link id="favicon" rel="icon" href="https://glitch.com/edit/favicon-app.ico" type="image/x-icon">
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/style.css">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Greeting App</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
+    <style>
+      :root {
+        --mdc-theme-primary: #ff0000;
+      }
+</style>
   </head>
-  <body>
-    <header>
-      <h1>
-        A Dream of the Future
-      </h1>
-    </header>
+  <main>
+  <h1 class="mdc-typography--display1">Tell us about yourself!</h1>
 
-    <main>
-      <p class="bold">Oh hi,</p>
-      <p>Tell me your hopes and dreams:</p>
-      <form>
-        <input type="text" maxlength="100" placeholder="Dreams!">
-        <button type="submit">Submit</button>
-      </form>
-      <section class="dreams">
-        <ul id="dreams">
-        </ul>
-      </section>
-    </main>
+  <form action="#" id="greeting-form">
+    <div>
+      <div class="mdc-form-field">
+        <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
+          <input id="firstname" type="text" class="mdc-textfield__input">
+          <label for="firstname" class="mdc-textfield__label">
+            Discord Webhook URL
+          </label>
+        </div>
+      </div>
+    </div>
 
-    <footer>
-      <a href="https://glitch.com">
-        Remix this in Glitch
-      </a>
-    </footer>
+    <button type="submit"
+            class="mdc-button
+                   mdc-button--raised
+                   mdc-button--primary
+                   mdc-ripple-surface"
+            data-mdc-auto-init="MDCRipple">
+      Convert
+    </button>
+  </form>
+    
+    <section id="demo-wrapper">
+          <div id="js-select" class="mdc-select" role="listbox" tabindex="0">
+            <span class="mdc-select__selected-text">Pick a food group</span>
+            <div class="mdc-simple-menu mdc-select__menu">
+              <ul class="mdc-list mdc-simple-menu__items">
+                <li class="mdc-list-item" role="option" id="grains" tabindex="0">
+                  Bread, Cereal, Rice, and Pasta
+                </li>
+                <li class="mdc-list-item" role="option" id="vegetables" tabindex="0">
+                  Vegetables
+                </li>
+                <li class="mdc-list-item" role="option" id="fruit" tabindex="0">
+                  Fruit
+                </li>
+                <li class="mdc-list-item" role="option" id="dairy" tabindex="0">
+                  Milk, Yogurt, and Cheese
+                </li>
+                <li class="mdc-list-item" role="option" id="meat" tabindex="0">
+                  Meat, Poultry, Fish, Dry Beans, Eggs, and Nuts
+                </li>
+                <li class="mdc-list-item" role="option" id="fats" tabindex="0">
+                  Fats, Oils, and Sweets
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+        <p>Currently selected: <span id="currently-selected">(none)</span></p>
 
-    <!-- Your web-app is https, so your scripts need to be too -->
-    <script src="https://code.jquery.com/jquery-2.2.1.min.js"
-            integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="
-            crossorigin="anonymous"></script>
-    <script src="/client.js"></script>
+  <!-- The p element below is where we'll eventually output our greeting -->
+  <p class="mdc-typography--headline" id="greeting"></p>
+</main>
 
-  </body>
+<script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+<script>window.mdc.autoInit();</script>
+  <script>
+  document.getElementById('greeting-form').addEventListener('submit', function(evt) {
+    evt.preventDefault();
+    var discordHookUrl = evt.target.elements.firstname.value;
+    if (discordHookUrl) {
+      //TODO transform to the other url
+    }
+
+    document.getElementById('greeting').textContent = discordHookUrl;
+  });
+</script>
 </html>
