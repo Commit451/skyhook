@@ -4,7 +4,7 @@
 	"//3": "updating this file will download and update your packages",
 	"name": "gitlab-to-discord",
 	"version": "0.0.1",
-	"description": "Parses GitLab webhook and forwards it in the proper format to Discord",
+	"description": "Parses webhooks and forwards it in the proper format to Discord",
 	"main": "server.js",
 	"scripts": {
 		"start": "node server.js"

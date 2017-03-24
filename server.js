@@ -4,6 +4,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var request = require('request');
 var gitlab = require('./gitlab')
+var travis = require('./travis')
 var app = express();
 
 
@@ -16,7 +17,7 @@ app.get("/", function (request, response) {
   response.sendFile(__dirname + '/views/index.html');
 });
 
-app.post("/hooks/:hookPart1/:hookPart2/:from", function (req, res) {
+app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
   //TODO verify that part1 and 2 exist
   var hookPart1 = req.params.hookPart1;
   var hookPart2 = req.params.hookPart2;
@@ -30,6 +31,9 @@ app.post("/hooks/:hookPart1/:hookPart2/:from", function (req, res) {
   switch(from) {
     case "gitlab":
       gitlab.parse(req, discordPayload)
+      break;
+    case "travis":
+      travis.parse(req, discordPayload)
       break;
     default:
       console.log("Unknown from: " + from);
