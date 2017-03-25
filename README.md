@@ -2,6 +2,7 @@
 Parses webhooks and forwards them in the proper format to Discord.
 
 ## Setup
+You can use the [site](https://skyhook.glitch.me/) to create the right webhook link. 
 1. Create a webhook in Discord (Server Settings -> Webhooks -> Create Webhook)
 2. Copy the webhook url
 3. Turn the Discord webhook url into a skyhook webhook url like so:

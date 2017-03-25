@@ -13,7 +13,8 @@
 		"express": "^4.15.2",
 		"body-parser": "^1.17.1",
 		"request": "^2.81.0",
-		"material-components-web": "^0.7.0"
+		"material-components-web": "^0.7.0",
+		"copy-to-clipboard": "^3.0.5"
 	},
 	"engines": {
 		"node": "6.9.x"
