@@ -7,6 +7,7 @@ window.mdc.autoInit();
 (function(global) {
     'use strict';
 
+    //init snackbar things
     var MDCSnackbar = global.mdc.snackbar.MDCSnackbar;
     var snackbar = new MDCSnackbar(document.getElementById('mdc-js-snackbar'));
 
@@ -25,7 +26,14 @@ window.mdc.autoInit();
       if (discordHookUrl) {
         discordHookUrl = discordHookUrl.replace("discordapp.com", "skyhook.glitch.me")
         //add the provider
-        var index = select.selectedIndex
+        var index = 0
+        //loop on all radios, seeing which one is checked
+        var radios = document.querySelectorAll('.mdc-radio__native-control');
+        for (var i = 0, radio; radio = radios[i]; i++) {
+          if (radio.checked === true) {
+            index = i
+          }
+        }
         switch(index) {
           case 0:
             discordHookUrl = discordHookUrl + "/appveyor"
@@ -54,10 +62,5 @@ window.mdc.autoInit();
         show(snackbar, "Unable to create URL. Please fill in all fields");
       }
     });
-
-
-    var MDCSelect = mdc.select.MDCSelect;
-    var selectElement = document.getElementById('js-select');
-    var select = MDCSelect.attachTo(selectElement);
 
   })(this);
