@@ -3,7 +3,7 @@
 
 
 window.mdc.autoInit();
-    
+
 (function(global) {
     'use strict';
 
@@ -19,9 +19,8 @@ window.mdc.autoInit();
         sb.show(data);
     }
 
-    document.getElementById('greeting-form').addEventListener('submit', function(evt) {
-      evt.preventDefault();
-      var discordHookUrl = evt.target.elements.url.value;
+    $("#button-generate").click(function(){
+      var discordHookUrl = $('#url').val();
       var error = false
       if (discordHookUrl) {
         discordHookUrl = discordHookUrl.replace("discordapp.com", "skyhook.glitch.me")
@@ -55,6 +54,7 @@ window.mdc.autoInit();
         show(snackbar, "Unable to create URL. Please fill in all fields");
       }
     });
+
 
     var MDCSelect = mdc.select.MDCSelect;
     var selectElement = document.getElementById('js-select');

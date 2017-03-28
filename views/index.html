@@ -19,7 +19,7 @@
         <p>
           In order to have skyhook parse your webhooks properly, you must generate a webhook URL. Once you have the URL generated, you can pass it along to the provider you selected.
         </p>
-        <form action="#" id="greeting-form">
+
           <div>
             <div class="mdc-form-field">
               <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
@@ -53,7 +53,8 @@
           </div>
         </section>
           <br />
-          <button type="submit"
+          <button
+          id="button-generate"
             class="mdc-button
             mdc-button--raised
             mdc-button--primary
@@ -61,8 +62,7 @@
             data-mdc-auto-init="MDCRipple">
           Generate
           </button>
-        </form>
-        
+
         <div id="mdc-js-snackbar"
           class="mdc-snackbar"
           aria-live="assertive"
@@ -78,6 +78,9 @@
   </main>
   <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
   <script src="https://wzrd.in/standalone/copy-to-clipboard@latest" async></script>
+  <script src="https://code.jquery.com/jquery-2.2.1.min.js"
+          integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="
+          crossorigin="anonymous"></script>
   <script src="./client.js"></script>
 
 </html>
