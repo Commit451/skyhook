@@ -1,0 +1,31 @@
+{
+	"//1": "describes your app and its dependencies",
+	"//2": "https://docs.npmjs.com/files/package.json",
+	"//3": "updating this file will download and update your packages",
+	"name": "gitlab-to-discord",
+	"version": "0.0.1",
+	"description": "Parses webhooks and forwards it in the proper format to Discord",
+	"main": "server.js",
+	"scripts": {
+		"start": "node server.js"
+	},
+	"dependencies": {
+		"express": "^4.15.2",
+		"body-parser": "^1.17.1",
+		"request": "^2.81.0",
+		"material-components-web": "^0.7.0",
+		"copy-to-clipboard": "^3.0.5"
+	},
+	"engines": {
+		"node": "6.9.x"
+	},
+	"repository": {
+		"url": "https://github.com/Jawnnypoo/gitlab-to-discord"
+	},
+	"license": "MIT",
+	"keywords": [
+		"node",
+		"glitch",
+		"express"
+	]
+}
