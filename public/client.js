@@ -23,7 +23,7 @@ window.mdc.autoInit();
     $("#button-generate").click(function(){
       var discordHookUrl = $('#url').val();
       var error = false
-      if (discordHookUrl) {
+      if (discordHookUrl && discordHookUrl.includes("discordapp.com")) {
         discordHookUrl = discordHookUrl.replace("discordapp.com", "skyhook.glitch.me")
         //add the provider
         var index = 0
@@ -59,7 +59,7 @@ window.mdc.autoInit();
         window.copyToClipboard(discordHookUrl);
         show(snackbar, "URL Generated. Copied to Clipboard");
       } else {
-        show(snackbar, "Unable to create URL. Please fill in all fields");
+        show(snackbar, "Unable to create URL. Make sure your Discord URL is valid");
       }
     });
 

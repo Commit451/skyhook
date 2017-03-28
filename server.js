@@ -25,9 +25,7 @@ app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
   var hookPart2 = req.params.hookPart2
   var from = req.params.from
   var discordHookUrl = "https://discordapp.com/api/webhooks/" + hookPart1 + "/" + hookPart2
-  
-  console.log("Posting to hook: " + discordHookUrl)
-  console.log("Hook from: " + from)
+
   // https://discordapp.com/developers/docs/resources/webhook#execute-webhook
   var discordPayload = new Object()
   switch(from) {
@@ -47,22 +45,20 @@ app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
       console.log("Unknown from: " + from)
       //todo return some error
   }
-  
+
    var jsonString= JSON.stringify(discordPayload)
   request.post({
     headers: {'content-type' : 'application/json'},
     url:     discordHookUrl,
     body:    jsonString
   }, function(error, response, body){
-    console.log(body)
     if (error) {
-      console.log(error)
       res.sendStatus(400)
     } else {
       res.sendStatus(200)
     }
   });
-  
+
 });
 
 // listen for requests :)
