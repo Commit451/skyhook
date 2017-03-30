@@ -90,7 +90,7 @@ class Gitlab extends BaseProvider {
 
     console.log(this.hook.build_duration)
     if(this.hook.build_duration !== null) {
-      fields.push({ name: "Build Duration", value: `${Math.round(this.hook.build_duration)} seconds` })
+      fields.push({ name: "Build Duration", value: `${Math.round(this.hook.build_duration)} seconds`, inline: true })
     }
 
     this.pushEmbed({
