@@ -43,7 +43,6 @@ class Gitlab extends BaseProvider {
       title: `${commits} ${commitString} ${verb} pushed to ${this.hook.project.namespace}/${this.hook.project.name}`,
       url: this.hook.project.web_url,
       color: this.colors['push'],
-      description: commitStr,
       author: {
         name: this.hook.user_name,
         icon_url: this.hook.user_avatar
