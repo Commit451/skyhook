@@ -4,11 +4,13 @@ class BaseProvider {
   constructor (req) {
     this.req = req
     this.hook = {}
+
     // Instead of typing this.body.whatever.something.
     // make it easier to find exactly what you're looking for from the webhook data.
-    for (let prop in req.body) {
-      this.hook[prop] = req.body[prop]
-    }
+    // looking back, probably not such a great idea.
+    // for (let prop in req.body) {
+    //   this.hook[prop] = req.body[prop]
+    // }
 
     this.payload = {
       content: null,
