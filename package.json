@@ -7,14 +7,16 @@
 	"description": "Parses webhooks and forwards it in the proper format to Discord",
 	"main": "server.js",
 	"scripts": {
-		"start": "node server.js"
+		"start": "node server.js",
+		"dev": "node_modules/nodemon/bin/nodemon.js server.js"
 	},
 	"dependencies": {
-		"express": "^4.15.2",
 		"body-parser": "^1.17.1",
-		"request": "^2.81.0",
+		"camelcase": "^4.1.0",
+		"copy-to-clipboard": "^3.0.5",
+		"express": "^4.15.2",
 		"material-components-web": "^0.7.0",
-		"copy-to-clipboard": "^3.0.5"
+		"request": "^2.81.0"
 	},
 	"engines": {
 		"node": "6.9.x"
@@ -27,5 +29,8 @@
 		"node",
 		"glitch",
 		"express"
-	]
+	],
+	"devDependencies": {
+		"nodemon": "^1.11.0"
+	}
 }
