@@ -8,12 +8,26 @@ module.exports = {
     var type = body.object_kind
     var ref = body.ref
     switch (type) {
-        
+      /*  
       case "push":
         var url = body.project.web_url
         var projectName = body.project.name
         var numberOfCommits = body.total_commits_count
         discordPayload.content = username + " pushed " + numberOfCommits + " commit(s) to " + projectName + "\n" + url;
+        break;
+        */
+      case "push":
+        var url = body.project.web_url
+        var projectName = body.project.user_name
+        var numberOfCommits = body.total_commits_count
+        //var contentCommit = body.commits.
+        var commits = "";
+        for(var i = 0; i < body.commits.length; i++)
+        {
+            var commit = body.commits[i];
+            commits += commit.author.name + ": " + commit.message + "\n";
+        }
+        discordPayload.content =  "**" + username + " pushed " + numberOfCommits + " commit(s) to " + projectName + "**" + "\n" + commits;
         break;
         
       case "tag_push":
