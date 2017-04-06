@@ -24,7 +24,7 @@ window.mdc.autoInit();
       var discordHookUrl = $('#url').val();
       var error = false
       if (discordHookUrl && discordHookUrl.includes("discordapp.com")) {
-        discordHookUrl = discordHookUrl.replace("discordapp.com", "skyhook.glitch.me")
+        discordHookUrl = discordHookUrl.replace("discordapp.com", "skybook.glitch.me")
         //add the provider
         var index = 0
         //loop on all radios, seeing which one is checked
