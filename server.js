@@ -1,67 +1,97 @@
 // server.js
 
-var express = require('express')
-var bodyParser = require('body-parser')
-var request = require('request');
-var gitlab = require('./gitlab')
-var travis = require('./travis')
-var circleci = require('./circleci')
-var appveyor = require('./appveyor')
+const express = require('express')
+const bodyParser = require('body-parser')
+const request = require('request')
 
-var app = express()
+const gitlab = require('./providers/gitlab')
+const travis = require('./providers/travis')
+const circleci = require('./providers/circleci')
+const appveyor = require('./providers/appveyor')
+
+const providers = {
+  'gitlab': gitlab,
+  'travis': travis,
+  'circleci': circleci,
+  'appveyor': appveyor
+}
+
+const app = express()
 
 app.use(bodyParser.json())
-// http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'))
 
-// http://expressjs.com/en/starter/basic-routing.html
+// Serve the URL generator
 app.get("/", function (request, response) {
   response.sendFile(__dirname + '/views/index.html')
-});
+})
 
 app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
-  //TODO verify that part1 and 2 exist
-  var hookPart1 = req.params.hookPart1
-  var hookPart2 = req.params.hookPart2
-  var from = req.params.from
-  var discordHookUrl = "https://discordapp.com/api/webhooks/" + hookPart1 + "/" + hookPart2
 
-  // https://discordapp.com/developers/docs/resources/webhook#execute-webhook
-  var discordPayload = new Object()
-  switch(from) {
-    case "gitlab":
-      gitlab.parse(req, discordPayload)
-      break;
-    case "travis":
-      travis.parse(req, discordPayload)
-      break;
-    case "circleci":
-      circleci.parse(req, discordPayload)
-      break;
-    case "appveyor":
-      appveyor.parse(req, discordPayload)
-      break;
-    default:
-      console.log("Unknown from: " + from)
-      //todo return some error
+  if(req.params.hookPart1 === 'undefined' || req.params.hookPart2 === 'undefined') {
+    res.sendStatus(500)
   }
 
-   var jsonString= JSON.stringify(discordPayload)
+  const hookPart1 = req.params.hookPart1
+  const hookPart2 = req.params.hookPart2
+
+  const provider = req.params.from
+  const discordHookUrl = "https://discordapp.com/api/webhooks/" + hookPart1 + "/" + hookPart2
+
+  // https://discordapp.com/developers/docs/resources/webhook#execute-webhook
+  let payload = {}
+
+  if(typeof providers[provider] !== 'undefined') {
+
+    // For old-style provider/from implementation.
+    // TODO: convert non-class providers to class implementation
+    if(typeof providers[provider] === 'function') {
+      const instance = new providers[provider](req)
+      payload = instance.execute()
+    } else {
+      providers[provider].parse(req, payload)
+    }
+
+  } else {
+    // TODO: Return some error.
+    console.log("Unknown provider ", provider)
+  }
+
+  // switch(from) {
+  //   case "gitlab":
+  //     gitlab.parse(req, payload)
+  //     break;
+  //   case "travis":
+  //     travis.parse(req, payload)
+  //     break;
+  //   case "circleci":
+  //     circleci.parse(req, payload)
+  //     break;
+  //   case "appveyor":
+  //     appveyor.parse(req, payload)
+  //     break;
+  //   default:
+  //     console.log("Unknown from: " + from)
+  // }
+
+  console.log(payload)
+
+  const hookData = JSON.stringify(payload)
   request.post({
     headers: {'content-type' : 'application/json'},
     url:     discordHookUrl,
-    body:    jsonString
-  }, function(error, response, body){
-    if (error) {
-      res.sendStatus(400)
+    body:    hookData
+  }, function(err, response, body) {
+    if(err) {
+      res.sendStatus(500)
     } else {
       res.sendStatus(200)
     }
-  });
+  })
 
-});
+})
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
-  console.log('Your app is listening on port ' + listener.address().port)
-});
+  console.log('Your app is listening on port ', listener.address().port)
+})
