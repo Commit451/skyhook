@@ -46,7 +46,6 @@ app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
       unity.parse(req, discordPayload)
       break;
     default:
-      var body = req.body
       console.log("Unknown from: " + from)
       //todo return some error
   }
