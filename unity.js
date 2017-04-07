@@ -21,7 +21,7 @@ module.exports = {
         case "success":
         if(share != null)
           {
-            var shareUrl = body.links.api_self.share_url.href
+            var shareUrl = share.href
             download = "Download it here: " + shareUrl
           }
          discordPayload.content =  "\n**" + projectTarget + " got a new build**\n" + projectName + " latest version is now  #" + projectVersion + "\n" + download;
