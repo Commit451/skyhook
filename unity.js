@@ -11,7 +11,6 @@ module.exports = {
       var projectName = body.projectName
       var projectTarget = body.buildTargetName
       var projectVersion = body.buildNumber
-      var share1 = body.links.api_self.share_url
       var share = body.links.share_url
       var type = body.buildStatus
       var ref = body.ref
@@ -20,10 +19,6 @@ module.exports = {
       discordPayload.avatar_url = "https://developer.cloud.unity3d.com/images/icon-default.png";
       switch (type) {
         case "success":
-        console.log(body)
-        console.log(body.links.api_self.share_url)
-        console.log(share)
-        console.log(share1)
         if(share != null)
           {
             var shareUrl = body.links.api_self.share_url.href
