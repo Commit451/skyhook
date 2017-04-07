@@ -12,6 +12,7 @@ module.exports = {
     discordPayload.username = projectName +" Commit"//Should be replaced by GitLab Hook or so.
     discordPayload.avatar_url = usericon;
     switch (type) {
+
        case "push":
          var url = body.project.web_url
          var numberOfCommits = body.total_commits_count
