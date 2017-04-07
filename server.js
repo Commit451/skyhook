@@ -4,6 +4,7 @@ var express = require('express')
 var bodyParser = require('body-parser')
 var request = require('request');
 var gitlab = require('./gitlab')
+var unity = require('./unity')
 var travis = require('./travis')
 var circleci = require('./circleci')
 var appveyor = require('./appveyor')
@@ -41,7 +42,11 @@ app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
     case "appveyor":
       appveyor.parse(req, discordPayload)
       break;
+    case "unity":
+      unity.parse(req, discordPayload)
+      break;
     default:
+      var body = req.body
       console.log("Unknown from: " + from)
       //todo return some error
   }
