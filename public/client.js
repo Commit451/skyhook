@@ -47,6 +47,9 @@ window.mdc.autoInit();
           case 3:
             discordHookUrl = discordHookUrl + "/travis"
             break;
+          case 4:
+            discordHookUrl = discordHookUrl + "/unity"
+            break;
           default:
             error = true
             break;
