@@ -9,8 +9,8 @@ module.exports = {
     var projectName = body.project.name
     var type = body.object_kind
     var ref = body.ref
-    discordPayload.username = projectName +" Commit"//Should be replaced by GitLab Hook or so.
-    discordPayload.avatar_url = usericon;
+    discordPayload.username = projectName +" Commit"
+    discordPayload.avatar_url = usericon
     switch (type) {
 
        case "push":
@@ -19,10 +19,10 @@ module.exports = {
          var commits = "";
          for(var i = 0; i < body.commits.length; i++)
          {
-             var commit = body.commits[i];
-             commits += commit.author.name + " changed: " + commit.message + "\n";
+             var commit = body.commits[i]
+             commits += commit.author.name + " changed: " + commit.message + "\n"
          }
-         discordPayload.content =  "detect " +numberOfCommits + " Changes\n**" + username + " pushed " + numberOfCommits + " commit(s) to " + projectName + "**" + "\nChanges:\n" + commits;
+         discordPayload.content =  "detect " +numberOfCommits + " Changes\n**" + username + " pushed " + numberOfCommits + " commit(s) to " + projectName + "**" + "\nChanges:\n" + commits
          break;
         
       case "tag_push":
