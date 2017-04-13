@@ -8,8 +8,6 @@ module.exports = {
         var type = body.object_kind;
         var ref = body.ref;
 
-        // feel free to remove this line. It overwrites the set username of the webhook in discord. So the username that posts will be skyhook regardless what is set in discord.
-        discordPayload.username = "skyhook";
         // maybe change that to a local file on your webspace (overwrites the logo of the user that posts in the discord server)
         discordPayload.avatar_url = "https://about.gitlab.com/images/press/logo/logo.png";
 

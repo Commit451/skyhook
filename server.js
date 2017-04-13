@@ -70,7 +70,9 @@ app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
       res.sendStatus(200)
 =======
     // https://discordapp.com/developers/docs/resources/webhook#execute-webhook
-    var discordPayload = {};
+    var discordPayload = {
+        username: "skyhook" // feel free to remove this line. It overwrites the set username of the webhook in discord. So the username that posts will be skyhook regardless what is set in discord.
+    };
     switch (from) {
         case "gitlab":
             gitlab.parse(req, discordPayload);
@@ -106,6 +108,6 @@ app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
 });
 
 // listen for requests :)
-var listener = app.listen(process.env.PORT, function () {
+var listener = app.listen(process.env.PORT || 8080, function () {
     console.log('Your app is listening on port ' + listener.address().port);
 });
