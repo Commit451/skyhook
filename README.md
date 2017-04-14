@@ -2,7 +2,7 @@
 Parses webhooks and forwards them in the proper format to Discord.
 
 ## Setup
-You can use the [site](https://skyhook.glitch.me/) to create the right webhook link. 
+You can use the [site](https://skyhook.glitch.me/) to create the right webhook link.
 1. Create a webhook in Discord (Server Settings -> Webhooks -> Create Webhook)
 2. Copy the webhook url
 3. Turn the Discord webhook url into a skyhook webhook url like so:
@@ -21,6 +21,7 @@ https://skyhook.glitch.me/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/pr
 - [Travis](https://docs.travis-ci.com/user/notifications/#Webhooks-Delivery-Format) - `/travis`
 - [circleci](https://circleci.com/docs/1.0/configuration/#notify) - `/circleci`
 - [AppVeyor](https://www.appveyor.com/docs/notifications/#webhook-payload-default) - `/appveyor`
+- [Unity Cloud](https://build-api.cloud.unity3d.com/docs/1.0.0/index.html#operation-webhooks-intro) - `/unity`
 
 If you want support for a new provider, just create a pull request and add it!
 
