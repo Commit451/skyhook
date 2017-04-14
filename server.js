@@ -20,10 +20,14 @@ app.get("/", function (request, response) {
 });
 
 app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
-    //TODO verify that part1 and 2 exist
+
     var hookPart1 = req.params.hookPart1;
     var hookPart2 = req.params.hookPart2;
     var from = req.params.from;
+    if (!hookPart1 || !hookPart2 || !from) {
+      res.sendStatus(400);
+      return;
+    }
     var discordHookUrl = "https://discordapp.com/api/webhooks/" + hookPart1 + "/" + hookPart2;
 
     // https://discordapp.com/developers/docs/resources/webhook#execute-webhook
@@ -52,20 +56,29 @@ app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
     }
 
     var jsonString = JSON.stringify(discordPayload);
+    //special case for testing. Kinda lame to do that, but meh
+    if (hookPart1 == "test") {
+      res.setHeader('Content-Type', 'application/json');
+      res.send(jsonString);
+      return;
+    }
     request.post({
         headers: {'content-type': 'application/json'},
         url: discordHookUrl,
         body: jsonString
     }, function (error, response, body) {
         if (error) {
-            res.sendStatus(400)
+            res.sendStatus(400);
         } else {
-            res.sendStatus(200)
+            res.sendStatus(200);
         }
     });
 });
 
 // listen for requests :)
-var listener = app.listen(process.env.PORT || 8080, function () {
-    console.log('Your app is listening on port ' + listener.address().port);
+var server = app.listen(process.env.PORT || 8080, function () {
+    console.log('Your app is listening on port ' + server.address().port);
 });
+
+//for the tests!
+module.exports = server

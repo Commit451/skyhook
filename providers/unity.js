@@ -14,8 +14,7 @@ module.exports = {
             var type = body.buildStatus;
             var ref = body.ref;
             var download = "No download available.";
-            discordPayload.username = projectName + " Buildserver";
-            discordPayload.avatar_url = "https://developer.cloud.unity3d.com/images/icon-default.png";
+
             switch (type) {
                 case "success":
                     if (share != null) {
@@ -35,12 +34,9 @@ module.exports = {
                     break;
 
             }
-        }
-        else {
+        } else {
             console.log(req.body.hookId);
             discordPayload.content = "**Ping from host!**";
-            discordPayload.name = " Unity Hook Ping";
-            discordPayload.avatar_url = "https://developer.cloud.unity3d.com/images/icon-default.png";
         }
     }
 };
