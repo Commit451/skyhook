@@ -28,7 +28,6 @@ app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
 
     // https://discordapp.com/developers/docs/resources/webhook#execute-webhook
     var discordPayload = {
-        username: "skyhook" // feel free to remove this line. It overwrites the set username of the webhook in discord. So the username that posts will be skyhook regardless what is set in discord.
     };
     switch (from) {
         case "gitlab":
@@ -47,7 +46,8 @@ app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
             unity.parse(req, discordPayload);
             break;
         default:
-            console.log("Unknown from: " + from)
+            console.log("Unknown from: " + from);
+            break;
         //todo return some error
     }
 
