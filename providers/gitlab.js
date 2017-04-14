@@ -8,9 +8,6 @@ module.exports = {
         var type = body.object_kind;
         var ref = body.ref;
 
-        // maybe change that to a local file on your webspace (overwrites the logo of the user that posts in the discord server)
-        discordPayload.avatar_url = "https://about.gitlab.com/images/press/logo/logo.png";
-
         switch (type) {
             case "push":
                 var project = {
