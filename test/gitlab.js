@@ -84,8 +84,7 @@ var pushJson = {
               .send(pushJson)
               .end((err, res) => {
                   res.should.have.status(200);
-                  var json = JSON.stringify(res.body)
-                  console.log(json);
+                  console.log(res.body);
                   res.body.should.be.a('object');
                   res.body.should.have.property('embeds')
                   done();
