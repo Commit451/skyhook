@@ -33,7 +33,7 @@ module.exports = {
                     author: user,
                     description: commits,
                     footer: {
-                        text: "",
+                        text: "Powered by Skyhook",
                         icon_url: ""
                     }
                 }];
