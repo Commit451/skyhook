@@ -7,8 +7,6 @@ module.exports = {
         var username = body.user_name;
         var type = body.object_kind;
         var ref = body.ref;
-        discordPayload.username = username + " Commit";
-        discordPayload.avatar_url = body.user_avatar;
         switch (type) {
             case "push":
                 var project = {
