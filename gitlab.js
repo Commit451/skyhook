@@ -5,16 +5,25 @@ module.exports = {
   parse: function (req, discordPayload) {
     var body = req.body
     var username = body.user_name
+    var usericon = body.user_avatar
+    var projectName = body.project.name
     var type = body.object_kind
     var ref = body.ref
+    discordPayload.username = projectName +" Commit"
+    discordPayload.avatar_url = usericon
     switch (type) {
-        
-      case "push":
-        var url = body.project.web_url
-        var projectName = body.project.name
-        var numberOfCommits = body.total_commits_count
-        discordPayload.content = username + " pushed " + numberOfCommits + " commit(s) to " + projectName + "\n" + url;
-        break;
+
+       case "push":
+         var url = body.project.web_url
+         var numberOfCommits = body.total_commits_count
+         var commits = "";
+         for(var i = 0; i < body.commits.length; i++)
+         {
+             var commit = body.commits[i]
+             commits += commit.author.name + " changed: " + commit.message + "\n"
+         }
+         discordPayload.content =  "detect " +numberOfCommits + " Changes\n**" + username + " pushed " + numberOfCommits + " commit(s) to " + projectName + "**" + "\nChanges:\n" + commits
+         break;
         
       case "tag_push":
         var url = body.project.web_url
