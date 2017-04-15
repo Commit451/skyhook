@@ -1,19 +1,14 @@
 :root {
-  --mdc-theme-primary: #03A9F4;
-}
-
-body {
-  background-color: #E0E0E0;
+  --mdc-theme-primary: #009688;
 }
 
 .demo-card {
-  background-color: white;
-  margin-top: 100px;
-  margin-bottom: 48px;
-  margin-left: 48px;
-  margin-right: 48px;
-  padding-right: 48px;
-  padding-left: 48px;
-  padding-top: 48px;
-  padding-bottom: 48px;
+   margin-top: 100px;
+   margin-bottom: 48px;
+   margin-left: 48px;
+   margin-right: 48px;
+   padding-right: 48px;
+   padding-left: 48px;
+   padding-top: 48px;
+   padding-bottom: 48px;
 }
