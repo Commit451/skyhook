@@ -6,8 +6,10 @@ module.exports = {
         var body = req.body;
         var baseLink = 'https://bitbucket.org/';
 
-        if (typeof body.push !== undefined) { // push event
-            for(var i = 0; i < body.push.changes.length; i++){
+        discordPayload.embeds = [];
+
+        if (typeof body.push !== "undefined") { // push event
+            for (var i = 0; i < body.push.changes.length; i++) {
                 var change = body.push.changes[i];
                 var project = {
                     name: body.repository.name,
@@ -39,6 +41,20 @@ module.exports = {
                     }
                 });
             }
+        } else if (typeof body.fork !== "undefined") { // fork event
+            var user = {
+                name: body.actor.display_name,
+                icon_url: body.actor.links.avatar.href,
+                url: baseLink + body.actor.username
+            }
+            discordPayload.embeds.push({
+                author: user,
+                description: "Created a [`fork`](" + baseLink + body.fork.full_name + ") of [`" + body.repository.name + "`](" + baseLink + body.repository.full_name + ")",
+                footer: {
+                    text: "Powered by skyhook",
+                    icon_url: ""
+                }
+            });
         }
         //TODO: support of the other webhook methods of BitBucket
     }
