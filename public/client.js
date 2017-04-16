@@ -22,16 +22,16 @@ window.mdc.autoInit();
 
     $("#button-generate").click(function () {
         var discordHookUrl = $('#url').val();
-        var error = false
+        var error = false;
         if (discordHookUrl && discordHookUrl.includes("discordapp.com")) {
             discordHookUrl = discordHookUrl.replace("discordapp.com", "skyhook.glitch.me");
             //add the provider
-            var index = 0
+            var index = 0;
             //loop on all radios, seeing which one is checked
             var radios = document.querySelectorAll('.mdc-radio__native-control');
             for (var i = 0, radio; radio = radios[i]; i++) {
                 if (radio.checked === true) {
-                    index = i
+                    index = i;
                 }
             }
             switch (index) {
@@ -52,12 +52,13 @@ window.mdc.autoInit();
                     break;
                 case 5:
                     discordHookUrl = discordHookUrl + "/bitbucket";
+                    break;
                 default:
                     error = true;
                     break;
             }
         } else {
-            error = true
+            error = true;
         }
 
         if (!error) {
