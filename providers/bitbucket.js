@@ -254,6 +254,62 @@ module.exports = {
                     }
                 });
                 break;
+            case "pullrequest:approved":
+                var user = {
+                    name: body.actor.display_name,
+                    icon_url: body.actor.links.avatar.href,
+                    url: baseLink + body.actor.username
+                };
+
+                discordPayload.embeds.push({
+                    author: user,
+                    title: "Approved pull request #" + body.pullrequest.id + " on " + body.repository.name,
+                    url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
+                    description: ""
+                });
+                break;
+            case "pullrequest:unapproved":
+                var user = {
+                    name: body.actor.display_name,
+                    icon_url: body.actor.links.avatar.href,
+                    url: baseLink + body.actor.username
+                };
+
+                discordPayload.embeds.push({
+                    author: user,
+                    title: "Removed his approval for pull request #" + body.pullrequest.id + " on " + body.repository.name,
+                    url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
+                    description: ""
+                });
+                break;
+            case "pullrequest:fulfilled":
+                var user = {
+                    name: body.actor.display_name,
+                    icon_url: body.actor.links.avatar.href,
+                    url: baseLink + body.actor.username
+                };
+
+                discordPayload.embeds.push({
+                    author: user,
+                    title: "Merged pull request #" + body.pullrequest.id + " into " + body.repository.name,
+                    url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
+                    description: ""
+                });
+                break;
+            case "pullrequest:rejected":
+                var user = {
+                    name: body.actor.display_name,
+                    icon_url: body.actor.links.avatar.href,
+                    url: baseLink + body.actor.username
+                };
+
+                discordPayload.embeds.push({
+                    author: user,
+                    title: "Declined pull request #" + body.pullrequest.id + " on " + body.repository.name,
+                    url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
+                    description: (typeof body.pullrequest.reason !== "undefined") ? body.pullrequest.reason : ""
+                });
+                break;
         }
         //TODO: support of the other webhook methods of BitBucket
     }
