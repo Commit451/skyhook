@@ -8,6 +8,7 @@ var travis = require('./providers/travis');
 var circleci = require('./providers/circleci');
 var appveyor = require('./providers/appveyor');
 var unity = require('./providers/unity');
+var bitbucket = require('./providers/bitbucket');
 var app = express();
 
 app.use(bodyParser.json());
@@ -48,6 +49,9 @@ app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
             break;
         case "unity":
             unity.parse(req, discordPayload);
+            break;
+        case "bitbucket":
+            bitbucket.parse(req, discordPayload);
             break;
         default:
             console.log("Unknown from: " + from);
