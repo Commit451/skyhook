@@ -265,7 +265,7 @@ module.exports = {
                     author: user,
                     title: "Approved pull request #" + body.pullrequest.id + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
-                    description: ""
+                    description: "",
                     footer: {
                         text: "Powered by skyhook",
                         icon_url: ""
@@ -283,7 +283,7 @@ module.exports = {
                     author: user,
                     title: "Removed his approval for pull request #" + body.pullrequest.id + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
-                    description: ""
+                    description: "",
                     footer: {
                         text: "Powered by skyhook",
                         icon_url: ""
@@ -301,7 +301,7 @@ module.exports = {
                     author: user,
                     title: "Merged pull request #" + body.pullrequest.id + " into " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
-                    description: ""
+                    description: "",
                     footer: {
                         text: "Powered by skyhook",
                         icon_url: ""
@@ -319,7 +319,7 @@ module.exports = {
                     author: user,
                     title: "Declined pull request #" + body.pullrequest.id + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
-                    description: (typeof body.pullrequest.reason !== "undefined") ? body.pullrequest.reason : ""
+                    description: (typeof body.pullrequest.reason !== "undefined") ? body.pullrequest.reason : "",
                     footer: {
                         text: "Powered by skyhook",
                         icon_url: ""
@@ -381,6 +381,5 @@ module.exports = {
                 });
                 break;
         }
-        //TODO: support of the other webhook methods of BitBucket
     }
 };
