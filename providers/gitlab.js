@@ -34,6 +34,7 @@ module.exports = {
                     description: commits,
                     footer: {
                         text: "Powered by Skyhook",
+
                         icon_url: ""
                     }
                 }];
@@ -96,6 +97,5 @@ module.exports = {
                 discordPayload.content = "Build status: " + status + "\n" + url;
                 break;
         }
-      console.log(discordPayload);
     }
 };

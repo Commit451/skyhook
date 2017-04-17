@@ -53,9 +53,7 @@ module.exports = {
                     }
                 }];
         } else {
-            console.log(req.body.hookId);
             discordPayload.content = "**Ping from host!**";
         }
-      console.log(discordPayload);
     }
 };
