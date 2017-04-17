@@ -213,8 +213,33 @@ module.exports = {
 
                 discordPayload.embeds.push({
                     author: user,
-                    title: "Created a new Pull request on " + body.repository.name,
-                    url: baseLink + body.repository.full_name + "/pullrequests/" + body.pullrequest.id,
+                    title: "Created a new pull request on " + body.repository.name,
+                    url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
+                    description: body.pullrequest.description,
+                    fields: [
+                        {
+                            name: body.pullrequest.title,
+                            value: "**Destination branch:** " + body.pullrequest.destination.branch.name + "\n" +
+                            "**State:** " + body.pullrequest.state + "\n"
+                        }
+                    ],
+                    footer: {
+                        text: "Powered by skyhook",
+                        icon_url: ""
+                    }
+                });
+                break;
+            case "pullrequest:updated":
+                var user = {
+                    name: body.actor.display_name,
+                    icon_url: body.actor.links.avatar.href,
+                    url: baseLink + body.actor.username
+                };
+
+                discordPayload.embeds.push({
+                    author: user,
+                    title: "Updated pull request #" + body.pullrequest.id + " on " + body.repository.name,
+                    url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
                     description: body.pullrequest.description,
                     fields: [
                         {
