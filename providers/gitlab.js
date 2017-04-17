@@ -7,7 +7,6 @@ module.exports = {
         var username = body.user_name;
         var type = body.object_kind;
         var ref = body.ref;
-
         switch (type) {
             case "push":
                 var project = {
@@ -25,7 +24,7 @@ module.exports = {
                 for (var i = 0; i < project.commits.length; i++) {
                     var commit = project.commits[i];
                     var message = (commit.message.length > 50) ? commit.message.substring(0, 47) + "..." : commit.message;
-                    commits = commits + "[`" + commit.id.substring(0, 7) + "`](" + commit.url + ") " + message + " - " + commit.author.name + "\n";
+                    commits = commits + commit.author.name + " - ("+ "[`" + commit.id.substring(0, 7) + "`](" + commit.url + ") "+ ") [" + message.replace(/\n/g, ' ') + "](" + project.url + ") " + "\n";
                 }
 
                 discordPayload.embeds = [{
@@ -34,7 +33,8 @@ module.exports = {
                     author: user,
                     description: commits,
                     footer: {
-                        text: "Powered by skyhook",
+                        text: "Powered by Skyhook",
+
                         icon_url: ""
                     }
                 }];
