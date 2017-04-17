@@ -11,23 +11,25 @@ module.exports = {
 
         switch (type) {
             case "repo:push":
+                var project = {
+                    name: body.repository.name,
+                    url: baseLink + body.repository.full_name,
+                    branch: null,
+                    commits: null
+                };
+                var user = {
+                    name: body.actor.display_name,
+                    icon_url: body.actor.links.avatar.href,
+                    url: baseLink + body.actor.username
+                };
                 for (var i = 0; i < body.push.changes.length; i++) {
                     var change = body.push.changes[i];
-                    var project = {
-                        name: body.repository.name,
-                        url: baseLink + body.repository.full_name,
-                        branch: (change.old != null) ? change.old.name : change.new.name,
-                        commits: change.commits
-                    };
-                    var user = {
-                        name: body.actor.display_name,
-                        icon_url: body.actor.links.avatar.href,
-                        url: baseLink + body.actor.username
-                    }
+                    project.branch = (change.old != null) ? change.old.name : change.new.name;
+                    project.commits = change.commits;
 
                     var commits = "";
-                    for (var i = 0; i < project.commits.length; i++) {
-                        var commit = project.commits[i];
+                    for (var j = 0; j < project.commits.length; j++) {
+                        var commit = project.commits[j];
                         var message = (commit.message.length > 50) ? commit.message.substring(0, 47) + "..." : commit.message;
                         commits = commits + "[`" + commit.hash.substring(0, 7) + "`](" + commit.links.html.href + ") " + message + " - " + commit.author.user.display_name + "\n";
                     }
@@ -49,7 +51,7 @@ module.exports = {
                     name: body.actor.display_name,
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
-                }
+                };
                 discordPayload.embeds.push({
                     author: user,
                     description: "Created a [`fork`](" + baseLink + body.fork.full_name + ") of [`" + body.repository.name + "`](" + baseLink + body.repository.full_name + ")",
@@ -64,19 +66,19 @@ module.exports = {
                     name: body.actor.display_name,
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
-                }
+                };
 
                 var changes = [];
-                if(typeof body.changes.name !== "undefined"){
+                if (typeof body.changes.name !== "undefined") {
                     changes.push("**Name:** \"" + body.changes.name.old + "\" -> \"" + body.changes.name.new + "\"");
                 }
-                if(typeof body.changes.website !== "undefined"){
+                if (typeof body.changes.website !== "undefined") {
                     changes.push("**Website:** \"" + body.changes.website.old + "\" -> \"" + body.changes.website.new + "\"");
                 }
-                if(typeof body.changes.language !== "undefined"){
+                if (typeof body.changes.language !== "undefined") {
                     changes.push("**Language:** \"" + body.changes.language.old + "\" -> \"" + body.changes.language.new + "\"");
                 }
-                if(typeof body.changes.description !== "undefined"){
+                if (typeof body.changes.description !== "undefined") {
                     changes.push("**Description:** \"" + body.changes.description.old + "\" -> \"" + body.changes.description.new + "\"");
                 }
 
@@ -85,6 +87,24 @@ module.exports = {
                     title: "Changed general information of " + body.repository.name,
                     url: baseLink + body.repository.full_name,
                     description: changes.join("\n"),
+                    footer: {
+                        text: "Powered by skyhook",
+                        icon_url: ""
+                    }
+                });
+                break;
+            case "repo:commit_comment_created":
+                var user = {
+                    name: body.actor.display_name,
+                    icon_url: body.actor.links.avatar.href,
+                    url: baseLink + body.actor.username
+                };
+
+                discordPayload.embeds.push({
+                    author: user,
+                    title: "Wrote a comment to commit  " + body.commit.hash.substring(0, 7),
+                    url: baseLink + body.repository.full_name + "/commits/" + body.commit.hash,
+                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, ''),
                     footer: {
                         text: "Powered by skyhook",
                         icon_url: ""
