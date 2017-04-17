@@ -266,6 +266,10 @@ module.exports = {
                     title: "Approved pull request #" + body.pullrequest.id + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
                     description: ""
+                    footer: {
+                        text: "Powered by skyhook",
+                        icon_url: ""
+                    }
                 });
                 break;
             case "pullrequest:unapproved":
@@ -280,6 +284,10 @@ module.exports = {
                     title: "Removed his approval for pull request #" + body.pullrequest.id + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
                     description: ""
+                    footer: {
+                        text: "Powered by skyhook",
+                        icon_url: ""
+                    }
                 });
                 break;
             case "pullrequest:fulfilled":
@@ -294,6 +302,10 @@ module.exports = {
                     title: "Merged pull request #" + body.pullrequest.id + " into " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
                     description: ""
+                    footer: {
+                        text: "Powered by skyhook",
+                        icon_url: ""
+                    }
                 });
                 break;
             case "pullrequest:rejected":
@@ -308,6 +320,64 @@ module.exports = {
                     title: "Declined pull request #" + body.pullrequest.id + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
                     description: (typeof body.pullrequest.reason !== "undefined") ? body.pullrequest.reason : ""
+                    footer: {
+                        text: "Powered by skyhook",
+                        icon_url: ""
+                    }
+                });
+                break;
+            case "pullrequest:comment_created":
+                var user = {
+                    name: body.actor.display_name,
+                    icon_url: body.actor.links.avatar.href,
+                    url: baseLink + body.actor.username
+                };
+
+                discordPayload.embeds.push({
+                    author: user,
+                    title: "Wrote a comment to pull request #" + body.pullrequest.id + " on " + body.repository.name,
+                    url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
+                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, ''),
+                    footer: {
+                        text: "Powered by skyhook",
+                        icon_url: ""
+                    }
+                });
+                break;
+            case "pullrequest:comment_updated":
+                var user = {
+                    name: body.actor.display_name,
+                    icon_url: body.actor.links.avatar.href,
+                    url: baseLink + body.actor.username
+                };
+
+                discordPayload.embeds.push({
+                    author: user,
+                    title: "Updated a comment at pull request #" + body.pullrequest.id + " on " + body.repository.name,
+                    url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
+                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, ''),
+                    footer: {
+                        text: "Powered by skyhook",
+                        icon_url: ""
+                    }
+                });
+                break;
+            case "pullrequest:comment_deleted":
+                var user = {
+                    name: body.actor.display_name,
+                    icon_url: body.actor.links.avatar.href,
+                    url: baseLink + body.actor.username
+                };
+
+                discordPayload.embeds.push({
+                    author: user,
+                    title: "Deleted a comment at pull request #" + body.pullrequest.id + " on " + body.repository.name,
+                    url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
+                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, ''),
+                    footer: {
+                        text: "Powered by skyhook",
+                        icon_url: ""
+                    }
                 });
                 break;
         }
