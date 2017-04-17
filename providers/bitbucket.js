@@ -102,7 +102,7 @@ module.exports = {
 
                 discordPayload.embeds.push({
                     author: user,
-                    title: "Wrote a comment to commit  " + body.commit.hash.substring(0, 7),
+                    title: "Wrote a comment to commit " + body.commit.hash.substring(0, 7) + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/commits/" + body.commit.hash,
                     description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, ''),
                     footer: {
@@ -137,6 +137,67 @@ module.exports = {
                     title: body.commit_status.name,
                     url: body.commit_status.url,
                     description: "**State:** " + body.commit_status.state + "\n" + body.commit_status.description,
+                    footer: {
+                        text: "Powered by skyhook",
+                        icon_url: ""
+                    }
+                });
+                break;
+            case "issue:created":
+                var user = {
+                    name: body.actor.display_name,
+                    icon_url: body.actor.links.avatar.href,
+                    url: baseLink + body.actor.username
+                };
+
+                discordPayload.embeds.push({
+                    author: user,
+                    title: "Created a new Issue on " + body.repository.name,
+                    url: baseLink + body.repository.full_name + "/issues/" + body.issue.id,
+                    description: "",
+                    fields: [
+                        {
+                            name: body.issue.title,
+                            value: "**State:** " + body.issue.state + "\n" +
+                            "**Type:** " + body.issue.type + "\n" +
+                            "**Priority:** " + body.issue.priority + "\n"
+                        }
+                    ],
+                    footer: {
+                        text: "Powered by skyhook",
+                        icon_url: ""
+                    }
+                });
+                break;
+            case "issue:updated":
+                var user = {
+                    name: body.actor.display_name,
+                    icon_url: body.actor.links.avatar.href,
+                    url: baseLink + body.actor.username
+                };
+                discordPayload.embeds.push({
+                    author: user,
+                    title: "Updated Issue #" + body.issue.id + " on " + body.repository.name,
+                    url: baseLink + body.repository.full_name + "/issues/" + body.issue.id,
+                    description: "",
+                    footer: {
+                        text: "Powered by skyhook",
+                        icon_url: ""
+                    }
+                });
+                break;
+            case "issue:comment_created":
+                var user = {
+                    name: body.actor.display_name,
+                    icon_url: body.actor.links.avatar.href,
+                    url: baseLink + body.actor.username
+                };
+
+                discordPayload.embeds.push({
+                    author: user,
+                    title: "Wrote a comment to Issue #" + body.issue.id + " on " + body.repository.name,
+                    url: baseLink + body.repository.full_name + "/issues/" + body.issue.id,
+                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, ''),
                     footer: {
                         text: "Powered by skyhook",
                         icon_url: ""
