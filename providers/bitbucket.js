@@ -111,6 +111,38 @@ module.exports = {
                     }
                 });
                 break;
+            case "repo:commit_status_created":
+                discordPayload.embeds.push({
+                    author: {
+                        name: body.repository.name,
+                        url: baseLink + body.repository.full_name,
+                        icon_url: body.repository.links.avatar.href
+                    },
+                    title: body.commit_status.name,
+                    url: body.commit_status.url,
+                    description: "**State:** " + body.commit_status.state + "\n" + body.commit_status.description,
+                    footer: {
+                        text: "Powered by skyhook",
+                        icon_url: ""
+                    }
+                });
+                break;
+            case "repo:commit_status_updated":
+                discordPayload.embeds.push({
+                    author: {
+                        name: body.repository.name,
+                        url: baseLink + body.repository.full_name,
+                        icon_url: body.repository.links.avatar.href
+                    },
+                    title: body.commit_status.name,
+                    url: body.commit_status.url,
+                    description: "**State:** " + body.commit_status.state + "\n" + body.commit_status.description,
+                    footer: {
+                        text: "Powered by skyhook",
+                        icon_url: ""
+                    }
+                });
+                break;
         }
         //TODO: support of the other webhook methods of BitBucket
     }
