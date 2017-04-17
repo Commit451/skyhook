@@ -1,6 +1,8 @@
 # skyhook
 Parses webhooks and forwards them in the proper format to Discord.
 
+[![Join Us On Discord](https://img.shields.io/badge/Discord-%23discordgo-blue.svg)](https://discord.gg/js7wD7p)
+
 ## Setup
 You can use the [site](https://skyhook.glitch.me/) to create the right webhook link.
 1. Create a webhook in Discord (Server Settings -> Webhooks -> Create Webhook)
