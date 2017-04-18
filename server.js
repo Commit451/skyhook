@@ -26,8 +26,8 @@ app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
     var hookPart2 = req.params.hookPart2;
     var from = req.params.from;
     if (!hookPart1 || !hookPart2 || !from) {
-      res.sendStatus(400);
-      return;
+        res.sendStatus(400);
+        return;
     }
     var discordHookUrl = "https://discordapp.com/api/webhooks/" + hookPart1 + "/" + hookPart2;
 
@@ -62,12 +62,12 @@ app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
     var jsonString = JSON.stringify(discordPayload);
     //special case for testing. Kinda lame to do that, but meh
     if (hookPart1 == "test") {
-      res.setHeader('Content-Type', 'application/json');
-      res.send(jsonString);
-      return;
+        res.setHeader('Content-Type', 'application/json');
+        res.send(jsonString);
+        return;
     }
     request.post({
-        headers: {'content-type': 'application/json'},
+        headers: { 'content-type': 'application/json' },
         url: discordHookUrl,
         body: jsonString
     }, function (error, response, body) {
