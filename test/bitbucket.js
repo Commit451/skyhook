@@ -8,134 +8,273 @@ var should = chai.should();
 chai.use(chaiHttp);
 
 var repoPushJson = {
-	"actor": "Owner",
-	"repository": "Repository",
-	"push": {
-		"changes": [
-			{
-				"new": {
-					"type": "branch",
-					"name": "name-of-branch",
-					"target": {
-						"type": "commit",
-						"hash": "709d658dc5b6d6afcd46049c2f332ee3f515a67d",
-						"author": "User",
-						"message": "new commit message\n",
-						"date": "2015-06-09T03:34:49+00:00",
-						"parents": [
-							{
-								"type": "commit",
-								"hash": "1e65c05c1d5171631d92438a13901ca7dae9618c",
-								"links": {
-									"self": {
-										"href": "https://api.bitbucket.org/2.0/repositories/user_name/repo_name/commit/8cbbd65829c7ad834a97841e0defc965718036a0"
-									},
-									"html": {
-										"href": "https://bitbucket.org/user_name/repo_name/commits/8cbbd65829c7ad834a97841e0defc965718036a0"
-									}
-								}
-							}
-						],
-						"links": {
-							"self": {
-								"href": "https://api.bitbucket.org/2.0/repositories/user_name/repo_name/commit/c4b2b7914156a878aa7c9da452a09fb50c2091f2"
-							},
-							"html": {
-								"href": "https://bitbucket.org/user_name/repo_name/commits/c4b2b7914156a878aa7c9da452a09fb50c2091f2"
-							}
-						}
-					},
-					"links": {
-						"self": {
-							"href": "https://api.bitbucket.org/2.0/repositories/user_name/repo_name/refs/branches/master"
-						},
-						"commits": {
-							"href": "https://api.bitbucket.org/2.0/repositories/user_name/repo_name/commits/master"
-						},
-						"html": {
-							"href": "https://bitbucket.org/user_name/repo_name/branch/master"
-						}
-					}
-				},
-				"old": {
-					"type": "branch",
-					"name": "name-of-branch",
-					"target": {
-						"type": "commit",
-						"hash": "1e65c05c1d5171631d92438a13901ca7dae9618c",
-						"author": "User",
-						"message": "old commit message\n",
-						"date": "2015-06-08T21:34:56+00:00",
-						"parents": [
-							{
-								"type": "commit",
-								"hash": "e0d0c2041e09746be5ce4b55067d5a8e3098c843",
-								"links": {
-									"self": {
-										"href": "https://api.bitbucket.org/2.0/repositories/user_name/repo_name/commit/9c4a3452da3bc4f37af5a6bb9c784246f44406f7"
-									},
-									"html": {
-										"href": "https://bitbucket.org/user_name/repo_name/commits/9c4a3452da3bc4f37af5a6bb9c784246f44406f7"
-									}
-								}
-							}
-						],
-						"links": {
-							"self": {
-								"href": "https://api.bitbucket.org/2.0/repositories/user_name/repo_name/commit/b99ea6dad8f416e57c5ca78c1ccef590600d841b"
-							},
-							"html": {
-								"href": "https://bitbucket.org/user_name/repo_name/commits/b99ea6dad8f416e57c5ca78c1ccef590600d841b"
-							}
-						}
-					},
-					"links": {
-						"self": {
-							"href": "https://api.bitbucket.org/2.0/repositories/user_name/repo_name/refs/branches/master"
-						},
-						"commits": {
-							"href": "https://api.bitbucket.org/2.0/repositories/user_name/repo_name/commits/master"
-						},
-						"html": {
-							"href": "https://bitbucket.org/user_name/repo_name/branch/master"
-						}
-					}
-				},
-				"links": {
-					"html": {
-						"href": "https://bitbucket.org/user_name/repo_name/branches/compare/c4b2b7914156a878aa7c9da452a09fb50c2091f2..b99ea6dad8f416e57c5ca78c1ccef590600d841b"
-					},
-					"diff": {
-						"href": "https://api.bitbucket.org/2.0/repositories/user_name/repo_name/diff/c4b2b7914156a878aa7c9da452a09fb50c2091f2..b99ea6dad8f416e57c5ca78c1ccef590600d841b"
-					},
-					"commits": {
-						"href": "https://api.bitbucket.org/2.0/repositories/user_name/repo_name/commits?include=c4b2b7914156a878aa7c9da452a09fb50c2091f2&exclude=b99ea6dad8f416e57c5ca78c1ccef590600d841b"
-					}
-				},
-				"created": false,
-				"forced": false,
-				"closed": false,
-				"commits": [
-					{
-						"hash": "03f4a7270240708834de475bcf21532d6134777e",
-						"type": "commit",
-						"message": "commit message\n",
-						"author": "User",
-						"links": {
-							"self": {
-								"href": "https://api.bitbucket.org/2.0/repositories/user/repo/commit/03f4a7270240708834de475bcf21532d6134777e"
-							},
-							"html": {
-								"href": "https://bitbucket.org/user/repo/commits/03f4a7270240708834de475bcf21532d6134777e"
-							}
-						}
-					}
-				],
-				"truncated": false
-			}
-		]
-	}
-}
+    "push": {
+        "changes": [
+            {
+                "forced": false,
+                "old": {
+                    "type": "branch",
+                    "name": "master",
+                    "links": {
+                        "commits": {
+                            "href": "https://api.bitbucket.org/2.0/repositories/Mythen/bot/commits/master"
+                        },
+                        "self": {
+                            "href": "https://api.bitbucket.org/2.0/repositories/Mythen/bot/refs/branches/master"
+                        },
+                        "html": {
+                            "href": "https://bitbucket.org/Mythen/bot/branch/master"
+                        }
+                    },
+                    "target": {
+                        "hash": "fc246a4b6e69531398a937fa614c8584f2b473fd",
+                        "links": {
+                            "self": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/Mythen/bot/commit/fc246a4b6e69531398a937fa614c8584f2b473fd"
+                            },
+                            "html": {
+                                "href": "https://bitbucket.org/Mythen/bot/commits/fc246a4b6e69531398a937fa614c8584f2b473fd"
+                            }
+                        },
+                        "author": {
+                            "raw": "Mythen <*private mail*>",
+                            "user": {
+                                "username": "Mythen",
+                                "type": "user",
+                                "display_name": "Mythen",
+                                "uuid": "{d22d7853-231c-4d6d-870b-bde0e628130c}",
+                                "links": {
+                                    "self": {
+                                        "href": "https://api.bitbucket.org/2.0/users/Mythen"
+                                    },
+                                    "html": {
+                                        "href": "https://bitbucket.org/Mythen/"
+                                    },
+                                    "avatar": {
+                                        "href": "https://bitbucket.org/account/Mythen/avatar/32/"
+                                    }
+                                }
+                            }
+                        },
+                        "parents": [
+                            {
+                                "type": "commit",
+                                "hash": "297993c88378c757b6b402ecccba8ddc5a91a2a9",
+                                "links": {
+                                    "self": {
+                                        "href": "https://api.bitbucket.org/2.0/repositories/Mythen/bot/commit/297993c88378c757b6b402ecccba8ddc5a91a2a9"
+                                    },
+                                    "html": {
+                                        "href": "https://bitbucket.org/Mythen/bot/commits/297993c88378c757b6b402ecccba8ddc5a91a2a9"
+                                    }
+                                }
+                            }
+                        ],
+                        "date": "2017-04-16T15:28:11+00:00",
+                        "message": "test created online with Bitbucket",
+                        "type": "commit"
+                    }
+                },
+                "links": {
+                    "diff": {
+                        "href": "https://api.bitbucket.org/2.0/repositories/Mythen/bot/diff/abed126eae48e8c957ed222b3b5fbabdcfd7b77c..fc246a4b6e69531398a937fa614c8584f2b473fd"
+                    },
+                    "html": {
+                        "href": "https://bitbucket.org/Mythen/bot/branches/compare/abed126eae48e8c957ed222b3b5fbabdcfd7b77c..fc246a4b6e69531398a937fa614c8584f2b473fd"
+                    },
+                    "commits": {
+                        "href": "https://api.bitbucket.org/2.0/repositories/Mythen/bot/commits?include=abed126eae48e8c957ed222b3b5fbabdcfd7b77c&exclude=fc246a4b6e69531398a937fa614c8584f2b473fd"
+                    }
+                },
+                "created": false,
+                "commits": [
+                    {
+                        "hash": "abed126eae48e8c957ed222b3b5fbabdcfd7b77c",
+                        "links": {
+                            "self": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/Mythen/bot/commit/abed126eae48e8c957ed222b3b5fbabdcfd7b77c"
+                            },
+                            "comments": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/Mythen/bot/commit/abed126eae48e8c957ed222b3b5fbabdcfd7b77c/comments"
+                            },
+                            "patch": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/Mythen/bot/patch/abed126eae48e8c957ed222b3b5fbabdcfd7b77c"
+                            },
+                            "html": {
+                                "href": "https://bitbucket.org/Mythen/bot/commits/abed126eae48e8c957ed222b3b5fbabdcfd7b77c"
+                            },
+                            "diff": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/Mythen/bot/diff/abed126eae48e8c957ed222b3b5fbabdcfd7b77c"
+                            },
+                            "approve": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/Mythen/bot/commit/abed126eae48e8c957ed222b3b5fbabdcfd7b77c/approve"
+                            },
+                            "statuses": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/Mythen/bot/commit/abed126eae48e8c957ed222b3b5fbabdcfd7b77c/statuses"
+                            }
+                        },
+                        "author": {
+                            "raw": "Mythen <*private mail*>",
+                            "user": {
+                                "username": "Mythen",
+                                "type": "user",
+                                "display_name": "Mythen",
+                                "uuid": "{d22d7853-231c-4d6d-870b-bde0e628130c}",
+                                "links": {
+                                    "self": {
+                                        "href": "https://api.bitbucket.org/2.0/users/Mythen"
+                                    },
+                                    "html": {
+                                        "href": "https://bitbucket.org/Mythen/"
+                                    },
+                                    "avatar": {
+                                        "href": "https://bitbucket.org/account/Mythen/avatar/32/"
+                                    }
+                                }
+                            }
+                        },
+                        "parents": [
+                            {
+                                "type": "commit",
+                                "hash": "fc246a4b6e69531398a937fa614c8584f2b473fd",
+                                "links": {
+                                    "self": {
+                                        "href": "https://api.bitbucket.org/2.0/repositories/Mythen/bot/commit/fc246a4b6e69531398a937fa614c8584f2b473fd"
+                                    },
+                                    "html": {
+                                        "href": "https://bitbucket.org/Mythen/bot/commits/fc246a4b6e69531398a937fa614c8584f2b473fd"
+                                    }
+                                }
+                            }
+                        ],
+                        "date": "2017-04-17T10:11:08+00:00",
+                        "message": "Added file test2",
+                        "type": "commit"
+                    }
+                ],
+                "truncated": false,
+                "closed": false,
+                "new": {
+                    "type": "branch",
+                    "name": "master",
+                    "links": {
+                        "commits": {
+                            "href": "https://api.bitbucket.org/2.0/repositories/Mythen/bot/commits/master"
+                        },
+                        "self": {
+                            "href": "https://api.bitbucket.org/2.0/repositories/Mythen/bot/refs/branches/master"
+                        },
+                        "html": {
+                            "href": "https://bitbucket.org/Mythen/bot/branch/master"
+                        }
+                    },
+                    "target": {
+                        "hash": "abed126eae48e8c957ed222b3b5fbabdcfd7b77c",
+                        "links": {
+                            "self": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/Mythen/bot/commit/abed126eae48e8c957ed222b3b5fbabdcfd7b77c"
+                            },
+                            "html": {
+                                "href": "https://bitbucket.org/Mythen/bot/commits/abed126eae48e8c957ed222b3b5fbabdcfd7b77c"
+                            }
+                        },
+                        "author": {
+                            "raw": "Mythen <*private mail*>",
+                            "user": {
+                                "username": "Mythen",
+                                "type": "user",
+                                "display_name": "Mythen",
+                                "uuid": "{d22d7853-231c-4d6d-870b-bde0e628130c}",
+                                "links": {
+                                    "self": {
+                                        "href": "https://api.bitbucket.org/2.0/users/Mythen"
+                                    },
+                                    "html": {
+                                        "href": "https://bitbucket.org/Mythen/"
+                                    },
+                                    "avatar": {
+                                        "href": "https://bitbucket.org/account/Mythen/avatar/32/"
+                                    }
+                                }
+                            }
+                        },
+                        "parents": [
+                            {
+                                "type": "commit",
+                                "hash": "fc246a4b6e69531398a937fa614c8584f2b473fd",
+                                "links": {
+                                    "self": {
+                                        "href": "https://api.bitbucket.org/2.0/repositories/Mythen/bot/commit/fc246a4b6e69531398a937fa614c8584f2b473fd"
+                                    },
+                                    "html": {
+                                        "href": "https://bitbucket.org/Mythen/bot/commits/fc246a4b6e69531398a937fa614c8584f2b473fd"
+                                    }
+                                }
+                            }
+                        ],
+                        "date": "2017-04-17T10:11:08+00:00",
+                        "message": "Added file test2",
+                        "type": "commit"
+                    }
+                }
+            }
+        ]
+    },
+    "repository": {
+        "scm": "git",
+        "website": null,
+        "name": "Bot",
+        "links": {
+            "self": {
+                "href": "https://api.bitbucket.org/2.0/repositories/Mythen/bot"
+            },
+            "html": {
+                "href": "https://bitbucket.org/Mythen/bot"
+            },
+            "avatar": {
+                "href": "https://bitbucket.org/Mythen/bot/avatar/32/"
+            }
+        },
+        "full_name": "Mythen/bot",
+        "owner": {
+            "username": "Mythen",
+            "type": "user",
+            "display_name": "Mythen",
+            "uuid": "{d22d7853-231c-4d6d-870b-bde0e628130c}",
+            "links": {
+                "self": {
+                    "href": "https://api.bitbucket.org/2.0/users/Mythen"
+                },
+                "html": {
+                    "href": "https://bitbucket.org/Mythen/"
+                },
+                "avatar": {
+                    "href": "https://bitbucket.org/account/Mythen/avatar/32/"
+                }
+            }
+        },
+        "type": "repository",
+        "is_private": true,
+        "uuid": "{f157adae-1509-48e9-a227-d49ab2d0a53a}"
+    },
+    "actor": {
+        "username": "Mythen",
+        "type": "user",
+        "display_name": "Mythen",
+        "uuid": "{d22d7853-231c-4d6d-870b-bde0e628130c}",
+        "links": {
+            "self": {
+                "href": "https://api.bitbucket.org/2.0/users/Mythen"
+            },
+            "html": {
+                "href": "https://bitbucket.org/Mythen/"
+            },
+            "avatar": {
+                "href": "https://bitbucket.org/account/Mythen/avatar/32/"
+            }
+        }
+    }
+};
 
 /*
 * Test the /POST route
@@ -144,7 +283,7 @@ describe('/POST bitbucket', () => {
 	it('repo:push', (done) => {
 		chai.request(server)
 			.post('/api/webhooks/test/test/bitbucket')
-			//.set("X-Event-Key", "repo:push")
+			.set("X-Event-Key", "repo:push")
 			.send(repoPushJson)
 			.end((err, res) => {
 				res.should.have.status(200);
