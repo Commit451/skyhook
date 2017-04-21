@@ -84,6 +84,7 @@ describe('/POST appveyor', () => {
     it('build', (done) => {
         chai.request(server)
             .post('/api/webhooks/test/test/appveyor')
+            .set("test", "true")
             .send(json)
             .end((err, res) => {
                 res.should.have.status(200);

@@ -81,6 +81,7 @@ describe('/POST gitlab', () => {
   it('gitlab push', (done) => {
     chai.request(server)
       .post('/api/webhooks/test/test/gitlab')
+      .set("test", "true")
       .send(pushJson)
       .end((err, res) => {
         res.should.have.status(200);

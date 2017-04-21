@@ -40,6 +40,7 @@ describe('/POST circleci', () => {
 	it('build', (done) => {
 		chai.request(server)
 			.post('/api/webhooks/test/test/circleci')
+			.set("test", "true")
 			.send(json)
 			.end((err, res) => {
 				res.should.have.status(200);

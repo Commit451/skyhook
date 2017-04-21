@@ -284,6 +284,7 @@ describe('/POST bitbucket', () => {
 		chai.request(server)
 			.post('/api/webhooks/test/test/bitbucket')
 			.set("X-Event-Key", "repo:push")
+            .set("test", "true")
 			.send(repoPushJson)
 			.end((err, res) => {
 				res.should.have.status(200);

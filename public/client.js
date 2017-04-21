@@ -53,7 +53,7 @@ window.mdc.autoInit();
                 case 5:
                     discordHookUrl = discordHookUrl + "/unity";
                     break;
-                
+
                 default:
                     error = true;
                     break;

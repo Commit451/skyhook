@@ -73,6 +73,7 @@ describe('/POST travis', () => {
   it('build', (done) => {
     chai.request(server)
       .post('/api/webhooks/test/test/travis')
+      .set("test", "true")
       .send(json)
       .end((err, res) => {
         res.should.have.status(200);

@@ -1,5 +1,5 @@
 // server.js
-
+require('dotenv').config()
 var express = require('express');
 var bodyParser = require('body-parser');
 var request = require('request');
@@ -24,8 +24,9 @@ app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
 
     var hookPart1 = req.params.hookPart1;
     var hookPart2 = req.params.hookPart2;
-    var from = req.params.from;
-    if (!hookPart1 || !hookPart2 || !from) {
+    var provider = req.params.from;
+    var test = req.get("test")
+    if (!hookPart1 || !hookPart2 || !provider) {
         res.sendStatus(400);
         return;
     }
@@ -34,7 +35,8 @@ app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
     // https://discordapp.com/developers/docs/resources/webhook#execute-webhook
     var discordPayload = {
     };
-    switch (from) {
+    var error = false;
+    switch (provider) {
         case "gitlab":
             gitlab.parse(req, discordPayload);
             break;
@@ -54,29 +56,52 @@ app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
             bitbucket.parse(req, discordPayload);
             break;
         default:
-            console.log("Unknown from: " + from);
+            console.log("Unknown from: " + provider);
+            error = true;
             break;
-        //todo return some error
     }
 
-    var jsonString = JSON.stringify(discordPayload);
-    //special case for testing. Kinda lame to do that, but meh
-    if (hookPart1 == "test") {
-        res.setHeader('Content-Type', 'application/json');
-        res.send(jsonString);
+    if (error) {
+        res.sendStatus(400);
         return;
     }
-    request.post({
-        headers: { 'content-type': 'application/json' },
-        url: discordHookUrl,
-        body: jsonString
-    }, function (error, response, body) {
-        if (error) {
-            res.sendStatus(400);
+    var jsonString = JSON.stringify(discordPayload);
+    //special case for testing. Kinda lame to do that, but meh
+    if (test) {
+        var testHookUrl = process.env.TEST_HOOK_URL;
+        if (testHookUrl) {
+            console.log("Sending to test url: " + testHookUrl)
+            request.post({
+                headers: { 'content-type': 'application/json' },
+                url: discordHookUrl + provider,
+                body: jsonString
+            }, function (error, response, body) {
+                if (error) {
+                    console.log(error);
+                    res.sendStatus(400);
+                } else {
+                    res.setHeader('Content-Type', 'application/json');
+                    res.send(jsonString);
+                }
+            });
         } else {
-            res.sendStatus(200);
+            res.setHeader('Content-Type', 'application/json');
+            res.send(jsonString);
         }
-    });
+    } else {
+        request.post({
+            headers: { 'content-type': 'application/json' },
+            url: discordHookUrl,
+            body: jsonString
+        }, function (error, response, body) {
+            if (error) {
+                console.log(error);
+                res.sendStatus(400);
+            } else {
+                res.sendStatus(200);
+            }
+        });
+    }
 });
 
 // listen for requests :)
