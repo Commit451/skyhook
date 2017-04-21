@@ -3,15 +3,17 @@ require('dotenv').config()
 var express = require('express');
 var bodyParser = require('body-parser');
 var request = require('request');
-var gitlab = require('./providers/gitlab');
-var travis = require('./providers/travis');
-var circleci = require('./providers/circleci');
 var appveyor = require('./providers/appveyor');
-var unity = require('./providers/unity');
 var bitbucket = require('./providers/bitbucket');
+var circleci = require('./providers/circleci');
+var gitlab = require('./providers/gitlab');
+var heroku = require('./providers/heroku');
+var travis = require('./providers/travis');
+var unity = require('./providers/unity');
 var app = express();
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }))
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
 
@@ -37,23 +39,26 @@ app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
     };
     var error = false;
     switch (provider) {
-        case "gitlab":
-            gitlab.parse(req, discordPayload);
+        case "appveyor":
+            appveyor.parse(req, discordPayload);
             break;
-        case "travis":
-            travis.parse(req, discordPayload);
+        case "bitbucket":
+            bitbucket.parse(req, discordPayload);
             break;
         case "circleci":
             circleci.parse(req, discordPayload);
             break;
-        case "appveyor":
-            appveyor.parse(req, discordPayload);
+        case "gitlab":
+            gitlab.parse(req, discordPayload);
+            break;
+        case "heroku":
+            heroku.parse(req, discordPayload)
+            break;
+        case "travis":
+            travis.parse(req, discordPayload);
             break;
         case "unity":
             unity.parse(req, discordPayload);
-            break;
-        case "bitbucket":
-            bitbucket.parse(req, discordPayload);
             break;
         default:
             console.log("Unknown from: " + provider);
