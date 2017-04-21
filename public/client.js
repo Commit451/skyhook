@@ -39,20 +39,21 @@ window.mdc.autoInit();
                     discordHookUrl = discordHookUrl + "/appveyor";
                     break;
                 case 1:
-                    discordHookUrl = discordHookUrl + "/circleci";
-                    break;
-                case 2:
-                    discordHookUrl = discordHookUrl + "/gitlab";
-                    break;
-                case 3:
-                    discordHookUrl = discordHookUrl + "/travis";
-                    break;
-                case 4:
-                    discordHookUrl = discordHookUrl + "/unity";
-                    break;
-                case 5:
                     discordHookUrl = discordHookUrl + "/bitbucket";
                     break;
+                case 2:
+                    discordHookUrl = discordHookUrl + "/circleci";
+                    break;
+                case 3:
+                    discordHookUrl = discordHookUrl + "/gitlab";
+                    break;
+                case 4:
+                    discordHookUrl = discordHookUrl + "/travis";
+                    break;
+                case 5:
+                    discordHookUrl = discordHookUrl + "/unity";
+                    break;
+                
                 default:
                     error = true;
                     break;
