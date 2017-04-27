@@ -24,6 +24,11 @@ window.mdc.autoInit();
         var discordHookUrl = $('#url').val();
         var error = false;
         if (discordHookUrl && discordHookUrl.includes("discordapp.com")) {
+          
+            var endSpacialPart = discordHookUrl.indexOf("discordapp.com")
+            var startSpacialPart = (discordHookUrl.indexOf(":")  + 3);// + :// 3 chars:)
+            
+            discordHookUrl = discordHookUrl.replace(discordHookUrl.substring(startSpacialPart, endSpacialPart), "");
             discordHookUrl = discordHookUrl.replace("discordapp.com", "skyhook.glitch.me");
             //add the provider
             var index = 0;
