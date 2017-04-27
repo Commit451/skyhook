@@ -7,6 +7,8 @@ module.exports = {
         var username = body.user_name;
         var type = body.object_kind;
         var ref = body.ref;
+        var embedColor = 0xFCA326;
+
         switch (type) {
             case "push":
                 var project = {
@@ -14,10 +16,6 @@ module.exports = {
                     url: body.project.web_url,
                     branch: body.ref.split("/")[2],
                     commits: body.commits
-                };
-                var user = {
-                    name: body.user_name,
-                    icon_url: body.user_avatar
                 };
 
                 var commits = "";
@@ -30,31 +28,88 @@ module.exports = {
                 discordPayload.embeds = [{
                     title: "[" + project.name + ":" + project.branch + "] " + project.commits.length + " commit" + ((project.commits.length > 1) ? "s" : ""),
                     url: project.url,
-                    author: user,
+                    author: {
+                        name: body.user_name,
+                        icon_url: body.user_avatar
+                    },
                     description: commits,
+                    color: embedColor,
                     footer: {
                         text: "Powered by Skyhook",
-
                         icon_url: ""
                     }
                 }];
                 break;
 
             case "tag_push":
-                var url = body.project.web_url;
-                var projectName = body.project.name;
-                //get the name of the tag
-                var split = ref.split("/");
-                var tag = split[2];
-                discordPayload.content = username + " pushed tag " + ref + " to " + projectName + "\n" + url + "/tags/" + tag;
+                var tag = ref.split("/")[2];
+                var project = {
+                    name: body.project.name,
+                    url: body.project.web_url,
+                    branch: body.ref.split("/")[2],
+                    commits: body.commits
+                };
+
+                if (body.after !== '0000000000000000000000000000000000000000') {
+                    discordPayload.embeds = [{
+                        title: "Pushed tag \"" + tag + "\" to " + project.name,
+                        url: project.url + '/tags/' + tag,
+                        author: {
+                            name: body.user_name,
+                            icon_url: body.user_avatar
+                        },
+                        description: (typeof body.message !== 'undefined') ? body.message : '',
+                        color: embedColor,
+                        footer: {
+                            text: "Powered by Skyhook",
+                            icon_url: ""
+                        }
+                    }];
+                } else {
+                    discordPayload.embeds = [{
+                        title: "Deleted tag \"" + tag + "\" on " + project.name,
+                        url: project.url + '/tags/' + tag,
+                        author: {
+                            name: body.user_name,
+                            icon_url: body.user_avatar
+                        },
+                        description: (typeof body.message !== 'undefined') ? body.message : '',
+                        color: embedColor,
+                        footer: {
+                            text: "Powered by Skyhook",
+                            icon_url: ""
+                        }
+                    }];
+                }
                 break;
 
             case "issue":
-                var projectName = body.project.name;
-                var action = body.object_attributes.state;
-                var user = body.user.username;
-                var issueUrl = body.object_attributes.url;
-                discordPayload.content = user + " " + action + " issue on " + projectName + "\n" + issueUrl;
+                var actions = {
+                    open: "Opened",
+                    close: "Closed",
+                    reopen: "Reopened",
+                    update: "Updated"
+                };
+
+                discordPayload.embeds = [{
+                    title: actions[body.object_attributes.action] + " issue #" + body.object_attributes.iid + " on " + body.project.name,
+                    url: body.object_attributes.url,
+                    author: {
+                        name: body.user_name,
+                        icon_url: body.user_avatar
+                    },
+                    fields: [
+                        {
+                            name: body.object_attributes.title,
+                            value: body.object_attributes.description
+                        }
+                    ],
+                    color: embedColor,
+                    footer: {
+                        text: "Powered by Skyhook",
+                        icon_url: ""
+                    }
+                }];
                 break;
 
             case "note":
