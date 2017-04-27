@@ -1,122 +1,142 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>skyhook</title>
-  <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
-  <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>skyhook</title>
+    <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
-<main>
-  <body class="mdc-typography">
-    <div class="mdc-toolbar mdc-toolbar--fixed">
-      <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
-        <span class="mdc-toolbar__title">skyhook</span>
-      </section>
+<header class="mdc-toolbar mdc-toolbar--fixed">
+    <div class="mdc-toolbar__row">
+        <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
+            <span class="mdc-toolbar__title">skyhook</span>
+        </section>
     </div>
-    <div class="mdc-card demo-card">
-      <p>
-        In order to have skyhook parse your webhooks properly, you must generate a webhook URL. Once you have the URL generated, you can pass it along to the provider you selected.
-      </p>
+</header>
+<main>
 
-      <div class="mdc-form-field">
-        <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-          <input id="url" type="text" class="mdc-textfield__input">
-          <label for="url" class="mdc-textfield__label">
-            Discord Webhook URL
-          </label>
-        </div>
-      </div>
+    <body class="mdc-typography">
 
-      <p>Provider</p>
-      <section>
+        <div class="mdc-card demo-card">
+            <p>
+                In order to have skyhook parse your webhooks properly, you must generate a webhook URL. Once you have the URL generated,
+                you can pass it along to the provider you selected. </p>
 
-      <div class="mdc-form-field">
-        <div class="mdc-radio">
-          <input class="mdc-radio__native-control" type="radio" id="ex2-radio1" checked name="ex2">
-          <div class="mdc-radio__background">
-            <div class="mdc-radio__outer-circle"></div>
-            <div class="mdc-radio__inner-circle"></div>
-          </div>
-        </div>
-        <label id="ex2-radio1-label" for="ex2-radio1">AppVeyor</label>
-      </div>
+            <br />
+            <div class="mdc-form-field">
+                <div class="mdc-textfield mdc-textfield--multiline mdc-textfield--fullwidth" data-mdc-auto-init="MDCTextfield">
+                    <input id="url" type="text" class="mdc-textfield__input">
+                    <label for="url" class="mdc-textfield__label">
+                            Discord Webhook URL
+                    </label>
+                </div>
+            </div>
 
-      <div class="mdc-form-field">
-        <div class="mdc-radio">
-          <input class="mdc-radio__native-control" type="radio" id="ex2-radio2" name="ex2">
-          <div class="mdc-radio__background">
-            <div class="mdc-radio__outer-circle"></div>
-            <div class="mdc-radio__inner-circle"></div>
-          </div>
-        </div>
-        <label id="ex2-radio2-label" for="ex2-radio2">CircleCi</label>
-      </div>
+            <p>Provider</p>
+            <section>
 
-      <div class="mdc-form-field">
-        <div class="mdc-radio">
-          <input class="mdc-radio__native-control" type="radio" id="ex2-radio3" name="ex2">
-          <div class="mdc-radio__background">
-            <div class="mdc-radio__outer-circle"></div>
-            <div class="mdc-radio__inner-circle"></div>
-          </div>
-        </div>
-        <label id="ex2-radio3-label" for="ex2-radio3">GitLab</label>
-      </div>
+                <div class="mdc-form-field">
+                    <div class="mdc-radio">
+                        <input class="mdc-radio__native-control" type="radio" id="ex2-radio1" checked name="ex2">
+                        <div class="mdc-radio__background">
+                            <div class="mdc-radio__outer-circle"></div>
+                            <div class="mdc-radio__inner-circle"></div>
+                        </div>
+                    </div>
+                    <label id="ex2-radio1-label" for="ex2-radio1">AppVeyor</label>
+                </div>
 
-      <div class="mdc-form-field">
-        <div class="mdc-radio">
-          <input class="mdc-radio__native-control" type="radio" id="ex2-radio4" name="ex2">
-          <div class="mdc-radio__background">
-            <div class="mdc-radio__outer-circle"></div>
-            <div class="mdc-radio__inner-circle"></div>
-          </div>
-        </div>
-        <label id="ex2-radio4-label" for="ex2-radio4">Travis</label>
-      </div>
-        
-      <div class="mdc-form-field">
-        <div class="mdc-radio">
-          <input class="mdc-radio__native-control" type="radio" id="ex2-radio5" name="ex2">
-          <div class="mdc-radio__background">
-            <div class="mdc-radio__outer-circle"></div>
-            <div class="mdc-radio__inner-circle"></div>
-          </div>
-        </div>
-        <label id="ex2-radio5-label" for="ex2-radio5">Unity Cloud</label>
-      </div>
+                <div class="mdc-form-field">
+                    <div class="mdc-radio">
+                        <input class="mdc-radio__native-control" type="radio" id="ex2-radio6" name="ex2">
+                        <div class="mdc-radio__background">
+                            <div class="mdc-radio__outer-circle"></div>
+                            <div class="mdc-radio__inner-circle"></div>
+                        </div>
+                    </div>
+                    <label id="ex2-radio6-label" for="ex2-radio6">BitBucket</label>
+                </div>
 
-      </section>
-      <br />
-      <button
-        id="button-generate"
-        class="mdc-button
+                <div class="mdc-form-field">
+                    <div class="mdc-radio">
+                        <input class="mdc-radio__native-control" type="radio" id="ex2-radio2" name="ex2">
+                        <div class="mdc-radio__background">
+                            <div class="mdc-radio__outer-circle"></div>
+                            <div class="mdc-radio__inner-circle"></div>
+                        </div>
+                    </div>
+                    <label id="ex2-radio2-label" for="ex2-radio2">CircleCi</label>
+                </div>
+
+                <div class="mdc-form-field">
+                    <div class="mdc-radio">
+                        <input class="mdc-radio__native-control" type="radio" id="ex2-radio3" name="ex2">
+                        <div class="mdc-radio__background">
+                            <div class="mdc-radio__outer-circle"></div>
+                            <div class="mdc-radio__inner-circle"></div>
+                        </div>
+                    </div>
+                    <label id="ex2-radio3-label" for="ex2-radio3">GitLab</label>
+                </div>
+
+                <div class="mdc-form-field">
+                    <div class="mdc-radio">
+                        <input class="mdc-radio__native-control" type="radio" id="ex2-radio7" name="ex2">
+                        <div class="mdc-radio__background">
+                            <div class="mdc-radio__outer-circle"></div>
+                            <div class="mdc-radio__inner-circle"></div>
+                        </div>
+                    </div>
+                    <label id="ex2-radio6-label" for="ex2-radio7">Heroku</label>
+                </div>
+
+                <div class="mdc-form-field">
+                    <div class="mdc-radio">
+                        <input class="mdc-radio__native-control" type="radio" id="ex2-radio4" name="ex2">
+                        <div class="mdc-radio__background">
+                            <div class="mdc-radio__outer-circle"></div>
+                            <div class="mdc-radio__inner-circle"></div>
+                        </div>
+                    </div>
+                    <label id="ex2-radio4-label" for="ex2-radio4">Travis</label>
+                </div>
+
+                <div class="mdc-form-field">
+                    <div class="mdc-radio">
+                        <input class="mdc-radio__native-control" type="radio" id="ex2-radio5" name="ex2">
+                        <div class="mdc-radio__background">
+                            <div class="mdc-radio__outer-circle"></div>
+                            <div class="mdc-radio__inner-circle"></div>
+                        </div>
+                    </div>
+                    <label id="ex2-radio5-label" for="ex2-radio5">Unity Cloud</label>
+                </div>
+
+            </section>
+            <br/>
+            <button id="button-generate" class="mdc-button
         mdc-button--raised
         mdc-button--primary
-        mdc-ripple-surface"
-        data-mdc-auto-init="MDCRipple">
-        Generate
-      </button>
+        mdc-ripple-surface" data-mdc-auto-init="MDCRipple">
+                    Generate
+                </button>
 
-    <div id="mdc-js-snackbar"
-    class="mdc-snackbar"
-    aria-live="assertive"
-    aria-atomic="true"
-    aria-hidden="true">
-    <div class="mdc-snackbar__text"></div>
-    <div class="mdc-snackbar__action-wrapper">
-      <button type="button" class="mdc-button mdc-snackbar__action-button"></button>
-    </div>
-  </div>
-</div>
-</body>
+            <div id="mdc-js-snackbar" class="mdc-snackbar" aria-live="assertive" aria-atomic="true" aria-hidden="true">
+                <div class="mdc-snackbar__text"></div>
+                <div class="mdc-snackbar__action-wrapper">
+                    <button type="button" class="mdc-button mdc-snackbar__action-button"></button>
+                </div>
+            </div>
+        </div>
+    </body>
 </main>
 <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
 <script src="https://wzrd.in/standalone/copy-to-clipboard@latest" async></script>
-<script src="https://code.jquery.com/jquery-2.2.1.min.js"
-integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="
-crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-2.2.1.min.js" integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="
+    crossorigin="anonymous"></script>
 <script src="./client.js"></script>
 
 </html>

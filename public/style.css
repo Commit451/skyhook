@@ -2,6 +2,10 @@
   --mdc-theme-primary: #009688;
 }
 
+body {
+    background-color: #ECEFF1;
+}
+
 .demo-card {
    margin-top: 100px;
    margin-bottom: 48px;
@@ -11,4 +15,5 @@
    padding-left: 48px;
    padding-top: 48px;
    padding-bottom: 48px;
+   background-color: white;
 }

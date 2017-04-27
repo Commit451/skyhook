@@ -18,30 +18,30 @@ var pushJson = {
   "user_email": "john@example.com",
   "user_avatar": "https://s.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=8://s.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=80",
   "project_id": 15,
-  "project":{
-    "name":"Diaspora",
-    "description":"",
-    "web_url":"http://example.com/mike/diaspora",
-    "avatar_url":null,
-    "git_ssh_url":"git@example.com:mike/diaspora.git",
-    "git_http_url":"http://example.com/mike/diaspora.git",
-    "namespace":"Mike",
-    "visibility_level":0,
-    "path_with_namespace":"mike/diaspora",
-    "default_branch":"master",
-    "homepage":"http://example.com/mike/diaspora",
-    "url":"git@example.com:mike/diaspora.git",
-    "ssh_url":"git@example.com:mike/diaspora.git",
-    "http_url":"http://example.com/mike/diaspora.git"
+  "project": {
+    "name": "Diaspora",
+    "description": "",
+    "web_url": "http://example.com/mike/diaspora",
+    "avatar_url": null,
+    "git_ssh_url": "git@example.com:mike/diaspora.git",
+    "git_http_url": "http://example.com/mike/diaspora.git",
+    "namespace": "Mike",
+    "visibility_level": 0,
+    "path_with_namespace": "mike/diaspora",
+    "default_branch": "master",
+    "homepage": "http://example.com/mike/diaspora",
+    "url": "git@example.com:mike/diaspora.git",
+    "ssh_url": "git@example.com:mike/diaspora.git",
+    "http_url": "http://example.com/mike/diaspora.git"
   },
-  "repository":{
+  "repository": {
     "name": "Diaspora",
     "url": "git@example.com:mike/diaspora.git",
     "description": "",
     "homepage": "http://example.com/mike/diaspora",
-    "git_http_url":"http://example.com/mike/diaspora.git",
-    "git_ssh_url":"git@example.com:mike/diaspora.git",
-    "visibility_level":0
+    "git_http_url": "http://example.com/mike/diaspora.git",
+    "git_ssh_url": "git@example.com:mike/diaspora.git",
+    "visibility_level": 0
   },
   "commits": [
     {
@@ -74,20 +74,21 @@ var pushJson = {
   "total_commits_count": 4
 }
 
-  /*
-  * Test the /POST route
-  */
-  describe('/POST gitlab', () => {
-        it('gitlab push', (done) => {
-          chai.request(server)
-              .post('/api/webhooks/test/test/gitlab')
-              .send(pushJson)
-              .end((err, res) => {
-                  res.should.have.status(200);
-                  console.log(res.body);
-                  res.body.should.be.a('object');
-                  res.body.should.have.property('embeds')
-                  done();
-              });
-        });
-    });
+/*
+* Test the /POST route
+*/
+describe('/POST gitlab', () => {
+  it('gitlab push', (done) => {
+    chai.request(server)
+      .post('/api/webhooks/test/test/gitlab')
+      .set("test", "true")
+      .send(pushJson)
+      .end((err, res) => {
+        res.should.have.status(200);
+        console.log(res.body);
+        res.body.should.be.a('object');
+        res.body.should.have.property('embeds')
+        done();
+      });
+  });
+});

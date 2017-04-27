@@ -26,9 +26,9 @@ module.exports = {
                 case "success":
                     if (share != null) {
                         download = share.href;
-                      content = "[`Download it here`](" + download +")";
+                        content = "[`Download it here`](" + download + ")";
                     }
-                var link = "";
+                    var link = "";
                     content = "**New build**\n" + content;
                     break;
                 case "queued":
@@ -43,15 +43,15 @@ module.exports = {
 
             }
             discordPayload.embeds = [{
-                    title: "[" + projectName + "] " + " version #" + projectVersion,
-                    url: download,
-                    author: user,
-                    description: content,
-                    footer: {
-                        text: "",
-                        icon_url: ""
-                    }
-                }];
+                title: "[" + projectName + "] " + " version #" + projectVersion,
+                url: download,
+                author: user,
+                description: content,
+                footer: {
+                    text: "",
+                    icon_url: ""
+                }
+            }];
         } else {
             discordPayload.content = "**Ping from host!**";
         }
