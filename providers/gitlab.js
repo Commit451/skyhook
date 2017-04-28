@@ -80,8 +80,8 @@ module.exports = {
                     title: actions[body.object_attributes.action] + " issue #" + body.object_attributes.iid + " on " + body.project.name,
                     url: body.object_attributes.url,
                     author: {
-                        name: body.user_name,
-                        icon_url: body.user_avatar
+                        name: body.user.name,
+                        icon_url: body.user.avatar_url
                     },
                     fields: [
                         {
@@ -93,13 +93,31 @@ module.exports = {
                 break;
 
             case "note":
-                var projectName = body.project.name;
-                var action = body.object_attributes.state;
-                var user = body.user.username;
-                var noteUrl = body.object_attributes.url;
-                var noteType = body.object_attributes.noteable_type;
-                var note = body.object_attributes.note;
-                discordPayload.content = user + " commented on " + noteType + " on " + projectName + "\n" + "\"" + note + "\"" + "\n" + noteUrl;
+                var type = null;
+                switch(body.object_attributes.noteable_type){
+                    case "Commit":
+                        type = "commit (" + body.commit.id.substring(0, 7) + ")";
+                        break;
+                    case "MergeRequest":
+                        type = "merge request #" + body.merge_request.iid;
+                        break;
+                    case "Issue":
+                        type = "issue #" + body.issue.iid;
+                        break;
+                    case "Snippet":
+                        type = "snippet #" + body.snippet.id;
+                        break;
+                }
+
+                discordPayload.addEmbed({
+                    title: "Wrote a comment on " + type + " on " + body.project.name,
+                    url: body.object_attributes.url,
+                    author: {
+                        name: body.user.name,
+                        icon_url: body.user.avatar_url
+                    },
+                    description: (body.object_attributes.note.length > 50) ? body.object_attributes.note.substring(0, 47) + "..." : body.object_attributes.note
+                });
                 break;
 
             case "merge_request":
