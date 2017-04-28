@@ -7,7 +7,7 @@ module.exports = {
         var username = body.user_name;
         var type = body.object_kind;
         var ref = body.ref;
-        var embedColor = 0xFCA326;
+        discordPayload.setEmbedColor(0xFCA326);
 
         switch (type) {
             case "push":
@@ -25,20 +25,15 @@ module.exports = {
                     commits = commits + commit.author.name + " - (" + "[`" + commit.id.substring(0, 7) + "`](" + commit.url + ") " + ") [" + message.replace(/\n/g, ' ') + "](" + project.url + ") " + "\n";
                 }
 
-                discordPayload.embeds = [{
+                discordPayload.addEmbed({
                     title: "[" + project.name + ":" + project.branch + "] " + project.commits.length + " commit" + ((project.commits.length > 1) ? "s" : ""),
                     url: project.url,
                     author: {
                         name: body.user_name,
                         icon_url: body.user_avatar
                     },
-                    description: commits,
-                    color: embedColor,
-                    footer: {
-                        text: "Powered by Skyhook",
-                        icon_url: ""
-                    }
-                }];
+                    description: commits
+                });
                 break;
 
             case "tag_push":
@@ -51,35 +46,25 @@ module.exports = {
                 };
 
                 if (body.after !== '0000000000000000000000000000000000000000') {
-                    discordPayload.embeds = [{
+                    discordPayload.addEmbed({
                         title: "Pushed tag \"" + tag + "\" to " + project.name,
                         url: project.url + '/tags/' + tag,
                         author: {
                             name: body.user_name,
                             icon_url: body.user_avatar
                         },
-                        description: (typeof body.message !== 'undefined') ? body.message : '',
-                        color: embedColor,
-                        footer: {
-                            text: "Powered by Skyhook",
-                            icon_url: ""
-                        }
-                    }];
+                        description: (typeof body.message !== 'undefined') ? body.message : ''
+                    });
                 } else {
-                    discordPayload.embeds = [{
+                    discordPayload.addEmbed({
                         title: "Deleted tag \"" + tag + "\" on " + project.name,
                         url: project.url + '/tags/' + tag,
                         author: {
                             name: body.user_name,
                             icon_url: body.user_avatar
                         },
-                        description: (typeof body.message !== 'undefined') ? body.message : '',
-                        color: embedColor,
-                        footer: {
-                            text: "Powered by Skyhook",
-                            icon_url: ""
-                        }
-                    }];
+                        description: (typeof body.message !== 'undefined') ? body.message : ''
+                    });
                 }
                 break;
 
@@ -91,7 +76,7 @@ module.exports = {
                     update: "Updated"
                 };
 
-                discordPayload.embeds = [{
+                discordPayload.addEmbed({
                     title: actions[body.object_attributes.action] + " issue #" + body.object_attributes.iid + " on " + body.project.name,
                     url: body.object_attributes.url,
                     author: {
@@ -103,13 +88,8 @@ module.exports = {
                             name: body.object_attributes.title,
                             value: body.object_attributes.description
                         }
-                    ],
-                    color: embedColor,
-                    footer: {
-                        text: "Powered by Skyhook",
-                        icon_url: ""
-                    }
-                }];
+                    ]
+                });
                 break;
 
             case "note":
