@@ -15,7 +15,7 @@ function DiscordPayload() {
             this.data.embeds = [];
         }
 
-        this.data.footer = {
+        data.footer = {
             text: "Powered by Skyhook",
             icon_url: ""
         };

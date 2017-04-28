@@ -4,12 +4,10 @@
 module.exports = {
     parse: function (req, discordPayload) {
         var body = req.body;
-        var username = body.user_name;
-        var type = body.object_kind;
         var ref = body.ref;
         discordPayload.setEmbedColor(0xFCA326);
 
-        switch (type) {
+        switch (body.object_kind) {
             case "push":
                 var project = {
                     name: body.project.name,
@@ -22,7 +20,7 @@ module.exports = {
                 for (var i = 0; i < project.commits.length; i++) {
                     var commit = project.commits[i];
                     var message = (commit.message.length > 50) ? commit.message.substring(0, 47) + "..." : commit.message;
-                    commits = commits + commit.author.name + " - (" + "[`" + commit.id.substring(0, 7) + "`](" + commit.url + ") " + ") [" + message.replace(/\n/g, ' ') + "](" + project.url + ") " + "\n";
+                    commits = commits + commit.author.name + " - (" + "[`" + commit.id.substring(0, 7) + "`](" + commit.url + ")" + ") " + message.replace(/\n/g, " ").replace(/\r/g, " ") + "\n";
                 }
 
                 discordPayload.addEmbed({
@@ -86,7 +84,7 @@ module.exports = {
                     fields: [
                         {
                             name: body.object_attributes.title,
-                            value: body.object_attributes.description
+                            value: (body.object_attributes.description.length > 200) ? body.object_attributes.description.substring(0, 197) + "..." : body.object_attributes.description
                         }
                     ]
                 });
@@ -121,10 +119,28 @@ module.exports = {
                 break;
 
             case "merge_request":
-                var action = body.object_attributes.state;
-                var user = body.user.username;
-                var issueUrl = body.object_attributes.url;
-                discordPayload.content = user + " " + action + " merge request\n" + issueUrl;
+                var actions = {
+                    open: "Opened",
+                    close: "Closed",
+                    reopen: "Reopened",
+                    update: "Updated",
+                    merge: "Merged"
+                };
+
+                discordPayload.addEmbed({
+                    title: actions[body.object_attributes.action] + " merge request #" + body.object_attributes.iid + " on " + body.project.name,
+                    url: body.object_attributes.url,
+                    author: {
+                        name: body.user.name,
+                        icon_url: body.user.avatar_url
+                    },
+                    fields: [
+                        {
+                            name: body.object_attributes.title,
+                            value: (body.object_attributes.description.length > 200) ? body.object_attributes.description.substring(0, 197) + "..." : body.object_attributes.description
+                        }
+                    ]
+                });
                 break;
 
             case "wiki_page":
