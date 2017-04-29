@@ -4,9 +4,14 @@
 module.exports = {
     parse: function (req, discordPayload) {
         var body = req.body;
-        var id = body.id;
-        var buildUrl = body.build_url;
-        var status = body.status_message;
-        discordPayload.content = "Build " + id + " " + status + "\n" + buildUrl
+        discordPayload.setEmbedColor(0x000000);
+        discordPayload.addEmbed({
+            title: "Build #" + body.number,
+            url: body.build_url,
+            author: {
+                name: body.repository.name
+            },
+            description: "**Status**: " + body.status_message
+        });
     }
 };
