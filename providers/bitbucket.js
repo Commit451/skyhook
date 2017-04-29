@@ -7,7 +7,7 @@ module.exports = {
         var type = req.get("X-Event-Key");
         var baseLink = 'https://bitbucket.org/';
 
-        discordPayload.embeds = [];
+        discordPayload.setEmbedColor(0x205081);
 
         switch (type) {
             case "repo:push":
@@ -24,7 +24,7 @@ module.exports = {
                 };
                 for (var i = 0; i < body.push.changes.length; i++) {
                     var change = body.push.changes[i];
-                    project.branch = (change.old != null) ? change.old.name : change.new.name;
+                    project.branch = (change.old !== null) ? change.old.name : change.new.name;
                     project.commits = change.commits;
 
                     var commits = "";
@@ -34,15 +34,11 @@ module.exports = {
                         commits = commits + "[`" + commit.hash.substring(0, 7) + "`](" + commit.links.html.href + ") " + message + " - " + commit.author.user.display_name + "\n";
                     }
 
-                    discordPayload.embeds.push({
+                    discordPayload.addEmbed({
                         title: "[" + project.name + ":" + project.branch + "] " + project.commits.length + " commit" + ((project.commits.length > 1) ? "s" : ""),
                         url: project.url,
                         author: user,
-                        description: commits,
-                        footer: {
-                            text: "Powered by skyhook",
-                            icon_url: ""
-                        }
+                        description: commits
                     });
                 }
                 break;
@@ -52,13 +48,9 @@ module.exports = {
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
                 };
-                discordPayload.embeds.push({
+                discordPayload.addEmbed({
                     author: user,
-                    description: "Created a [`fork`](" + baseLink + body.fork.full_name + ") of [`" + body.repository.name + "`](" + baseLink + body.repository.full_name + ")",
-                    footer: {
-                        text: "Powered by skyhook",
-                        icon_url: ""
-                    }
+                    description: "Created a [`fork`](" + baseLink + body.fork.full_name + ") of [`" + body.repository.name + "`](" + baseLink + body.repository.full_name + ")"
                 });
                 break;
             case "repo:updated":
@@ -82,15 +74,11 @@ module.exports = {
                     changes.push("**Description:** \"" + body.changes.description.old + "\" -> \"" + body.changes.description.new + "\"");
                 }
 
-                discordPayload.embeds.push({
+                discordPayload.addEmbed({
                     author: user,
                     title: "Changed general information of " + body.repository.name,
                     url: baseLink + body.repository.full_name,
-                    description: changes.join("\n"),
-                    footer: {
-                        text: "Powered by skyhook",
-                        icon_url: ""
-                    }
+                    description: changes.join("\n")
                 });
                 break;
             case "repo:commit_comment_created":
@@ -100,19 +88,15 @@ module.exports = {
                     url: baseLink + body.actor.username
                 };
 
-                discordPayload.embeds.push({
+                discordPayload.addEmbed({
                     author: user,
                     title: "Wrote a comment to commit " + body.commit.hash.substring(0, 7) + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/commits/" + body.commit.hash,
-                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, ''),
-                    footer: {
-                        text: "Powered by skyhook",
-                        icon_url: ""
-                    }
+                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, '')
                 });
                 break;
             case "repo:commit_status_created":
-                discordPayload.embeds.push({
+                discordPayload.addEmbed({
                     author: {
                         name: body.repository.name,
                         url: baseLink + body.repository.full_name,
@@ -120,15 +104,11 @@ module.exports = {
                     },
                     title: body.commit_status.name,
                     url: body.commit_status.url,
-                    description: "**State:** " + body.commit_status.state + "\n" + body.commit_status.description,
-                    footer: {
-                        text: "Powered by skyhook",
-                        icon_url: ""
-                    }
+                    description: "**State:** " + body.commit_status.state + "\n" + body.commit_status.description
                 });
                 break;
             case "repo:commit_status_updated":
-                discordPayload.embeds.push({
+                discordPayload.addEmbed({
                     author: {
                         name: body.repository.name,
                         url: baseLink + body.repository.full_name,
@@ -136,11 +116,7 @@ module.exports = {
                     },
                     title: body.commit_status.name,
                     url: body.commit_status.url,
-                    description: "**State:** " + body.commit_status.state + "\n" + body.commit_status.description,
-                    footer: {
-                        text: "Powered by skyhook",
-                        icon_url: ""
-                    }
+                    description: "**State:** " + body.commit_status.state + "\n" + body.commit_status.description
                 });
                 break;
             case "issue:created":
@@ -150,7 +126,7 @@ module.exports = {
                     url: baseLink + body.actor.username
                 };
 
-                discordPayload.embeds.push({
+                discordPayload.addEmbed({
                     author: user,
                     title: "Created a new Issue on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/issues/" + body.issue.id,
@@ -162,11 +138,7 @@ module.exports = {
                             "**Type:** " + body.issue.type + "\n" +
                             "**Priority:** " + body.issue.priority + "\n"
                         }
-                    ],
-                    footer: {
-                        text: "Powered by skyhook",
-                        icon_url: ""
-                    }
+                    ]
                 });
                 break;
             case "issue:updated":
@@ -175,15 +147,10 @@ module.exports = {
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
                 };
-                discordPayload.embeds.push({
+                discordPayload.addEmbed({
                     author: user,
                     title: "Updated Issue #" + body.issue.id + " on " + body.repository.name,
-                    url: baseLink + body.repository.full_name + "/issues/" + body.issue.id,
-                    description: "",
-                    footer: {
-                        text: "Powered by skyhook",
-                        icon_url: ""
-                    }
+                    url: baseLink + body.repository.full_name + "/issues/" + body.issue.id
                 });
                 break;
             case "issue:comment_created":
@@ -193,15 +160,11 @@ module.exports = {
                     url: baseLink + body.actor.username
                 };
 
-                discordPayload.embeds.push({
+                discordPayload.addEmbed({
                     author: user,
                     title: "Wrote a comment to Issue #" + body.issue.id + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/issues/" + body.issue.id,
-                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, ''),
-                    footer: {
-                        text: "Powered by skyhook",
-                        icon_url: ""
-                    }
+                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, '')
                 });
                 break;
             case "pullrequest:created":
@@ -211,7 +174,7 @@ module.exports = {
                     url: baseLink + body.actor.username
                 };
 
-                discordPayload.embeds.push({
+                discordPayload.addEmbed({
                     author: user,
                     title: "Created a new pull request on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
@@ -222,11 +185,7 @@ module.exports = {
                             value: "**Destination branch:** " + body.pullrequest.destination.branch.name + "\n" +
                             "**State:** " + body.pullrequest.state + "\n"
                         }
-                    ],
-                    footer: {
-                        text: "Powered by skyhook",
-                        icon_url: ""
-                    }
+                    ]
                 });
                 break;
             case "pullrequest:updated":
@@ -236,7 +195,7 @@ module.exports = {
                     url: baseLink + body.actor.username
                 };
 
-                discordPayload.embeds.push({
+                discordPayload.addEmbed({
                     author: user,
                     title: "Updated pull request #" + body.pullrequest.id + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
@@ -247,11 +206,7 @@ module.exports = {
                             value: "**Destination branch:** " + body.pullrequest.destination.branch.name + "\n" +
                             "**State:** " + body.pullrequest.state + "\n"
                         }
-                    ],
-                    footer: {
-                        text: "Powered by skyhook",
-                        icon_url: ""
-                    }
+                    ]
                 });
                 break;
             case "pullrequest:approved":
@@ -261,15 +216,10 @@ module.exports = {
                     url: baseLink + body.actor.username
                 };
 
-                discordPayload.embeds.push({
+                discordPayload.addEmbed({
                     author: user,
                     title: "Approved pull request #" + body.pullrequest.id + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
-                    description: "",
-                    footer: {
-                        text: "Powered by skyhook",
-                        icon_url: ""
-                    }
                 });
                 break;
             case "pullrequest:unapproved":
@@ -279,15 +229,10 @@ module.exports = {
                     url: baseLink + body.actor.username
                 };
 
-                discordPayload.embeds.push({
+                discordPayload.addEmbed({
                     author: user,
                     title: "Removed his approval for pull request #" + body.pullrequest.id + " on " + body.repository.name,
-                    url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
-                    description: "",
-                    footer: {
-                        text: "Powered by skyhook",
-                        icon_url: ""
-                    }
+                    url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id
                 });
                 break;
             case "pullrequest:fulfilled":
@@ -297,15 +242,10 @@ module.exports = {
                     url: baseLink + body.actor.username
                 };
 
-                discordPayload.embeds.push({
+                discordPayload.addEmbed({
                     author: user,
                     title: "Merged pull request #" + body.pullrequest.id + " into " + body.repository.name,
-                    url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
-                    description: "",
-                    footer: {
-                        text: "Powered by skyhook",
-                        icon_url: ""
-                    }
+                    url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id
                 });
                 break;
             case "pullrequest:rejected":
@@ -315,15 +255,11 @@ module.exports = {
                     url: baseLink + body.actor.username
                 };
 
-                discordPayload.embeds.push({
+                discordPayload.addEmbed({
                     author: user,
                     title: "Declined pull request #" + body.pullrequest.id + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
-                    description: (typeof body.pullrequest.reason !== "undefined") ? body.pullrequest.reason : "",
-                    footer: {
-                        text: "Powered by skyhook",
-                        icon_url: ""
-                    }
+                    description: (typeof body.pullrequest.reason !== "undefined") ? body.pullrequest.reason : ""
                 });
                 break;
             case "pullrequest:comment_created":
@@ -333,15 +269,11 @@ module.exports = {
                     url: baseLink + body.actor.username
                 };
 
-                discordPayload.embeds.push({
+                discordPayload.addEmbed({
                     author: user,
                     title: "Wrote a comment to pull request #" + body.pullrequest.id + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
-                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, ''),
-                    footer: {
-                        text: "Powered by skyhook",
-                        icon_url: ""
-                    }
+                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, '')
                 });
                 break;
             case "pullrequest:comment_updated":
@@ -351,15 +283,11 @@ module.exports = {
                     url: baseLink + body.actor.username
                 };
 
-                discordPayload.embeds.push({
+                discordPayload.addEmbed({
                     author: user,
                     title: "Updated a comment at pull request #" + body.pullrequest.id + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
-                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, ''),
-                    footer: {
-                        text: "Powered by skyhook",
-                        icon_url: ""
-                    }
+                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, '')
                 });
                 break;
             case "pullrequest:comment_deleted":
@@ -369,15 +297,11 @@ module.exports = {
                     url: baseLink + body.actor.username
                 };
 
-                discordPayload.embeds.push({
+                discordPayload.addEmbed({
                     author: user,
                     title: "Deleted a comment at pull request #" + body.pullrequest.id + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
-                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, ''),
-                    footer: {
-                        text: "Powered by skyhook",
-                        icon_url: ""
-                    }
+                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, '')
                 });
                 break;
         }
