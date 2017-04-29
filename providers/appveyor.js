@@ -4,9 +4,14 @@
 module.exports = {
     parse: function (req, discordPayload) {
         var body = req.body;
-        var buildNumber = body.eventData.buildNumber;
-        var buildUrl = body.eventData.buildUrl;
-        var status = body.eventData.status;
-        discordPayload.content = "Build " + buildNumber + " " + status + "\n" + buildUrl
+        discordPayload.setEmbedColor(0xFFFFFF);
+        discordPayload.addEmbed({
+            title: "Build #" + body.eventData.buildNumber,
+            url: body.eventData.buildUrl,
+            author: {
+                name: body.eventData.projectName
+            },
+            description: "**Status**: " + build.eventData.status
+        });
     }
 };
