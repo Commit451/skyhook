@@ -174,11 +174,15 @@ module.exports = {
                 break;
 
             case "build":
-                var buildId = body.build_id;
-                var status = body.build_status;
-                //pipeline events don't give us a url, but we can create one
-                var url = body.repository.homepage + "/builds/" + buildId;
-                discordPayload.content = "Build status: " + status + "\n" + url;
+                discordPayload.addEmbed({
+                    title: "Build #" + build_id + " on " + body.project.name,
+                    url: body.project.web_url + "/builds/" + body.build_id,
+                    author: {
+                        name: body.user.name,
+                        icon_url: body.user.avatar_url
+                    },
+                    description: "**Status**: " + body.build_status
+                });
                 break;
         }
     }
