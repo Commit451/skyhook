@@ -4,7 +4,7 @@
 module.exports = {
     parse: function (req, discordPayload) {
         var body = req.body;
-        discordPayload.setEmbedColor(0x000000);
+        discordPayload.setEmbedColor(0xC7B398);
         discordPayload.addEmbed({
             title: "Build #" + body.number,
             url: body.build_url,
