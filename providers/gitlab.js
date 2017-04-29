@@ -144,10 +144,21 @@ module.exports = {
                 break;
 
             case "wiki_page":
-                var action = body.object_attributes.state;
-                var user = body.user.username;
-                var issueUrl = body.object_attributes.url;
-                discordPayload.content = user + " " + action + " wiki page\n" + issueUrl;
+                var actions = {
+                    create: "Created",
+                    delete: "Deleted",
+                    update: "Updated"
+                };
+
+                discordPayload.addEmbed({
+                    title: actions[body.object_attributes.action] + " wiki page " + body.object_attributes.title + " on " + body.project.name,
+                    url: body.object_attributes.url,
+                    author: {
+                        name: body.user.name,
+                        icon_url: body.user.avatar_url
+                    },
+                    description: (typeof body.object_attributes.message !== 'undefined' ) ? (body.object_attributes.message.length > 200) ? body.object_attributes.message.substring(0, 197) + "..." : body.object_attributes.message : ''
+                });
                 break;
 
             case "pipeline":
