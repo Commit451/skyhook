@@ -11,7 +11,7 @@ module.exports = {
             author: {
                 name: body.payload.reponame
             },
-            description: "**Outcome**: " + build.payload.outcome
+            description: "**Outcome**: " + body.payload.outcome
         });
     }
 };

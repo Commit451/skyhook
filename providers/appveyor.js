@@ -11,7 +11,7 @@ module.exports = {
             author: {
                 name: body.eventData.projectName
             },
-            description: "**Status**: " + build.eventData.status
+            description: "**Status**: " + body.eventData.status
         });
     }
 };

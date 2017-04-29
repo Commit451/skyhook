@@ -6,6 +6,8 @@ module.exports = {
         var body = req.body;
         var hookID = body.hookId;
 
+        discordPayload.setEmbedColor(0x222C37);
+
         if (hookID == null) {
             var projectName = body.projectName;
             var projectTarget = body.buildTargetName;
@@ -20,8 +22,7 @@ module.exports = {
             };
             var download = "";
             var link = "";
-            discordPayload.username = projectName + " Buildserver";
-            discordPayload.avatar_url = "https://developer.cloud.unity3d.com/images/icon-default.png";
+            discordPayload.setUser(projectName + "Buildserver", "https://developer.cloud.unity3d.com/images/icon-default.png");
             switch (type) {
                 case "success":
                     if (share != null) {
@@ -42,18 +43,14 @@ module.exports = {
                     break;
 
             }
-            discordPayload.embeds = [{
+            discordPayload.addEmbed({
                 title: "[" + projectName + "] " + " version #" + projectVersion,
                 url: download,
                 author: user,
-                description: content,
-                footer: {
-                    text: "",
-                    icon_url: ""
-                }
-            }];
+                description: content
+            });
         } else {
-            discordPayload.content = "**Ping from host!**";
+            discordPayload.setContent("**Ping from host!**");
         }
     }
 };

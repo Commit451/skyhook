@@ -10,6 +10,11 @@ function DiscordPayload() {
         this.data.content = content;
     };
 
+    this.setUser = function (user, avatarUrl){
+        this.data.username = user;
+        this.data.avatar_url = avatarUrl;
+    };
+
     this.addEmbed = function (data) {
         if (typeof this.data.embeds === 'undefined') {
             this.data.embeds = [];
