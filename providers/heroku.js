@@ -3,9 +3,13 @@
 // ========
 module.exports = {
     parse: function (req, discordPayload) {
-        var app = req.body.app;
-        var user = req.body.user;
-        var url = req.body.url;
-        discordPayload.content = "App " + app + " deployed by " + user + "\n" + url
+        discordPayload.setEmbedColor(0xC9C3E6);
+        discordPayload.addEmbed({
+            title: "Deployed App " + req.body.app,
+            url: req.body.url,
+            author: {
+                name: req.body.user
+            }
+        });
     }
 };

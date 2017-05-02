@@ -20,7 +20,7 @@ describe('/POST heroku', () => {
 				res.should.have.status(200);
 				console.log(res.body);
 				res.body.should.be.a('object');
-				res.body.should.have.property('content')
+				res.body.should.have.property('embeds')
 				done();
 			});
 	});
