@@ -31,7 +31,8 @@ module.exports = {
                     for (var j = 0; j < project.commits.length; j++) {
                         var commit = project.commits[j];
                         var message = (commit.message.length > 50) ? commit.message.substring(0, 47) + "..." : commit.message;
-                        commits = commits + "[`" + commit.hash.substring(0, 7) + "`](" + commit.links.html.href + ") " + message + " - " + commit.author.user.display_name + "\n";
+                        var author = (typeof commit.author.user !== "undefined") ? " - " + commit.author.user.display_name : "";
+                        commits = commits + "[`" + commit.hash.substring(0, 7) + "`](" + commit.links.html.href + ") " + message.replace(/\n/g, " ").replace(/\r/g, " ") + author + "\n";
                     }
 
                     discordPayload.addEmbed({
