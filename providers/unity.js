@@ -3,33 +3,33 @@
 // ========
 module.exports = {
     parse: function (req, discordPayload) {
-        var body = req.body;
-        var hookID = body.hookId;
+        const body = req.body;
+        const hookID = body.hookId;
 
         discordPayload.setEmbedColor(0x222C37);
 
-        if (hookID == null) {
-            var projectName = body.projectName;
-            var projectTarget = body.buildTargetName;
-            var projectVersion = body.buildNumber;
-            var share = body.links.share_url;
-            var type = body.buildStatus;
-            var ref = body.ref;
-            var content = "No download available.";
-            var user = {
+        if (hookID === null) {
+            const projectName = body.projectName;
+            const projectTarget = body.buildTargetName;
+            const projectVersion = body.buildNumber;
+            const share = body.links.share_url;
+            const type = body.buildStatus;
+            const ref = body.ref;
+            let content = "No download available.";
+            const user = {
                 name: projectTarget,
                 icon_url: "https://developer.cloud.unity3d.com/images/icon-default.png"
             };
-            var download = "";
-            var link = "";
+            let download = "";
+            let link = "";
             discordPayload.setUser(projectName + "Buildserver", "https://developer.cloud.unity3d.com/images/icon-default.png");
             switch (type) {
                 case "success":
-                    if (share != null) {
+                    if (share !== null) {
                         download = share.href;
                         content = "[`Download it here`](" + download + ")";
                     }
-                    var link = "";
+                    link = "";
                     content = "**New build**\n" + content;
                     break;
                 case "queued":

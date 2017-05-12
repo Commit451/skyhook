@@ -18,14 +18,14 @@ window.mdc.autoInit();
         };
 
         sb.show(data);
-    }
+    };
 
     $("#button-generate").click(function () {
         var discordHookUrl = $('#url').val();
         var error = false;
         if (discordHookUrl && discordHookUrl.includes("discordapp.com")) {
 
-            var endSpacialPart = discordHookUrl.indexOf("discordapp.com")
+            var endSpacialPart = discordHookUrl.indexOf("discordapp.com");
             var startSpacialPart = (discordHookUrl.indexOf(":") + 3);// + :// 3 chars:)
 
             discordHookUrl = discordHookUrl.replace(discordHookUrl.substring(startSpacialPart, endSpacialPart), "");

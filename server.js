@@ -1,17 +1,17 @@
 // server.js
-require('dotenv').config()
-var express = require('express');
-var bodyParser = require('body-parser');
-var request = require('request');
-var DiscordPayload = require('./util/DiscordPayload');
-var appveyor = require('./providers/appveyor');
-var bitbucket = require('./providers/bitbucket');
-var circleci = require('./providers/circleci');
-var gitlab = require('./providers/gitlab');
-var heroku = require('./providers/heroku');
-var travis = require('./providers/travis');
-var unity = require('./providers/unity');
-var app = express();
+require('dotenv').config();
+const express = require('express');
+const bodyParser = require('body-parser');
+const request = require('request');
+const DiscordPayload = require('./util/DiscordPayload');
+const appveyor = require('./providers/appveyor');
+const bitbucket = require('./providers/bitbucket');
+const circleci = require('./providers/circleci');
+const gitlab = require('./providers/gitlab');
+const heroku = require('./providers/heroku');
+const travis = require('./providers/travis');
+const unity = require('./providers/unity');
+let app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -25,19 +25,19 @@ app.get("/", function (request, response) {
 
 app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
 
-    var hookPart1 = req.params.hookPart1;
-    var hookPart2 = req.params.hookPart2;
-    var provider = req.params.from;
-    var test = req.get("test")
+    let hookPart1 = req.params.hookPart1;
+    let hookPart2 = req.params.hookPart2;
+    let provider = req.params.from;
+    const test = req.get("test");
     if (!hookPart1 || !hookPart2 || !provider) {
         res.sendStatus(400);
         return;
     }
-    var discordHookUrl = "https://discordapp.com/api/webhooks/" + hookPart1 + "/" + hookPart2;
+    const discordHookUrl = "https://discordapp.com/api/webhooks/" + hookPart1 + "/" + hookPart2;
 
     // https://discordapp.com/developers/docs/resources/webhook#execute-webhook
-    var discordPayload = new DiscordPayload();
-    var error = false;
+    let discordPayload = new DiscordPayload();
+    let error = false;
     switch (provider) {
         case "appveyor":
             appveyor.parse(req, discordPayload);
@@ -70,10 +70,10 @@ app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
         res.sendStatus(400);
         return;
     }
-    var jsonString = JSON.stringify(discordPayload.getData());
+    let jsonString = JSON.stringify(discordPayload.getData());
     //special case for testing. Kinda lame to do that, but meh
     if (test) {
-        var testHookUrl = process.env.TEST_HOOK_URL;
+        const testHookUrl = process.env.TEST_HOOK_URL;
         if (testHookUrl) {
             console.log("Sending to test url: " + testHookUrl);
             request.post({
@@ -110,7 +110,7 @@ app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
 });
 
 // listen for requests :)
-var server = app.listen(process.env.PORT || 8080, function () {
+const server = app.listen(process.env.PORT || 8080, function () {
     console.log('Your app is listening on port ' + server.address().port);
 });
 

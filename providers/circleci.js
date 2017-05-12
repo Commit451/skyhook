@@ -3,7 +3,7 @@
 // ========
 module.exports = {
     parse: function (req, discordPayload) {
-        var body = req.body;
+        const body = req.body;
         discordPayload.setEmbedColor(0x000000);
         discordPayload.addEmbed({
             title: "Build #" + body.payload.build_num,

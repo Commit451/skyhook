@@ -3,35 +3,35 @@
 // ========
 module.exports = {
     parse: function (req, discordPayload) {
-        var body = req.body;
-        var type = req.get("X-Event-Key");
-        var baseLink = 'https://bitbucket.org/';
+        const body = req.body;
+        const type = req.get("X-Event-Key");
+        const baseLink = 'https://bitbucket.org/';
 
         discordPayload.setEmbedColor(0x205081);
 
         switch (type) {
             case "repo:push":
-                var project = {
+                let project = {
                     name: body.repository.name,
                     url: baseLink + body.repository.full_name,
                     branch: null,
                     commits: null
                 };
-                var user = {
+                let user = {
                     name: body.actor.display_name,
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
                 };
-                for (var i = 0; i < body.push.changes.length; i++) {
-                    var change = body.push.changes[i];
+                for (let i = 0; i < body.push.changes.length; i++) {
+                    let change = body.push.changes[i];
                     project.branch = (change.old !== null) ? change.old.name : change.new.name;
                     project.commits = change.commits;
 
-                    var commits = "";
-                    for (var j = 0; j < project.commits.length; j++) {
-                        var commit = project.commits[j];
-                        var message = (commit.message.length > 50) ? commit.message.substring(0, 47) + "..." : commit.message;
-                        var author = (typeof commit.author.user !== "undefined") ? " - " + commit.author.user.display_name : "";
+                    let commits = "";
+                    for (let j = 0; j < project.commits.length; j++) {
+                        let commit = project.commits[j];
+                        let message = (commit.message.length > 50) ? commit.message.substring(0, 47) + "..." : commit.message;
+                        let author = (typeof commit.author.user !== "undefined") ? " - " + commit.author.user.display_name : "";
                         commits = commits + "[`" + commit.hash.substring(0, 7) + "`](" + commit.links.html.href + ") " + message.replace(/\n/g, " ").replace(/\r/g, " ") + author + "\n";
                     }
 
@@ -44,7 +44,7 @@ module.exports = {
                 }
                 break;
             case "repo:fork":
-                var user = {
+                user = {
                     name: body.actor.display_name,
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
@@ -55,13 +55,13 @@ module.exports = {
                 });
                 break;
             case "repo:updated":
-                var user = {
+                user = {
                     name: body.actor.display_name,
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
                 };
 
-                var changes = [];
+                let changes = [];
                 if (typeof body.changes.name !== "undefined") {
                     changes.push("**Name:** \"" + body.changes.name.old + "\" -> \"" + body.changes.name.new + "\"");
                 }
@@ -83,7 +83,7 @@ module.exports = {
                 });
                 break;
             case "repo:commit_comment_created":
-                var user = {
+                user = {
                     name: body.actor.display_name,
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
@@ -121,7 +121,7 @@ module.exports = {
                 });
                 break;
             case "issue:created":
-                var user = {
+                user = {
                     name: body.actor.display_name,
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
@@ -143,7 +143,7 @@ module.exports = {
                 });
                 break;
             case "issue:updated":
-                var user = {
+                user = {
                     name: body.actor.display_name,
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
@@ -155,7 +155,7 @@ module.exports = {
                 });
                 break;
             case "issue:comment_created":
-                var user = {
+                user = {
                     name: body.actor.display_name,
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
@@ -169,7 +169,7 @@ module.exports = {
                 });
                 break;
             case "pullrequest:created":
-                var user = {
+                user = {
                     name: body.actor.display_name,
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
@@ -190,7 +190,7 @@ module.exports = {
                 });
                 break;
             case "pullrequest:updated":
-                var user = {
+                user = {
                     name: body.actor.display_name,
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
@@ -211,7 +211,7 @@ module.exports = {
                 });
                 break;
             case "pullrequest:approved":
-                var user = {
+                user = {
                     name: body.actor.display_name,
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
@@ -224,7 +224,7 @@ module.exports = {
                 });
                 break;
             case "pullrequest:unapproved":
-                var user = {
+                user = {
                     name: body.actor.display_name,
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
@@ -237,7 +237,7 @@ module.exports = {
                 });
                 break;
             case "pullrequest:fulfilled":
-                var user = {
+                user = {
                     name: body.actor.display_name,
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
@@ -250,7 +250,7 @@ module.exports = {
                 });
                 break;
             case "pullrequest:rejected":
-                var user = {
+                user = {
                     name: body.actor.display_name,
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
@@ -264,7 +264,7 @@ module.exports = {
                 });
                 break;
             case "pullrequest:comment_created":
-                var user = {
+                user = {
                     name: body.actor.display_name,
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
@@ -278,7 +278,7 @@ module.exports = {
                 });
                 break;
             case "pullrequest:comment_updated":
-                var user = {
+                user = {
                     name: body.actor.display_name,
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
@@ -292,7 +292,7 @@ module.exports = {
                 });
                 break;
             case "pullrequest:comment_deleted":
-                var user = {
+                user = {
                     name: body.actor.display_name,
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username

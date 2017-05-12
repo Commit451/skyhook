@@ -3,23 +3,23 @@
 // ========
 module.exports = {
     parse: function (req, discordPayload) {
-        var body = req.body;
-        var ref = body.ref;
+        const body = req.body;
+        const ref = body.ref;
         discordPayload.setEmbedColor(0xFCA326);
 
         switch (body.object_kind) {
             case "push":
-                var project = {
+                let project = {
                     name: body.project.name,
                     url: body.project.web_url,
                     branch: body.ref.split("/")[2],
                     commits: body.commits
                 };
 
-                var commits = "";
-                for (var i = 0; i < project.commits.length; i++) {
-                    var commit = project.commits[i];
-                    var message = (commit.message.length > 50) ? commit.message.substring(0, 47) + "..." : commit.message;
+                let commits = "";
+                for (let i = 0; i < project.commits.length; i++) {
+                    const commit = project.commits[i];
+                    const message = (commit.message.length > 50) ? commit.message.substring(0, 47) + "..." : commit.message;
                     commits = commits + commit.author.name + " - (" + "[`" + commit.id.substring(0, 7) + "`](" + commit.url + ")" + ") " + message.replace(/\n/g, " ").replace(/\r/g, " ") + "\n";
                 }
 
@@ -35,8 +35,8 @@ module.exports = {
                 break;
 
             case "tag_push":
-                var tag = ref.split("/")[2];
-                var project = {
+                const tag = ref.split("/")[2];
+                project = {
                     name: body.project.name,
                     url: body.project.web_url,
                     branch: body.ref.split("/")[2],
@@ -67,7 +67,7 @@ module.exports = {
                 break;
 
             case "issue":
-                var actions = {
+                let actions = {
                     open: "Opened",
                     close: "Closed",
                     reopen: "Reopened",
@@ -91,7 +91,7 @@ module.exports = {
                 break;
 
             case "note":
-                var type = null;
+                let type = null;
                 switch(body.object_attributes.noteable_type){
                     case "Commit":
                         type = "commit (" + body.commit.id.substring(0, 7) + ")";
@@ -119,7 +119,7 @@ module.exports = {
                 break;
 
             case "merge_request":
-                var actions = {
+                actions = {
                     open: "Opened",
                     close: "Closed",
                     reopen: "Reopened",
@@ -144,7 +144,7 @@ module.exports = {
                 break;
 
             case "wiki_page":
-                var actions = {
+                actions = {
                     create: "Created",
                     delete: "Deleted",
                     update: "Updated"

@@ -1,13 +1,12 @@
 process.env.NODE_ENV = 'test';
 
-var chai = require('chai');
-var chaiHttp = require('chai-http');
-var server = require('../server');
-var should = chai.should();
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const server = require('../server');
 
 chai.use(chaiHttp);
 
-var repoPushJson = {
+const repoPushJson = {
     "push": {
         "changes": [
             {
@@ -277,21 +276,21 @@ var repoPushJson = {
 };
 
 /*
-* Test the /POST route
-*/
+ * Test the /POST route
+ */
 describe('/POST bitbucket', () => {
-	it('repo:push', (done) => {
-		chai.request(server)
-			.post('/api/webhooks/test/test/bitbucket')
-			.set("X-Event-Key", "repo:push")
+    it('repo:push', (done) => {
+        chai.request(server)
+            .post('/api/webhooks/test/test/bitbucket')
+            .set("X-Event-Key", "repo:push")
             .set("test", "true")
-			.send(repoPushJson)
-			.end((err, res) => {
-				res.should.have.status(200);
-				console.log(res.body);
-				res.body.should.be.a('object');
-				res.body.should.have.property('embeds')
-				done();
-			});
-	});
+            .send(repoPushJson)
+            .end((err, res) => {
+                res.should.have.status(200);
+                console.log(res.body);
+                res.body.should.be.a('object');
+                res.body.should.have.property('embeds');
+                done();
+            });
+    });
 });

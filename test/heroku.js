@@ -1,9 +1,8 @@
 process.env.NODE_ENV = 'test';
 
-var chai = require('chai');
-var chaiHttp = require('chai-http');
-var server = require('../server');
-var should = chai.should();
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const server = require('../server');
 
 chai.use(chaiHttp);
 
@@ -20,7 +19,7 @@ describe('/POST heroku', () => {
 				res.should.have.status(200);
 				console.log(res.body);
 				res.body.should.be.a('object');
-				res.body.should.have.property('embeds')
+				res.body.should.have.property('embeds');
 				done();
 			});
 	});

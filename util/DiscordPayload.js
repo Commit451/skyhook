@@ -10,7 +10,7 @@ function DiscordPayload() {
         this.data.content = content;
     };
 
-    this.setUser = function (user, avatarUrl){
+    this.setUser = function (user, avatarUrl) {
         this.data.username = user;
         this.data.avatar_url = avatarUrl;
     };
