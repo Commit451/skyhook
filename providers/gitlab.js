@@ -5,11 +5,14 @@ module.exports = {
     parse: function (req, discordPayload) {
         const body = req.body;
         const ref = body.ref;
-        discordPayload.setEmbedColor(0xFCA326);
+        discordPayload.setEmbedColor(0xFCA326)
+
+        let project = null;
+        let actions = null;
 
         switch (body.object_kind) {
             case "push":
-                let project = {
+                project = {
                     name: body.project.name,
                     url: body.project.web_url,
                     branch: body.ref.split("/")[2],
@@ -67,7 +70,7 @@ module.exports = {
                 break;
 
             case "issue":
-                let actions = {
+                actions = {
                     open: "Opened",
                     close: "Closed",
                     reopen: "Reopened",
