@@ -9,15 +9,18 @@ module.exports = {
 
         discordPayload.setEmbedColor(0x205081);
 
+        let project = null;
+        let user = null;
+
         switch (type) {
             case "repo:push":
-                let project = {
+                project = {
                     name: body.repository.name,
                     url: baseLink + body.repository.full_name,
                     branch: null,
                     commits: null
                 };
-                let user = {
+                user = {
                     name: body.actor.display_name,
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
