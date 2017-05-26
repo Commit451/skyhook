@@ -19,11 +19,7 @@ function DiscordPayload() {
         if (typeof this.data.embeds === 'undefined') {
             this.data.embeds = [];
         }
-
-        data.footer = {
-            text: "Powered by Skyhook",
-            icon_url: ""
-        };
+        
         if (this.embedColor !== null) {
             data.color = this.embedColor;
         }
