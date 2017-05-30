@@ -29,6 +29,8 @@ https://skyhook.glitch.me/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/pr
 
 If you want support for a new provider, just create a pull request and add it!
 
+Alternatively, a new provider can also be requested by creating an [issue](https://github.com/Commit451/skyhook/issues).
+
 \ ゜o゜)ノ
 
 ## Testing Locally
