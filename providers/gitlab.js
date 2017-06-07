@@ -4,18 +4,21 @@
 module.exports = {
     parse: function (req, discordPayload) {
         const body = req.body;
-        const ref = body.ref;
-        discordPayload.setEmbedColor(0xFCA326)
+        discordPayload.setEmbedColor(0xFCA326);
 
         let project = null;
         let actions = null;
 
         switch (body.object_kind) {
             case "push":
+                const branch = body.ref.split("/");
+                branch.shift();
+                branch.shift();
+
                 project = {
                     name: body.project.name,
                     url: body.project.web_url,
-                    branch: body.ref.split("/")[2],
+                    branch: branch.join("/"),
                     commits: body.commits
                 };
 
@@ -38,11 +41,14 @@ module.exports = {
                 break;
 
             case "tag_push":
-                const tag = ref.split("/")[2];
+                const tmpTag = body.ref.split("/");
+                tmpTag.shift();
+                tmpTag.shift();
+                const tag = tmpTag.join("/");
+
                 project = {
                     name: body.project.name,
                     url: body.project.web_url,
-                    branch: body.ref.split("/")[2],
                     commits: body.commits
                 };
 
