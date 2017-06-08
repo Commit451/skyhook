@@ -33,7 +33,7 @@ module.exports = {
                     let commits = [];
                     for (let j = 0; j < project.commits.length; j++) {
                         let commit = project.commits[j];
-                        let message = (commit.message.length > 50) ? commit.message.substring(0, 47) + "..." : commit.message;
+                        let message = (commit.message.length > 256) ? commit.message.substring(0, 253) + "..." : commit.message;
                         let author = (typeof commit.author.user !== "undefined") ? commit.author.user.display_name : "Unknown";
 
                         commits.push({
