@@ -25,7 +25,7 @@ module.exports = {
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
                 };
-                for (let i = 0; i < body.push.changes.length; i++) {
+                for (let i = 0; (i < body.push.changes.length && i <4); i++) {
                     let change = body.push.changes[i];
                     project.branch = (change.old !== null) ? change.old.name : change.new.name;
                     project.commits = change.commits;
