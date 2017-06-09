@@ -33,7 +33,7 @@ module.exports = {
                     let commits = [];
                     for (let j = 0; j < project.commits.length; j++) {
                         let commit = project.commits[j];
-                        let message = (commit.message.length > 256) ? commit.message.substring(0, 253) + "..." : commit.message;
+                        let message = (commit.message.length > 256) ? commit.message.substring(0, 255) + "\u2026" : commit.message;
                         let author = (typeof commit.author.user !== "undefined") ? commit.author.user.display_name : "Unknown";
 
                         commits.push({
@@ -103,7 +103,7 @@ module.exports = {
                     author: user,
                     title: "Wrote a comment to commit " + body.commit.hash.substring(0, 7) + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/commits/" + body.commit.hash,
-                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 1024) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 1021) + "..." : body.comment.content.html.replace(/<.*?>/g, '')
+                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 1024) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 1023) + "\u2026" : body.comment.content.html.replace(/<.*?>/g, '')
                 });
                 break;
             case "repo:commit_status_created":
@@ -175,7 +175,7 @@ module.exports = {
                     author: user,
                     title: "Wrote a comment to Issue #" + body.issue.id + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/issues/" + body.issue.id,
-                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 1024) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 1021) + "..." : body.comment.content.html.replace(/<.*?>/g, '')
+                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 1024) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 1023) + "\u2026" : body.comment.content.html.replace(/<.*?>/g, '')
                 });
                 break;
             case "pullrequest:created":
@@ -284,7 +284,7 @@ module.exports = {
                     author: user,
                     title: "Wrote a comment to pull request #" + body.pullrequest.id + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
-                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, '')
+                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 1024) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 1023) + "\u2026" : body.comment.content.html.replace(/<.*?>/g, '')
                 });
                 break;
             case "pullrequest:comment_updated":
@@ -298,7 +298,7 @@ module.exports = {
                     author: user,
                     title: "Updated a comment at pull request #" + body.pullrequest.id + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
-                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, '')
+                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 1024) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 1023) + "\u2026" : body.comment.content.html.replace(/<.*?>/g, '')
                 });
                 break;
             case "pullrequest:comment_deleted":
@@ -312,7 +312,7 @@ module.exports = {
                     author: user,
                     title: "Deleted a comment at pull request #" + body.pullrequest.id + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
-                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, '')
+                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 1024) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 1023) + "\u2026" : body.comment.content.html.replace(/<.*?>/g, '')
                 });
                 break;
         }
