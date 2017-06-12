@@ -25,24 +25,31 @@ module.exports = {
                     icon_url: body.actor.links.avatar.href,
                     url: baseLink + body.actor.username
                 };
-                for (let i = 0; i < body.push.changes.length; i++) {
+                for (let i = 0; (i < body.push.changes.length && i <4); i++) {
                     let change = body.push.changes[i];
                     project.branch = (change.old !== null) ? change.old.name : change.new.name;
                     project.commits = change.commits;
 
-                    let commits = "";
+                    let commits = [];
                     for (let j = 0; j < project.commits.length; j++) {
                         let commit = project.commits[j];
-                        let message = (commit.message.length > 50) ? commit.message.substring(0, 47) + "..." : commit.message;
-                        let author = (typeof commit.author.user !== "undefined") ? " - " + commit.author.user.display_name : "";
-                        commits = commits + "[`" + commit.hash.substring(0, 7) + "`](" + commit.links.html.href + ") " + message.replace(/\n/g, " ").replace(/\r/g, " ") + author + "\n";
+                        let message = (commit.message.length > 256) ? commit.message.substring(0, 255) + "\u2026" : commit.message;
+                        let author = (typeof commit.author.user !== "undefined") ? commit.author.user.display_name : "Unknown";
+
+                        commits.push({
+                            name: "Commit from " + author,
+                            value: "(" + "[`" + commit.hash.substring(0, 7) + "`](" + commit.links.html.href + ")" + ")" + message.replace(/\n/g, " ").replace(/\r/g, " "),
+                            inline: false
+                        });
+                        //commits = commits + "[`" + commit.hash.substring(0, 7) + "`](" + commit.links.html.href + ") " + message.replace(/\n/g, " ").replace(/\r/g, " ") + author + "\n";
                     }
 
                     discordPayload.addEmbed({
                         title: "[" + project.name + ":" + project.branch + "] " + project.commits.length + " commit" + ((project.commits.length > 1) ? "s" : ""),
                         url: project.url,
                         author: user,
-                        description: commits
+                        fields: commits
+                        //description: commits
                     });
                 }
                 break;
@@ -96,7 +103,7 @@ module.exports = {
                     author: user,
                     title: "Wrote a comment to commit " + body.commit.hash.substring(0, 7) + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/commits/" + body.commit.hash,
-                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, '')
+                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 1024) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 1023) + "\u2026" : body.comment.content.html.replace(/<.*?>/g, '')
                 });
                 break;
             case "repo:commit_status_created":
@@ -168,7 +175,7 @@ module.exports = {
                     author: user,
                     title: "Wrote a comment to Issue #" + body.issue.id + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/issues/" + body.issue.id,
-                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, '')
+                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 1024) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 1023) + "\u2026" : body.comment.content.html.replace(/<.*?>/g, '')
                 });
                 break;
             case "pullrequest:created":
@@ -277,7 +284,7 @@ module.exports = {
                     author: user,
                     title: "Wrote a comment to pull request #" + body.pullrequest.id + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
-                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, '')
+                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 1024) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 1023) + "\u2026" : body.comment.content.html.replace(/<.*?>/g, '')
                 });
                 break;
             case "pullrequest:comment_updated":
@@ -291,7 +298,7 @@ module.exports = {
                     author: user,
                     title: "Updated a comment at pull request #" + body.pullrequest.id + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
-                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, '')
+                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 1024) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 1023) + "\u2026" : body.comment.content.html.replace(/<.*?>/g, '')
                 });
                 break;
             case "pullrequest:comment_deleted":
@@ -305,7 +312,7 @@ module.exports = {
                     author: user,
                     title: "Deleted a comment at pull request #" + body.pullrequest.id + " on " + body.repository.name,
                     url: baseLink + body.repository.full_name + "/pull-requests/" + body.pullrequest.id,
-                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 100) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 97) + "..." : body.comment.content.html.replace(/<.*?>/g, '')
+                    description: (body.comment.content.html.replace(/<.*?>/g, '').length > 1024) ? body.comment.content.html.replace(/<.*?>/g, '').substring(0, 1023) + "\u2026" : body.comment.content.html.replace(/<.*?>/g, '')
                 });
                 break;
         }

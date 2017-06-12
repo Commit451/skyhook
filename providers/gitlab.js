@@ -22,11 +22,17 @@ module.exports = {
                     commits: body.commits
                 };
 
-                let commits = "";
-                for (let i = 0; i < project.commits.length; i++) {
+                let commits = [];
+                for (let i = 0; (i < project.commits.length && i < 4); i++) {
                     const commit = project.commits[i];
-                    const message = (commit.message.length > 50) ? commit.message.substring(0, 47) + "..." : commit.message;
-                    commits = commits + commit.author.name + " - (" + "[`" + commit.id.substring(0, 7) + "`](" + commit.url + ")" + ") " + message.replace(/\n/g, " ").replace(/\r/g, " ") + "\n";
+                    const message = (commit.message.length > 256) ? commit.message.substring(0, 255) + "\u2026" : commit.message;
+
+                    commits.push({
+                        name: "Commit from " + commit.author.name,
+                        value: "(" + "[`" + commit.id.substring(0, 7) + "`](" + commit.url + ")" + ")" + message.replace(/\n/g, " ").replace(/\r/g, " "),
+                        inline: false
+                    });
+                    //commits = commits + commit.author.name + " - (" + "[`" + commit.id.substring(0, 7) + "`](" + commit.url + ")" + ") " + message.replace(/\n/g, " ").replace(/\r/g, " ") + "\n";
                 }
 
                 discordPayload.addEmbed({
@@ -36,7 +42,8 @@ module.exports = {
                         name: body.user_name,
                         icon_url: body.user_avatar
                     },
-                    description: commits
+                    fields: commits
+                    //description: commits
                 });
                 break;
 
@@ -60,7 +67,7 @@ module.exports = {
                             name: body.user_name,
                             icon_url: body.user_avatar
                         },
-                        description: (typeof body.message !== 'undefined') ? body.message : ''
+                        description: (typeof body.message !== 'undefined') ? ((body.message.length > 1024) ? body.message.substring(0, 1023) + "\u2026" : body.message) : ''
                     });
                 } else {
                     discordPayload.addEmbed({
@@ -70,7 +77,7 @@ module.exports = {
                             name: body.user_name,
                             icon_url: body.user_avatar
                         },
-                        description: (typeof body.message !== 'undefined') ? body.message : ''
+                        description: (typeof body.message !== 'undefined') ? ((body.message.length > 1024) ? body.message.substring(0, 1023) + "\u2026" : body.message) : ''
                     });
                 }
                 break;
@@ -93,7 +100,7 @@ module.exports = {
                     fields: [
                         {
                             name: body.object_attributes.title,
-                            value: (body.object_attributes.description.length > 200) ? body.object_attributes.description.substring(0, 197) + "..." : body.object_attributes.description
+                            value: (body.object_attributes.description.length > 1024) ? body.object_attributes.description.substring(0, 1023) + "\u2026" : body.object_attributes.description
                         }
                     ]
                 });
@@ -101,7 +108,7 @@ module.exports = {
 
             case "note":
                 let type = null;
-                switch(body.object_attributes.noteable_type){
+                switch (body.object_attributes.noteable_type) {
                     case "Commit":
                         type = "commit (" + body.commit.id.substring(0, 7) + ")";
                         break;
@@ -123,7 +130,7 @@ module.exports = {
                         name: body.user.name,
                         icon_url: body.user.avatar_url
                     },
-                    description: (body.object_attributes.note.length > 50) ? body.object_attributes.note.substring(0, 47) + "..." : body.object_attributes.note
+                    description: (body.object_attributes.note.length > 2048) ? body.object_attributes.note.substring(0, 2047) + "\u2026" : body.object_attributes.note
                 });
                 break;
 
@@ -146,7 +153,7 @@ module.exports = {
                     fields: [
                         {
                             name: body.object_attributes.title,
-                            value: (body.object_attributes.description.length > 200) ? body.object_attributes.description.substring(0, 197) + "..." : body.object_attributes.description
+                            value: (body.object_attributes.description.length > 1024) ? body.object_attributes.description.substring(0, 1023) + "\u2026" : body.object_attributes.description
                         }
                     ]
                 });
@@ -166,7 +173,7 @@ module.exports = {
                         name: body.user.name,
                         icon_url: body.user.avatar_url
                     },
-                    description: (typeof body.object_attributes.message !== 'undefined' ) ? (body.object_attributes.message.length > 200) ? body.object_attributes.message.substring(0, 197) + "..." : body.object_attributes.message : ''
+                    description: (typeof body.object_attributes.message !== 'undefined' ) ? (body.object_attributes.message.length > 2048) ? body.object_attributes.message.substring(0, 2047) + "\u2026" : body.object_attributes.message : ''
                 });
                 break;
 
