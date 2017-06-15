@@ -8,11 +8,11 @@ window.mdc.autoInit();
     'use strict';
 
     //init snackbar things
-    var MDCSnackbar = global.mdc.snackbar.MDCSnackbar;
-    var snackbar = new MDCSnackbar(document.getElementById('mdc-js-snackbar'));
+    const MDCSnackbar = global.mdc.snackbar.MDCSnackbar;
+    const snackbar = new MDCSnackbar(document.getElementById('mdc-js-snackbar'));
 
-    var show = function (sb, theMessage) {
-        var data = {
+    const show = function (sb, theMessage) {
+        const data = {
             message: theMessage,
             multiline: false
         };
@@ -21,17 +21,17 @@ window.mdc.autoInit();
     };
 
     $("#button-generate").click(function () {
-        var discordHookUrl = $('#url').val();
-        var error = false;
+        let discordHookUrl = $('#url').val();
+        let error = false;
         if (discordHookUrl && discordHookUrl.includes("discordapp.com")) {
 
-            var endSpacialPart = discordHookUrl.indexOf("discordapp.com");
-            var startSpacialPart = (discordHookUrl.indexOf(":") + 3);// + :// 3 chars:)
+            const endSpacialPart = discordHookUrl.indexOf("discordapp.com");
+            const startSpacialPart = (discordHookUrl.indexOf(":") + 3);// + :// 3 chars:)
 
             discordHookUrl = discordHookUrl.replace(discordHookUrl.substring(startSpacialPart, endSpacialPart), "");
             discordHookUrl = discordHookUrl.replace("discordapp.com", "skyhook.glitch.me");
 
-            var provider = $('input[name=ex2]:checked').val();
+            const provider = $('input[name=ex2]:checked').val();
             discordHookUrl = discordHookUrl + "/" + provider;
         } else {
             error = true;
