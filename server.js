@@ -11,6 +11,7 @@ const gitlab = require('./providers/gitlab');
 const heroku = require('./providers/heroku');
 const travis = require('./providers/travis');
 const unity = require('./providers/unity');
+const jenkins = require('./providers/jenkins');
 let app = express();
 
 app.use(bodyParser.json());
@@ -59,6 +60,9 @@ app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
             break;
         case "unity":
             unity.parse(req, discordPayload);
+            break;
+        case "jenkins":
+            jenkins.parse(req, discordPayload);
             break;
         default:
             console.log("Unknown from: " + provider);
