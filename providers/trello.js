@@ -3,12 +3,16 @@
 // ========
 module.exports = {
     parse: function (req, discordPayload) {
+        //In order to actually see the json payload.
+        console.log(req.body);
+        console.log(req.body.action.data);
+
         const body = req.body;
         const type = body.action.type;
         const baselink = 'https://trello.com/';
         const avatarurl = 'https://trello-avatars.s3.amazonaws.com/';
 
-        discordPayload.setEmbedColor('0x026aa7');
+        discordPayload.setEmbedColor(158375);
 
         let board = null;
         let user = null;
@@ -24,7 +28,7 @@ module.exports = {
                     title: 'Added ' +  body.action.member.fullName + ' (' + body.action.member.username + ') as admin to board ' + body.model.name,
                     url: body.model.url,
                     author: user,
-                    thumbnail: avatarurl + body.action.member.avatarHash + '/170.png',
+                    thumbnail: avatarurl + body.action.member.avatarHash + '/170.png'
                 });
                 break;
             case 'addAdminToOrganization':
@@ -109,11 +113,13 @@ module.exports = {
                 break;
             case 'addToOrganizationBoard':
                 user = {
-
+                    name: body.action.memberCreator.fullName,
+                    icon_url: avatarurl + body.action.memberCreator.avatarHash + '/170.png',
+                    url: baselink + body.action.memberCreator.username
                 };
                 discordPayload.addEmbed({
-                    title: '',
-                    url: '',
+                    title: 'Board \'' + body.action.data.board.name + '\' created in ' + body.action.data.organization.name,
+                    url: baselink + 'b/' + body.action.data.board.shortLink,
                     author: user
                 });
                 break;
@@ -519,11 +525,13 @@ module.exports = {
                 break;
             case 'removeFromOrganizationBoard':
                 user = {
-
+                    name: body.action.memberCreator.fullName,
+                    icon_url: avatarurl + body.action.memberCreator.avatarHash + '/170.png',
+                    url: baselink + body.action.memberCreator.username
                 };
                 discordPayload.addEmbed({
-                    title: '',
-                    url: '',
+                    title: 'Board \'' + body.action.data.board.name + '\' deleted from ' + body.action.data.organization.name,
+                    url: body.model.url,
                     author: user
                 });
                 break;

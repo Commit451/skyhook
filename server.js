@@ -11,6 +11,7 @@ const providers = {
     gitlab: require('./providers/gitlab'),
     heroku: require('./providers/heroku'),
     jenkins: require('./providers/jenkins'),
+    trello: require('./providers/trello'),
     travis: require('./providers/travis'),
     unity: require('./providers/unity')
 };
@@ -23,6 +24,11 @@ app.use(express.static('public'));
 // http://expressjs.com/en/starter/basic-routing.html
 app.get("/", function (request, response) {
     response.sendFile(__dirname + '/views/index.html');
+});
+
+// Needed otherwise trello will not allow webhook creation.
+app.get("/api/webhooks/:webhookID/:webhookSecret/:from", function(req, res) {
+    res.sendStatus(200);
 });
 
 app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async function (req, res) {
