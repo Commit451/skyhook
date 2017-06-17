@@ -110,6 +110,18 @@ module.exports = {
             case 'addLabelToCard':
                 break;
             case 'addMemberToBoard':
+                embed = {
+                    url: body.model.url,
+                    author: user
+                };
+                if(body.action.memberCreator.id === body.action.member.id){
+                    embed.title = 'Joined Board';
+                    embed.description = body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) has joined ' + body.action.data.board.name + '.';
+                } else {
+                    embed.title = 'Added User to Board';
+                    embed.description = body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was added to ' + body.action.data.board.name + '.';
+                    _addMemberThumbnail(body.action.member.avatarHash, embed);
+                }
                 break;
             case 'addMemberToCard':
                 break;
@@ -118,7 +130,7 @@ module.exports = {
                     url: body.model.url,
                     author: user
                 };
-                if(body.action.memberCreator.username === body.action.member.username){
+                if(body.action.memberCreator.id === body.action.member.id){
                     embed.title = 'Joined Organization';
                     embed.description = body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) has joined ' + body.action.data.organization.name + '.';
                 } else {
@@ -163,7 +175,7 @@ module.exports = {
                 break;
             case 'createOrganization':
                 break;
-            case 'createOrganizationInvitation':
+            case 'createOrganizationInvitation': //Won't Trigger?
                 break;
             case 'deleteAttachmentFromCard':
                 break;
@@ -175,7 +187,7 @@ module.exports = {
                 break;
             case 'deleteLabel':
                 break;
-            case 'deleteOrganizationInvitation':
+            case 'deleteOrganizationInvitation': //Won't Trigger?
                 break;
             case 'disablePlugin':
                 break;
@@ -188,10 +200,17 @@ module.exports = {
             case 'enablePowerUp':
                 break;
             case 'makeAdminOfBoard':
+                embed = {
+                    title: 'Made User an Admin of Board',
+                    url: body.model.url,
+                    description: body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was made an admin of ' + body.action.data.board.name + '.',
+                    author: user
+                };
+                _addMemberThumbnail(body.action.member.avatarHash, embed);
                 break;
             case 'makeAdminOfOrganization':
                 embed = {
-                    title: 'User Permission Change to Organization',
+                    title: 'Made user an Admin of Organization',
                     url: body.model.url,
                     description: body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was made an admin of ' + body.action.data.organization.name + '.',
                     author: user
@@ -199,10 +218,17 @@ module.exports = {
                 _addMemberThumbnail(body.action.member.avatarHash, embed);
                 break;
             case 'makeNormalMemberOfBoard':
+                embed = {
+                    title: 'Made User a Normal Member of Board',
+                    url: body.model.url,
+                    description: body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was made a normal member of ' + body.action.data.board.name + '.',
+                    author: user
+                };
+                _addMemberThumbnail(body.action.member.avatarHash, embed);
                 break;
             case 'makeNormalMemberOfOrganization':
                 embed = {
-                    title: 'User Permission Change to Organization',
+                    title: 'Made User a Normal Member of Organization',
                     url: body.model.url,
                     description: body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was made a normal member of ' + body.action.data.organization.name + '.',
                     author: user
@@ -221,7 +247,14 @@ module.exports = {
                 break;
             case 'moveListToBoard':
                 break;
-            case 'removeAdminFromBoard':
+            case 'removeAdminFromBoard': //Deprecated
+                embed = {
+                    title: 'Admin Removed from Board',
+                    url: body.model.url,
+                    description: body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was removed from ' + body.action.data.board.name + '.',
+                    author: user
+                };
+                _addMemberThumbnail(body.action.member.avatarHash, embed);
                 break;
             case 'removeAdminFromOrganization': //Deprecated
                 embed = {
@@ -247,6 +280,18 @@ module.exports = {
             case 'removeLabelFromCard':
                 break;
             case 'removeMemberFromBoard':
+                embed = {
+                    url: body.model.url,
+                    author: user
+                };
+                if(body.action.memberCreator.id === body.action.member.id){
+                    embed.title = 'Left Board';
+                    embed.description = body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) has left ' + body.action.data.board.name + '.';
+                } else {
+                    embed.title = 'Removed User from Board';
+                    embed.description = body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was removed from ' + body.action.data.board.name + '.';
+                    _addMemberThumbnail(body.action.member.avatarHash, embed);
+                }
                 break;
             case 'removeMemberFromCard':
                 break;
@@ -255,7 +300,7 @@ module.exports = {
                     url: body.model.url,
                     author: user
                 };
-                if(body.action.memberCreator.username === body.action.member.username){
+                if(body.action.memberCreator.id === body.action.member.id){
                     embed.title = 'Left Organization';
                     embed.description = body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) has left ' + body.action.data.organization.name + '.';
                 } else {
@@ -266,7 +311,7 @@ module.exports = {
                 break;
             case 'unconfirmedBoardInvitation':
                 break;
-            case 'unconfirmedOrganizationInvitation':
+            case 'unconfirmedOrganizationInvitation': //Won't Trigger?
                 break;
             case 'updateBoard':
                 break;
