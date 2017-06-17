@@ -115,17 +115,23 @@ module.exports = {
                 break;
             case 'addMemberToOrganization':
                 embed = {
-                    title: 'User Added to Organization',
                     url: body.model.url,
-                    description: body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was added to ' + body.action.data.organization.name + '.',
                     author: user
                 };
-                _addMemberThumbnail(body.action.member.avatarHash, embed);
+                if(body.action.memberCreator.username === body.action.member.username){
+                    embed.title = 'Joined Organization';
+                    embed.description = body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) has joined ' + body.action.data.organization.name + '.';
+                } else {
+                    embed.title = 'Added User to Organization';
+                    embed.description = body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was added to ' + body.action.data.organization.name + '.';
+                    _addMemberThumbnail(body.action.member.avatarHash, embed);
+                }
                 break;
             case 'addToOrganizationBoard':
                 embed = {
-                    title: 'Created board ' + body.action.data.board.name + ' in ' + body.action.data.organization.name,
-                    url: baselink + 'b/' + body.action.data.board.shortLink,
+                    title: 'Added Board to Organization',
+                    url: body.model.url,
+                    description: 'Board [`' + body.action.data.board.name + '`](' + baselink + 'b/' + body.action.data.board.shortLink + ') added to ' +  body.action.data.organization.name + '.',
                     author: user
                 };
                 break;
@@ -232,8 +238,9 @@ module.exports = {
                 break;
             case 'removeFromOrganizationBoard':
                 embed = {
-                    title: 'Deleted board ' + body.action.data.board.name + ' from ' + body.action.data.organization.name,
+                    title: 'Removed Board from Organization',
                     url: body.model.url,
+                    description: 'Board `' + body.action.data.board.name + '` removed from ' +  body.action.data.organization.name + '.',
                     author: user
                 };
                 break;
@@ -245,12 +252,17 @@ module.exports = {
                 break;
             case 'removeMemberFromOrganization':
                 embed = {
-                    title: 'User Removed from Organization',
                     url: body.model.url,
-                    description: body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was removed from ' + body.action.data.organization.name + '.',
                     author: user
                 };
-                _addMemberThumbnail(body.action.member.avatarHash, embed);
+                if(body.action.memberCreator.username === body.action.member.username){
+                    embed.title = 'Left Organization';
+                    embed.description = body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) has left ' + body.action.data.organization.name + '.';
+                } else {
+                    embed.title = 'Removed User from Organization';
+                    embed.description = body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was removed from ' + body.action.data.organization.name + '.';
+                    _addMemberThumbnail(body.action.member.avatarHash, embed);
+                }
                 break;
             case 'unconfirmedBoardInvitation':
                 break;
