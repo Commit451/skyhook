@@ -4,14 +4,33 @@
 
 const baselink = 'https://trello.com/';
 const avatarurl = 'https://trello-avatars.s3.amazonaws.com/';
+const colors = {
+    blue: 31167,      // #0079bf
+    orange: 13799476, // #d29034
+    green: 5347385,   // #519839
+    red: 11552306,    // #b04632
+    purple: 9003166,  // #89609e
+    pink: 13458065,   // #cd5a91
+    lime: 4964203,    // #4bbf6b
+    sky: 44748,       // #00aecc
+    grey: 8621201     // #838c91
+}
 
 //Utility
 function _addMemberThumbnail(avatarHash, embed){
     if(avatarHash != null && avatarHash !== 'null'){
         embed.thumbnail = {
             url: avatarurl + avatarHash + '/170.png'
-        }
+        };
     }
+}
+
+function _resolveCardURL(shortLink){
+    return baselink + 'c/' + shortLink;
+}
+
+function _resolveBoardURL(shortLink){
+    return baselink + 'b/' + shortLink;
 }
 
 function _formatOrganizationUpdate(organization, old, model, embed){
@@ -78,7 +97,11 @@ module.exports = {
         const body = req.body;
         const type = body.action.type;
 
-        discordPayload.setEmbedColor(158375);
+        if(body.model.prefs.background != null && colors[body.model.prefs.background] != null){
+            discordPayload.setEmbedColor(colors[body.model.prefs.background]);
+        } else {
+            discordPayload.setEmbedColor(158375); //Default Trello Color
+        }
 
         let board = null;
         let user = {
@@ -90,11 +113,18 @@ module.exports = {
         let embed = null;
 
         switch (type) {
-            case 'addAdminToBoard':
+            case 'addAdminToBoard': //Deprecated
+                embed = {
+                    title: 'Added Admin to Board',
+                    url: body.model.url,
+                    description: body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was added as an admin to ' + body.action.data.board.name + '.',
+                    author: user
+                };
+                _addMemberThumbnail(body.action.member.avatarHash, embed);
                 break;
             case 'addAdminToOrganization': //Deprecated
                 embed = {
-                    title: 'Admin Added to Organization',
+                    title: 'Added Admin to Organization',
                     url: body.model.url,
                     description: body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was added as an admin to ' + body.action.data.organization.name + '.',
                     author: user
@@ -143,7 +173,7 @@ module.exports = {
                 embed = {
                     title: 'Added Board to Organization',
                     url: body.model.url,
-                    description: 'Board [`' + body.action.data.board.name + '`](' + baselink + 'b/' + body.action.data.board.shortLink + ') added to ' +  body.action.data.organization.name + '.',
+                    description: '[`' + body.action.data.board.name + '`](' + _resolveBoardURL(body.action.data.board.shortLink) + ') was added to ' +  body.action.data.organization.name + '.',
                     author: user
                 };
                 break;
@@ -154,6 +184,13 @@ module.exports = {
             case 'copyBoard':
                 break;
             case 'copyCard':
+                //TODO make this look nicer
+                embed = {
+                    title: 'Copied Card \'' + body.action.data.cardSource.name + '\'',
+                    url: _resolveCardURL(body.action.data.cardSource.shortLink),
+                    description: 'Copied to ' + body.action.data.list.name + ' in ' +  body.action.data.board.name + ' under the name [`' + body.action.data.card.name + '`](' + _resolveCardURL(body.action.data.card.shortLink) + ').',
+                    author: user
+                };
                 break;
             case 'copyChecklist':
                 break;
@@ -168,10 +205,22 @@ module.exports = {
             case 'createBoardPreference':
                 break;
             case 'createCard':
+                embed = {
+                    title: 'Created Card',
+                    url: body.model.url,
+                    description: '[`' + body.action.data.card.name + '`](' + _resolveCardURL(body.action.data.card.shortLink) + ') was added to ' + body.action.data.list.name + ' in ' +  body.action.data.board.name + '.',
+                    author: user
+                };
                 break;
             case 'createChecklist':
                 break;
             case 'createList':
+                embed = {
+                    title: 'Created List',
+                    url: body.model.url,
+                    description: '`' + body.action.data.list.name + '` was created in ' +  body.action.data.board.name + '.',
+                    author: user
+                };
                 break;
             case 'createOrganization':
                 break;
@@ -273,7 +322,7 @@ module.exports = {
                 embed = {
                     title: 'Removed Board from Organization',
                     url: body.model.url,
-                    description: 'Board `' + body.action.data.board.name + '` removed from ' +  body.action.data.organization.name + '.',
+                    description: '`' + body.action.data.board.name + '` was removed from ' +  body.action.data.organization.name + '.',
                     author: user
                 };
                 break;
