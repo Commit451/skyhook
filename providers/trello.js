@@ -38,8 +38,8 @@ function _resolveCommentURL(card, commentID){
     return _resolveCardURL(card) + '#comment-' + commentID;
 }
 
-function _formatLargeString(str){
-    return (str.length > 256 ? str.substring(0, 255) + "\u2026" : str);
+function _formatLargeString(str, limit = 256){
+    return (str.length > limit ? str.substring(0, limit-1) + "\u2026" : str);
 }
 
 function _formatAttachment(attachment, embed){
@@ -176,7 +176,6 @@ module.exports = {
         //Embed Shell, reducing redundant code.
         let ready = false;
         let embed = {
-            title: '[' + (model.displayName != null ? model.displayName : model.name) + '] ',
             url: body.model.url,
             author: {
                 name: action.memberCreator.fullName,
@@ -184,15 +183,15 @@ module.exports = {
                 url: baselink + action.memberCreator.username
             }
         };
+        if(model.displayName != null){
+            embed.title = '[' + model.displayName + '] ';
+        } else if(model.fullName != null){
+            embed.title = '[' + model.fullName + '] ';
+        } else {
+            embed.title = '[' + model.name + '] ';
+        }
 
         switch (type) {
-            case 'addAdminToBoard': //Deprecated
-            case 'addAdminToOrganization': //Deprecated
-                embed.title = embed.title + 'Admin Added';
-                embed.description = action.member.fullName + ' ([`' + action.member.username + '`](' + baselink + action.member.username + '))';
-                _addMemberThumbnail(action.member.avatarHash, embed);
-                ready = true;
-                break;
             case 'addAttachmentToCard':
                 embed.title = embed.title + 'Attachment Added to ' + action.data.card.name;
                 embed.url = _resolveCardURL(action.data.card);
@@ -252,7 +251,11 @@ module.exports = {
                 embed.description = '`' + action.data.card.name + '` from [' + action.data.cardSource.name + '](' + _resolveCardURL(action.data.cardSource) + ') was converted to a card.';
                 ready = true;
                 break;
-            case 'copyBoard': //Won't Trigger?
+            case 'copyBoard':
+                embed.title = embed.title + 'Board Copied';
+                embed.url = _resolveBoardURL(action.data.board);
+                embed.description = action.data.board.name + ' was copied from [another board](' + baselink + 'b/' + action.data.boardSource.id + ').'
+                ready = true;
                 break;
             case 'copyCard':
                 embed.title = embed.title + 'Card Copied';
@@ -271,11 +274,14 @@ module.exports = {
                 break;
             case 'copyCommentCard': //How to Trigger?
                 break;
-            case 'createBoard': //TODO
+            case 'createBoard':
+                embed.title = embed.title + 'Created Board ' + _formatLargeString(action.data.board.name);
+                embed.url = _resolveBoardURL(action.data.board);
+                ready = true;
                 break;
             case 'createBoardInvitation': //Won't Trigger?
                 break;
-            case 'createBoardPreference': //TODO
+            case 'createBoardPreference': //How to Trigger?
                 break;
             case 'createCard':
                 embed.title = embed.title + 'Card Created';
@@ -292,10 +298,14 @@ module.exports = {
                 break;
             case 'createList':
                 embed.title = embed.title + 'List Created';
-                embed.description = '`' + body.action.data.list.name + '`';
+                embed.description = '`' + action.data.list.name + '`';
                 ready = true;
                 break;
-            case 'createOrganization': //TODO
+            case 'createOrganization':
+                embed.title = embed.title + 'Organization Created';
+                embed.description = '`' + action.data.organization.name + '`';
+                embed.url = baselink + action.data.organization.id;
+                ready = true;
                 break;
             case 'createOrganizationInvitation': //Won't Trigger?
                 break;
@@ -356,12 +366,16 @@ module.exports = {
                 embed.title = embed.title + 'User Set to Normal Member';
                 emed.description = action.member.fullName + ' ([`' + action.member.username + '`](' + baselink + action.member.username + '))';
                 _addMemberThumbnail(action.member.avatarHash, embed);
+                if(action.data.board != null) {
+                    embed.url = _resolveBoardURL(action.data.board);
+                }
                 ready = true;
                 break;
             case 'makeObserverOfBoard': //Can't test, business class+ only.
                 embed.title = embed.title + 'User Set to Observer';
                 embed.description = action.member.fullName + ' ([`' + action.member.username + '`](' + baselink + action.member.username + '))';
                 _addMemberThumbnail(action.member.avatarHash, embed);
+                embed.url = _resolveBoardURL(action.data.board);
                 ready = true;
                 break;
             case 'memberJoinedTrello': //How to Trigger?
@@ -384,13 +398,6 @@ module.exports = {
             case 'moveListToBoard':
                 embed.title = embed.title + 'List Moved To Board';
                 embed.description = action.data.list.name + ' has been moved from [another board](' + baselink + 'b/' + action.data.boardSource.id + ').';
-                ready = true;
-                break;
-            case 'removeAdminFromBoard': //Deprecated
-            case 'removeAdminFromOrganization': //Deprecated
-                embed.title = embed.title + 'Admin Removed';
-                embed.description = action.member.fullName + ' ([`' + action.member.username + '`](' + baselink + action.member.username + '))';
-                _addMemberThumbnail(action.member.avatarHash, embed);
                 ready = true;
                 break;
             case 'removeBoardsPinnedFromMember': //How to Trigger?
@@ -432,6 +439,9 @@ module.exports = {
                     _addMemberThumbnail(action.member.avatarHash, embed);
                 }
                 embed.description = action.member.fullName + ' ([`' + action.member.username + '`](' + baselink + action.member.username + '))';
+                if(action.data.board != null) {
+                    embed.url = _resolveBoardURL(action.data.board);
+                }
                 ready = true;
                 break;
             case 'unconfirmedBoardInvitation': //How to Trigger?
@@ -439,8 +449,10 @@ module.exports = {
             case 'unconfirmedOrganizationInvitation': //How to Trigger?
                 break;
             case 'updateBoard': //TODO
+                //So many preferences x.x
                 break;
             case 'updateCard': //TODO
+                //So many preferences x.x
                 break;
             case 'updateCheckItem':
                 embed.title = embed.title + 'Check Item in ' + action.data.checklist.name + ' Renamed';
@@ -521,7 +533,7 @@ module.exports = {
                 embed.description = '`' + _formatLargeString(action.data.old.name) + '` \uD83E\uDC6A `' + _formatLargeString(action.data.list.name) + '`';
                 ready = true;
                 break;
-            case 'updateMember': //TODO
+            case 'updateMember': //How to Trigger?
                 break;
             case 'updateOrganization':
                 embed.title = embed.title + 'Updated Information';
