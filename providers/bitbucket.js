@@ -38,7 +38,7 @@ module.exports = {
 
                         commits.push({
                             name: "Commit from " + author,
-                            value: "(" + "[`" + commit.hash.substring(0, 7) + "`](" + commit.links.html.href + ")" + ")" + message.replace(/\n/g, " ").replace(/\r/g, " "),
+                            value: "(" + "[`" + commit.hash.substring(0, 7) + "`](" + commit.links.html.href + ")" + ") " + message.replace(/\n/g, " ").replace(/\r/g, " "),
                             inline: false
                         });
                         //commits = commits + "[`" + commit.hash.substring(0, 7) + "`](" + commit.links.html.href + ") " + message.replace(/\n/g, " ").replace(/\r/g, " ") + author + "\n";

@@ -55,14 +55,14 @@ app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
         case "heroku":
             heroku.parse(req, discordPayload);
             break;
+        case "jenkins":
+            jenkins.parse(req, discordPayload);
+            break;
         case "travis":
             travis.parse(req, discordPayload);
             break;
         case "unity":
             unity.parse(req, discordPayload);
-            break;
-        case "jenkins":
-            jenkins.parse(req, discordPayload);
             break;
         default:
             console.log("Unknown from: " + provider);
