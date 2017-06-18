@@ -324,13 +324,16 @@ module.exports = {
                 break;
             case 'deleteOrganizationInvitation': //Won't Trigger?
                 break;
-            case 'disablePlugin': //TODO
+            case 'disablePlugin': //On Hold
+                /**
+                 * See comment in enablePlugin
+                 */
                 break;
             case 'disablePowerUp': //How to Trigger?
                 break;
             case 'emailCard': //How to Trigger?
                 break;
-            case 'enablePlugin': //TODO
+            case 'enablePlugin': //On Hold
                 /**
                  * Plugins return a link to the plugin manifest.
                  * This contains details about the plugin, in order
@@ -363,13 +366,25 @@ module.exports = {
                 break;
             case 'memberJoinedTrello': //How to Trigger?
                 break;
-            case 'moveCardFromBoard': //TODO
+            case 'moveCardFromBoard':
+                embed.title = embed.title + 'Card Moved From Board';
+                embed.description = '[' + action.data.card.name + '](' + _resolveCardURL(action.data.card) + ') has been moved from ' + action.data.list.name + 'to [another board](' + baselink + 'b/' + action.data.boardTarget.id + ').';
+                ready = true;
                 break;
-            case 'moveCardToBoard': //TODO
+            case 'moveCardToBoard':
+                embed.title = embed.title + 'Card Moved To Board';
+                embed.description = '[' + action.data.card.name + '](' + _resolveCardURL(action.data.card) + ') has been moved to ' + action.data.list.name + ' from [another board](' + baselink + 'b/' + action.data.boardSource.id + ').';
+                ready = true;
                 break;
-            case 'moveListFromBoard': //TODO
+            case 'moveListFromBoard':
+                embed.title = embed.title + 'List Moved From Board';
+                embed.description = action.data.list.name + ' has been moved to [another board](' + baselink + 'b/' + action.data.boardTarget.id + ').';
+                ready = true;
                 break;
-            case 'moveListToBoard': //TODO
+            case 'moveListToBoard':
+                embed.title = embed.title + 'List Moved To Board';
+                embed.description = action.data.list.name + ' has been moved from [another board](' + baselink + 'b/' + action.data.boardSource.id + ').';
+                ready = true;
                 break;
             case 'removeAdminFromBoard': //Deprecated
             case 'removeAdminFromOrganization': //Deprecated
