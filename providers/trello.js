@@ -1,20 +1,21 @@
 // trello.js
 // https://developers.trello.com/apis/webhooks
 // ========
-
+const request = require('request');
 const baselink = 'https://trello.com/';
 const avatarurl = 'https://trello-avatars.s3.amazonaws.com/';
-const colors = {
-    blue: 31167,      // #0079bf
-    orange: 13799476, // #d29034
-    green: 5347385,   // #519839
-    red: 11552306,    // #b04632
-    purple: 9003166,  // #89609e
-    pink: 13458065,   // #cd5a91
-    lime: 4964203,    // #4bbf6b
-    sky: 44748,       // #00aecc
-    grey: 8621201     // #838c91
-}
+const defTrelloColors = {
+    blue: 0x0079bf,
+    yellow: 0xd9b51c,
+    orange: 0xd29034,
+    green: 0x519839,
+    red: 0xb04632,
+    purple: 0x89609e,
+    pink: 0xcd5a91,
+    lime: 0x4bbf6b,
+    sky: 0x00aecc,
+    grey: 0x838c91
+};
 
 //Utility
 function _addMemberThumbnail(avatarHash, embed){
@@ -25,12 +26,71 @@ function _addMemberThumbnail(avatarHash, embed){
     }
 }
 
-function _resolveCardURL(shortLink){
-    return baselink + 'c/' + shortLink;
+function _resolveCardURL(card){
+    return baselink + 'c/' + card.shortLink + '/' + card.idShort + '-' + card.name.replace(/\s/g, '-').toLowerCase();
 }
 
-function _resolveBoardURL(shortLink){
-    return baselink + 'b/' + shortLink;
+function _resolveBoardURL(board){
+    return baselink + 'b/' + board.shortLink + '/' + board.name.replace(/\s/g, '-').toLowerCase();
+}
+
+function _resolveCommentURL(card, commentID){
+    return _resolveCardURL(card) + '#comment-' + commentID;
+}
+
+function _formatLargeString(str){
+    return (str.length > 256 ? str.substring(0, 255) + "\u2026" : str);
+}
+
+function _formatAttachment(attachment, embed){
+    if(attachment.previewUrl != null){
+        embed.image = {url: attachment.previewUrl};
+    }
+    if(attachment.url != null){
+        if(attachment.name !== attachment.url){
+            embed.fields = [{
+                name: attachment.name,
+                value: attachment.url
+            }];
+        } else {
+            embed.description = attachment.url; 
+        }
+    } else {
+        embed.description = attachment.name;
+    }
+}
+
+function _formatLabel(text, value, embed, discordPayload){
+    if(value){
+        discordPayload.setEmbedColor(defTrelloColors[value]);
+    } else {
+        discordPayload.setEmbedColor(0xb6bbbf); // 'No Color'
+    }
+    if(text){
+        embed.description = '`' + text + '`';
+    }
+}
+
+function _formatPlugin(plugin, embed){
+    return new Promise(function(resolve, reject){
+        request(plugin.url, {timeout: 200}, function(error, response, body){
+            if(error){
+                embed.description = plugin.name;
+                resolve();
+            } else {
+                const manifest = JSON.parse(body)
+                embed.thumbnail = {
+                    url: plugin.url.substring(0, plugin.url.lastIndexOf('/')) + manifest.icon.url.substring(1)
+                };
+                embed.fields = [{
+                    name: manifest.name,
+                    value: _formatLargeString(manifest.details),
+                    inline: false
+                }];
+                resolve();
+            }
+        });
+    });
 }
 
 function _formatOrganizationUpdate(organization, old, model, embed){
@@ -74,7 +134,7 @@ function _formatOrganizationUpdate(organization, old, model, embed){
         } else if(old.desc != null){
             field = {
                name: 'Changed Description of ' + organization.name,
-               value: (old.desc.length > 256 ? old.desc.substring(0, 255) + "\u2026" : old.desc) + '\n`\uD83E\uDC6B`\n' + (organization.desc.length > 256 ? organization.desc.substring(0, 255) + "\u2026" : organization.desc),
+               value: _formatLargeString(old.desc) + '\n`\uD83E\uDC6B`\n' + _formatLargeString(organization.desc),
             };
         }
     } else {
@@ -90,306 +150,300 @@ function _formatOrganizationUpdate(organization, old, model, embed){
 
 module.exports = {
     parse: function (req, discordPayload) {
-        //In order to actually see the json payload.
-        console.log(req.body);
-        console.log(req.body.action.data);
+        //In order to actually see the json payload. Debug use only.
+        console.info(req.body);
+        console.info(req.body.action.data);
 
         const body = req.body;
-        const type = body.action.type;
+        const model = body.model;
+        const action = body.action;
 
-        if(body.model.prefs.background != null && colors[body.model.prefs.background] != null){
-            discordPayload.setEmbedColor(colors[body.model.prefs.background]);
-        } else {
-            discordPayload.setEmbedColor(158375); //Default Trello Color
+        //Our responses are based off of these values so it's important that they are present.
+        if(model == null || action == null){
+            console.error('Trello payload format has changed, provider needs to be updated!');
+            return;
         }
 
-        let board = null;
-        let user = {
-            name: body.action.memberCreator.fullName,
-            icon_url: avatarurl + body.action.memberCreator.avatarHash + '/170.png',
-            url: baselink + body.action.memberCreator.username
-        };
+        const type = action.type;
 
-        let embed = null;
+        //Use the background color of the board if applicable. Otherwise, use the default trello color.
+        if(body.model.prefs != null && body.model.prefs.background != null && defTrelloColors[body.model.prefs.background] != null){
+            discordPayload.setEmbedColor(defTrelloColors[body.model.prefs.background]);
+        } else {
+            discordPayload.setEmbedColor(0x26aa7);
+        }
+
+        //Embed Shell, reducing redundant code.
+        let ready = false;
+        let embed = {
+            title: '[' + (model.displayName != null ? model.displayName : model.name) + '] ',
+            url: body.model.url,
+            author: {
+                name: action.memberCreator.fullName,
+                icon_url: avatarurl + action.memberCreator.avatarHash + '/170.png',
+                url: baselink + action.memberCreator.username
+            }
+        };
 
         switch (type) {
             case 'addAdminToBoard': //Deprecated
-                embed = {
-                    title: 'Added Admin to Board',
-                    url: body.model.url,
-                    description: body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was added as an admin to ' + body.action.data.board.name + '.',
-                    author: user
-                };
-                _addMemberThumbnail(body.action.member.avatarHash, embed);
-                break;
             case 'addAdminToOrganization': //Deprecated
-                embed = {
-                    title: 'Added Admin to Organization',
-                    url: body.model.url,
-                    description: body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was added as an admin to ' + body.action.data.organization.name + '.',
-                    author: user
-                };
-                _addMemberThumbnail(body.action.member.avatarHash, embed);
+                embed.title = embed.title + 'Admin Added';
+                embed.description = action.member.fullName + ' ([`' + action.member.username + '`](' + baselink + action.member.username + '))';
+                _addMemberThumbnail(action.member.avatarHash, embed);
+                ready = true;
                 break;
             case 'addAttachmentToCard':
+                embed.title = embed.title + 'Attachment Added to ' + action.data.card.name;
+                embed.url = _resolveCardURL(action.data.card);
+                _formatAttachment(action.data.attachment, embed);
+                ready = true;
                 break;
-            case 'addBoardsPinnedToMember':
+            case 'addBoardsPinnedToMember': //How to Trigger?
                 break;
             case 'addChecklistToCard':
+                embed.title = embed.title + 'Checklist Added to ' + action.data.card.name;
+                embed.url = _resolveCardURL(action.data.card);
+                embed.description = '`' + action.data.checklist.name + '`';
+                ready = true;
                 break;
             case 'addLabelToCard':
-                break;
-            case 'addMemberToBoard':
-                embed = {
-                    url: body.model.url,
-                    author: user
-                };
-                if(body.action.memberCreator.id === body.action.member.id){
-                    embed.title = 'Joined Board';
-                    embed.description = body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) has joined ' + body.action.data.board.name + '.';
-                } else {
-                    embed.title = 'Added User to Board';
-                    embed.description = body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was added to ' + body.action.data.board.name + '.';
-                    _addMemberThumbnail(body.action.member.avatarHash, embed);
-                }
+                embed.title = embed.title + 'Label Added to ' + action.data.card.name;
+                embed.url = _resolveCardURL(action.data.card);
+                _formatLabel(action.data.text, action.data.value, embed, discordPayload);
+                ready = true;
                 break;
             case 'addMemberToCard':
-                break;
-            case 'addMemberToOrganization':
-                embed = {
-                    url: body.model.url,
-                    author: user
-                };
-                if(body.action.memberCreator.id === body.action.member.id){
-                    embed.title = 'Joined Organization';
-                    embed.description = body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) has joined ' + body.action.data.organization.name + '.';
+                if(action.memberCreator.id === action.member.id){
+                    embed.title = embed.title + 'User Joined ' + action.data.card.name;
                 } else {
-                    embed.title = 'Added User to Organization';
-                    embed.description = body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was added to ' + body.action.data.organization.name + '.';
-                    _addMemberThumbnail(body.action.member.avatarHash, embed);
+                    embed.title = embed.title + 'User Added to ' + action.data.card.name;
+                    _addMemberThumbnail(action.member.avatarHash, embed);
                 }
+                embed.url = _resolveCardURL(action.data.card);
+                embed.description = action.member.fullName + ' ([`' + action.member.username + '`](' + baselink + action.member.username + '))';
+                ready = true;
+                break;
+            case 'addMemberToBoard':
+            case 'addMemberToOrganization':
+                if(action.memberCreator.id === action.member.id){
+                    embed.title = embed.title + 'User Joined';
+                } else {
+                    embed.title = embed.title + 'User Added';
+                    _addMemberThumbnail(action.member.avatarHash, embed);
+                }
+                embed.description = action.member.fullName + ' ([`' + action.member.username + '`](' + baselink + action.member.username + '))';
+                ready = true;
                 break;
             case 'addToOrganizationBoard':
-                embed = {
-                    title: 'Added Board to Organization',
-                    url: body.model.url,
-                    description: '[`' + body.action.data.board.name + '`](' + _resolveBoardURL(body.action.data.board.shortLink) + ') was added to ' +  body.action.data.organization.name + '.',
-                    author: user
-                };
+                embed.title = embed.title + 'Board Added';
+                embed.description = '[`' + action.data.board.name + '`](' + _resolveBoardURL(action.data.board) + ')';
+                ready = true;
                 break;
             case 'commentCard':
+                embed.title = embed.title + 'Comment on Card ' + action.data.card.name;
+                embed.url = _resolveCommentURL(action.data.card, action.id);
+                embed.description = _formatLargeString(action.data.text);
+                ready = true;
                 break;
             case 'convertToCardFromCheckItem':
+                embed.title = embed.title + 'Check Item Converted to Card';
+                embed.url = _resolveCardURL(action.data.card);
+                embed.description = '`' + action.data.card.name + '` from [' + action.data.cardSource.name + '](' + _resolveCardURL(action.data.cardSource) + ') was converted to a card.';
+                ready = true;
                 break;
-            case 'copyBoard':
+            case 'copyBoard': //Won't Trigger?
                 break;
             case 'copyCard':
-                //TODO make this look nicer
-                embed = {
-                    title: 'Copied Card \'' + body.action.data.cardSource.name + '\'',
-                    url: _resolveCardURL(body.action.data.cardSource.shortLink),
-                    description: 'Copied to ' + body.action.data.list.name + ' in ' +  body.action.data.board.name + ' under the name [`' + body.action.data.card.name + '`](' + _resolveCardURL(body.action.data.card.shortLink) + ').',
-                    author: user
-                };
+                embed.title = embed.title + 'Card Copied';
+                embed.description = '[`' + action.data.cardSource.name + '`](' + _resolveCardURL(action.data.cardSource) + ') \uD83E\uDC6A [`' + action.data.card.name + '`](' + _resolveCardURL(action.data.card) + ')';
+                ready = true;
                 break;
             case 'copyChecklist':
+                embed.title = embed.title + 'Checklist Copied';
+                embed.description = '`' + action.data.checklistSource.name + '` \uD83E\uDC6A `' + action.data.checklist.name + '`';
+                ready = true;
                 break;
             case 'createLabel':
+                embed.title = embed.title + 'Label Created';
+                _formatLabel(action.data.label.name, action.data.label.color, embed, discordPayload);
+                ready = true;
                 break;
-            case 'copyCommentCard':
+            case 'copyCommentCard': //How to Trigger?
                 break;
-            case 'createBoard':
+            case 'createBoard': //TODO
                 break;
-            case 'createBoardInvitation':
+            case 'createBoardInvitation': //Won't Trigger?
                 break;
-            case 'createBoardPreference':
+            case 'createBoardPreference': //TODO
                 break;
             case 'createCard':
-                embed = {
-                    title: 'Created Card',
-                    url: body.model.url,
-                    description: '[`' + body.action.data.card.name + '`](' + _resolveCardURL(body.action.data.card.shortLink) + ') was added to ' + body.action.data.list.name + ' in ' +  body.action.data.board.name + '.',
-                    author: user
-                };
+                embed.title = embed.title + 'Card Created';
+                embed.description = '[`' + action.data.card.name + '`](' + _resolveCardURL(action.data.card) + ') was added to ' + action.data.list.name + '.';
+                ready = true;
                 break;
-            case 'createChecklist':
+            case 'createCheckItem':
+                embed.title = embed.title + 'Check Item Created in ' + action.data.card.name;
+                embed.url = _resolveCardURL(action.data.card);
+                embed.description = '`' + action.data.checkItem.name + '` was added to `' + action.data.checklist.name + '`.';
+                ready = true;
+                break;
+            case 'createChecklist': //How to Trigger?
                 break;
             case 'createList':
-                embed = {
-                    title: 'Created List',
-                    url: body.model.url,
-                    description: '`' + body.action.data.list.name + '` was created in ' +  body.action.data.board.name + '.',
-                    author: user
-                };
+                embed.title = embed.title + 'List Created';
+                embed.description = '`' + body.action.data.list.name + '`';
+                ready = true;
                 break;
-            case 'createOrganization':
+            case 'createOrganization': //TODO
                 break;
             case 'createOrganizationInvitation': //Won't Trigger?
                 break;
             case 'deleteAttachmentFromCard':
+                embed.title = embed.title + 'Attachment Removed from ' + action.data.card.name;
+                embed.url = _resolveCardURL(action.data.card);
+                _formatAttachment(action.data.attachment, embed);
+                ready = true;
                 break;
-            case 'deleteBoardInvitation':
+            case 'deleteBoardInvitation': //Won't Trigger?
                 break;
             case 'deleteCard':
+                embed.title = embed.title + 'Card Deleted';
+                embed.description = 'A card was deleted from ' + action.data.list.name + '.';
+                ready = true;
                 break;
             case 'deleteCheckItem':
+                embed.title = embed.title + 'Check Item Deleted from ' + action.data.card.name;
+                embed.url = _resolveCardURL(action.data.card);
+                embed.description = '`' + action.data.checkItem.name + '` was removed from `' + action.data.checklist.name + '`.';
+                ready = true;
                 break;
             case 'deleteLabel':
+                embed.title = embed.title + 'Label Deleted';
+                ready = true;
                 break;
             case 'deleteOrganizationInvitation': //Won't Trigger?
                 break;
-            case 'disablePlugin':
+            case 'disablePlugin': //TODO
                 break;
-            case 'disablePowerUp':
+            case 'disablePowerUp': //TODO
                 break;
-            case 'emailCard':
+            case 'emailCard': //TODO
                 break;
-            case 'enablePlugin':
+            case 'enablePlugin': //TODO
+                /**
+                 * Plugins return a link to the plugin manifest.
+                 * This contains details about the plugin, in order
+                 * to use that we need to make an async request to
+                 * retrieve the manifest. That won't work with
+                 * the current design.
+                 */
                 break;
-            case 'enablePowerUp':
+            case 'enablePowerUp': //TODO
                 break;
             case 'makeAdminOfBoard':
-                embed = {
-                    title: 'Made User an Admin of Board',
-                    url: body.model.url,
-                    description: body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was made an admin of ' + body.action.data.board.name + '.',
-                    author: user
-                };
-                _addMemberThumbnail(body.action.member.avatarHash, embed);
-                break;
             case 'makeAdminOfOrganization':
-                embed = {
-                    title: 'Made user an Admin of Organization',
-                    url: body.model.url,
-                    description: body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was made an admin of ' + body.action.data.organization.name + '.',
-                    author: user
-                };
-                _addMemberThumbnail(body.action.member.avatarHash, embed);
+                embed.title = embed.title + 'User Set to Admin';
+                embed.description = action.member.fullName + ' ([`' + action.member.username + '`](' + baselink + action.member.username + '))';
+                _addMemberThumbnail(action.member.avatarHash, embed);
+                ready = true;
                 break;
             case 'makeNormalMemberOfBoard':
-                embed = {
-                    title: 'Made User a Normal Member of Board',
-                    url: body.model.url,
-                    description: body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was made a normal member of ' + body.action.data.board.name + '.',
-                    author: user
-                };
-                _addMemberThumbnail(body.action.member.avatarHash, embed);
-                break;
             case 'makeNormalMemberOfOrganization':
-                embed = {
-                    title: 'Made User a Normal Member of Organization',
-                    url: body.model.url,
-                    description: body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was made a normal member of ' + body.action.data.organization.name + '.',
-                    author: user
-                };
-                _addMemberThumbnail(body.action.member.avatarHash, embed);
+                embed.title = embed.title + 'User Set to Normal Member';
+                emed.description = action.member.fullName + ' ([`' + action.member.username + '`](' + baselink + action.member.username + '))';
+                _addMemberThumbnail(action.member.avatarHash, embed);
+                ready = true;
                 break;
-            case 'makeObserverOfBoard':
+            case 'makeObserverOfBoard': //TODO
                 break;
-            case 'memberJoinedTrello':
+            case 'memberJoinedTrello': //TODO
                 break;
-            case 'moveCardFromBoard':
+            case 'moveCardFromBoard': //TODO
                 break;
-            case 'moveCardToBoard':
+            case 'moveCardToBoard': //TODO
                 break;
-            case 'moveListFromBoard':
+            case 'moveListFromBoard': //TODO
                 break;
-            case 'moveListToBoard':
+            case 'moveListToBoard': //TODO
                 break;
             case 'removeAdminFromBoard': //Deprecated
-                embed = {
-                    title: 'Admin Removed from Board',
-                    url: body.model.url,
-                    description: body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was removed from ' + body.action.data.board.name + '.',
-                    author: user
-                };
-                _addMemberThumbnail(body.action.member.avatarHash, embed);
-                break;
             case 'removeAdminFromOrganization': //Deprecated
-                embed = {
-                    title: 'Admin Removed from Organization',
-                    url: body.model.url,
-                    description: body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was removed from ' + body.action.data.organization.name + '.',
-                    author: user
-                };
-                _addMemberThumbnail(body.action.member.avatarHash, embed);
+                embed.title = embed.title + 'Admin Removed';
+                embed.description = action.member.fullName + ' ([`' + action.member.username + '`](' + baselink + action.member.username + '))';
+                _addMemberThumbnail(action.member.avatarHash, embed);
+                ready = true;
                 break;
-            case 'removeBoardsPinnedFromMember':
+            case 'removeBoardsPinnedFromMember': //How to Trigger?
                 break;
             case 'removeChecklistFromCard':
+                embed.title = embed.title + 'Checklist Removed from ' + action.data.card.name;
+                embed.url = _resolveCardURL(action.data.card);
+                embed.description = '`' + action.data.checklist.name + '`';
+                ready = true;
                 break;
             case 'removeFromOrganizationBoard':
-                embed = {
-                    title: 'Removed Board from Organization',
-                    url: body.model.url,
-                    description: '`' + body.action.data.board.name + '` was removed from ' +  body.action.data.organization.name + '.',
-                    author: user
-                };
+                embed.title = embed.title + 'Board Removed';
+                embed.description = '`' + body.action.data.board.name + '`';
+                ready = true;
                 break;
             case 'removeLabelFromCard':
-                break;
-            case 'removeMemberFromBoard':
-                embed = {
-                    url: body.model.url,
-                    author: user
-                };
-                if(body.action.memberCreator.id === body.action.member.id){
-                    embed.title = 'Left Board';
-                    embed.description = body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) has left ' + body.action.data.board.name + '.';
-                } else {
-                    embed.title = 'Removed User from Board';
-                    embed.description = body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was removed from ' + body.action.data.board.name + '.';
-                    _addMemberThumbnail(body.action.member.avatarHash, embed);
-                }
+                embed.title = embed.title + 'Label Removed From ' + action.data.card.name;
+                embed.url = _resolveCardURL(action.data.card);
+                _formatLabel(action.data.text, action.data.value, embed, discordPayload);
+                ready = true;
                 break;
             case 'removeMemberFromCard':
-                break;
-            case 'removeMemberFromOrganization':
-                embed = {
-                    url: body.model.url,
-                    author: user
-                };
-                if(body.action.memberCreator.id === body.action.member.id){
-                    embed.title = 'Left Organization';
-                    embed.description = body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) has left ' + body.action.data.organization.name + '.';
+                if(action.memberCreator.id === action.member.id){
+                    embed.title = embed.title + 'User Left ' + action.data.card.name;
                 } else {
-                    embed.title = 'Removed User from Organization';
-                    embed.description = body.action.member.fullName + ' ([`' + body.action.member.username + '`](' + baselink + body.action.member.username + ')) was removed from ' + body.action.data.organization.name + '.';
-                    _addMemberThumbnail(body.action.member.avatarHash, embed);
+                    embed.title = embed.title + 'User Removed from ' + action.data.card.name;
+                    _addMemberThumbnail(action.member.avatarHash, embed);
                 }
+                embed.url = _resolveCardURL(action.data.card);
+                embed.description = action.member.fullName + ' ([`' + action.member.username + '`](' + baselink + action.member.username + '))';
+                ready = true;
                 break;
-            case 'unconfirmedBoardInvitation':
+            case 'removeMemberFromBoard':
+            case 'removeMemberFromOrganization':
+                if(action.memberCreator.id === action.member.id){
+                    embed.title = embed.title + 'User Left';
+                } else {
+                    embed.title = embed.title + 'User Removed';
+                    _addMemberThumbnail(action.member.avatarHash, embed);
+                }
+                embed.description = action.member.fullName + ' ([`' + action.member.username + '`](' + baselink + action.member.username + '))';
+                ready = true;
                 break;
-            case 'unconfirmedOrganizationInvitation': //Won't Trigger?
+            case 'unconfirmedBoardInvitation': //How to Trigger?
                 break;
-            case 'updateBoard':
+            case 'unconfirmedOrganizationInvitation': //How to Trigger?
                 break;
-            case 'updateCard':
+            case 'updateBoard': //TODO
                 break;
-            case 'updateCheckItem':
+            case 'updateCard': //TODO
                 break;
-            case 'updateCheckItemStateOnCard':
+            case 'updateCheckItem': //TODO
                 break;
-            case 'updateChecklist':
+            case 'updateCheckItemStateOnCard': //TODO
                 break;
-            case 'updateLabel':
+            case 'updateChecklist': //TODO
                 break;
-            case 'updateList':
+            case 'updateLabel': //TODO
                 break;
-            case 'updateMember':
+            case 'updateList': //TODO
+                break;
+            case 'updateMember': //TODO
                 break;
             case 'updateOrganization':
-                embed = {
-                    title: 'Updated Organization Information',
-                    url: body.model.url,
-                    author: user
-                };
-                _formatOrganizationUpdate(body.action.data.organization, body.action.data.old, body.model, embed);
+                embed.title = embed.title + 'Updated Information';
+                _formatOrganizationUpdate(action.data.organization, action.data.old, model, embed);
+                ready = true;
                 break;
-            case 'voteOnCard':
+            case 'voteOnCard': //TODO
                 break;
         }
-        if(embed != null){
+        if(ready){
             discordPayload.addEmbed(embed);
         }
     }
