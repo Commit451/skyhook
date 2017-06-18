@@ -326,9 +326,9 @@ module.exports = {
                 break;
             case 'disablePlugin': //TODO
                 break;
-            case 'disablePowerUp': //TODO
+            case 'disablePowerUp': //How to Trigger?
                 break;
-            case 'emailCard': //TODO
+            case 'emailCard': //How to Trigger?
                 break;
             case 'enablePlugin': //TODO
                 /**
@@ -339,7 +339,7 @@ module.exports = {
                  * the current design.
                  */
                 break;
-            case 'enablePowerUp': //TODO
+            case 'enablePowerUp': //How to Trigger?
                 break;
             case 'makeAdminOfBoard':
             case 'makeAdminOfOrganization':
@@ -355,9 +355,13 @@ module.exports = {
                 _addMemberThumbnail(action.member.avatarHash, embed);
                 ready = true;
                 break;
-            case 'makeObserverOfBoard': //TODO
+            case 'makeObserverOfBoard': //Can't test, business class+ only.
+                embed.title = embed.title + 'User Set to Observer';
+                embed.description = action.member.fullName + ' ([`' + action.member.username + '`](' + baselink + action.member.username + '))';
+                _addMemberThumbnail(action.member.avatarHash, embed);
+                ready = true;
                 break;
-            case 'memberJoinedTrello': //TODO
+            case 'memberJoinedTrello': //How to Trigger?
                 break;
             case 'moveCardFromBoard': //TODO
                 break;
@@ -423,15 +427,84 @@ module.exports = {
                 break;
             case 'updateCard': //TODO
                 break;
-            case 'updateCheckItem': //TODO
+            case 'updateCheckItem':
+                embed.title = embed.title + 'Check Item in ' + action.data.checklist.name + ' Renamed';
+                embed.url = _resolveCardURL(action.data.card);
+                embed.description = '`' + _formatLargeString(action.data.old.name) + '` \uD83E\uDC6A `' + _formatLargeString(action.data.checkItem.name) + '`';
+                ready = true;
                 break;
-            case 'updateCheckItemStateOnCard': //TODO
+            case 'updateCheckItemStateOnCard':
+                let capitalized = action.data.checkItem.state.charAt(0).toUpperCase() + action.data.checkItem.state.slice(1);
+                embed.title = embed.title + 'Check Item Marked ' + capitalized;
+                if(action.data.checkItem.state === 'complete'){
+                    embed.title = embed.title + ' `\u2714`';
+                } else if(action.data.checkItem.state === 'incomplete'){
+                    embed.title = embed.title + ' `\u2718`';
+                }
+                embed.description = '`' + action.data.checkItem.name + '` has been marked as ' + action.data.checkItem.state + ' in `' + action.data.checklist.name + '`.';
+                embed.url = _resolveCardURL(action.data.card);
+                ready = true;
                 break;
-            case 'updateChecklist': //TODO
+            case 'updateChecklist':
+                embed.title = embed.title + 'Checklist Renamed';
+                embed.description = '`' + _formatLargeString(action.data.old.name) + '` \uD83E\uDC6A `' + _formatLargeString(action.data.checklist.name) + '`';
+                ready = true;
                 break;
-            case 'updateLabel': //TODO
+            case 'updateLabel':
+                embed.title = embed.title + 'Label Updated';
+                let field = {};
+                if(action.data.old != null){
+                    if(action.data.old.color != null){
+                        if(action.data.label.color){
+                            field = {
+                                name: 'Color Changed',
+                                value: '`' + action.data.old.color + '` \uD83E\uDC6A `' + action.data.label.color + '`',
+                                inline: false
+                            };
+                        } else {
+                            field = {
+                                name: 'Color Removed',
+                                value: 'Previous color - `' + action.data.old.color + '`',
+                                inline: false
+                            };
+                        }
+                    } else if(action.data.old.name != null){
+                        if(action.data.old.name){
+                            if(action.data.label.name){
+                                field = {
+                                    name: 'Name Changed',
+                                    value: '`' + action.data.old.name + '` \uD83E\uDC6A `' + action.data.label.name + '`',
+                                    inline: false
+                                };
+                            } else {
+                                field = {
+                                    name: 'Name Removed',
+                                    value: 'Previous name - `' + action.data.old.name + '`',
+                                    inline: false
+                                };
+                            }
+                        } else {
+                            field = {
+                                name: 'Name Added',
+                                value: '`' + action.data.label.name + '`',
+                                inline: false
+                            };
+                        }
+                    }
+                } else {
+                    field = {
+                        name: 'Color Added',
+                        value: '`' + action.data.label.color + '`',
+                        inline: false
+                    };
+                }
+                embed.fields = [field];
+                ready = true;
                 break;
-            case 'updateList': //TODO
+            case 'updateList':
+                embed.title = embed.title + 'List Renamed';
+                embed.description = '`' + _formatLargeString(action.data.old.name) + '` \uD83E\uDC6A `' + _formatLargeString(action.data.list.name) + '`';
+                ready = true;
                 break;
             case 'updateMember': //TODO
                 break;
@@ -440,7 +513,14 @@ module.exports = {
                 _formatOrganizationUpdate(action.data.organization, action.data.old, model, embed);
                 ready = true;
                 break;
-            case 'voteOnCard': //TODO
+            case 'voteOnCard':
+                if(action.data.voted){
+                    embed.title = embed.title + 'Voted on ' + action.data.card.name + ' \u2705';
+                } else {
+                    embed.title = embed.title + 'Removed Vote on ' + action.data.card.name;
+                }
+                embed.url = _resolveCardURL(action.data.card);
+                ready = true;
                 break;
         }
         if(ready){
