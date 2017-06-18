@@ -1,21 +1,23 @@
-function DiscordPayload() {
-    this.data = {};
-    this.embedColor = null;
+class DiscordPayload {
+    constructor() {
+        this.data = {};
+        this.embedColor = null;
+    }
 
-    this.setEmbedColor = function (color) {
+    setEmbedColor(color) {
         this.embedColor = color;
-    };
+    }
 
-    this.setContent = function (content) {
+    setContent(content) {
         this.data.content = content;
-    };
+    }
 
-    this.setUser = function (user, avatarUrl) {
-        this.data.username = user;
+    setUser(username, avatarUrl) {
+        this.data.username = username;
         this.data.avatar_url = avatarUrl;
-    };
+    }
 
-    this.addEmbed = function (data) {
+    addEmbed(data) {
         if (typeof this.data.embeds === 'undefined') {
             this.data.embeds = [];
         }
@@ -28,11 +30,11 @@ function DiscordPayload() {
             data.color = this.embedColor;
         }
         this.data.embeds.push(data);
-    };
+    }
 
-    this.getData = function () {
+    getData() {
         return this.data;
-    };
+    }
 }
 
 module.exports = DiscordPayload;
