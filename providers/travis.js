@@ -1,17 +1,21 @@
 // travis.js
 // https://docs.travis-ci.com/user/notifications/#Configuring-webhook-notifications
 // ========
-module.exports = {
-    parse: function (req, discordPayload) {
-        const body = req.body;
-        discordPayload.setEmbedColor(0xC7B398);
-        discordPayload.addEmbed({
-            title: "Build #" + body.number,
-            url: body.build_url,
+const BaseProvider = require('../util/BaseProvider');
+
+class TravisCi extends BaseProvider {
+    async parseData(){
+        this.payload.setEmbedColor(0xC7B398);
+        this.payload.addEmbed({
+            title: "Build #" + this.body.number,
+            url: this.body.build_url,
             author: {
-                name: body.repository.name
+                name: this.body.repository.name
             },
-            description: "**Status**: " + body.status_message
+            description: "**Status**: " + this.body.status_message
         });
     }
-};
+}
+
+module.exports = TravisCi;
+
