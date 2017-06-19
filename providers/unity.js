@@ -4,6 +4,10 @@
 const BaseProvider = require('../util/BaseProvider');
 
 class Unity extends BaseProvider {
+    static getName() {
+        return 'Unity Cloud';
+    }
+
     async parseData() {
         this.payload.setEmbedColor(0x222C37);
 

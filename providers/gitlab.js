@@ -9,6 +9,10 @@ class GitLab extends BaseProvider {
         this.payload.setEmbedColor(0xFCA326);
     }
 
+    static getName() {
+        return 'GitLab';
+    }
+
     async getType() {
         return this.body.object_kind;
     }
