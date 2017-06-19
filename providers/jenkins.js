@@ -1,34 +1,36 @@
 // jenkins.js
 // https://plugins.jenkins.io/notification
 // ========
-module.exports = {
-    parse: function (req, discordPayload) {
-        const body = req.body;
-        discordPayload.setEmbedColor(0xF0D6B7);
-        const phase = body.build.phase;
+const BaseProvider = require('../util/BaseProvider');
 
-        console.log(body);
+class Jenkins extends BaseProvider {
+    async parseData(){
+        this.payload.setEmbedColor(0xF0D6B7);
+        const phase = this.body.build.phase;
 
-        switch (phase) {
+        switch(phase){
             case "STARTED":
-                discordPayload.addEmbed({
-                    title: "Project " + body.name,
-                    url: body.build.full_url,
-                    description: "Started build #" + body.build.number
+                this.payload.addEmbed({
+                    title: "Project " + this.body.name,
+                    url: this.body.build.full_url,
+                    description: "Started build #" + this.body.build.number
                 });
                 break;
             case "COMPLETED":
             case "FINALIZED":
-                discordPayload.addEmbed({
-                    title: "Project " + body.name,
-                    url: body.build.full_url,
-                    description: this.capitalize(phase) + " build #" + body.build.number + " with status: " + body.build.status
+                this.payload.addEmbed({
+                    title: "Project " + this.body.name,
+                    url: this.body.build.full_url,
+                    description: Jenkins.capitalize(phase) + " build #" + this.body.build.number + " with status: " + this.body.build.status
                 });
                 break;
         }
-    },
-    capitalize: function (string) {
-        const tmp = string.toLowerCase();
+    }
+
+    static capitalize(str){
+        const tmp = str.toLowerCase();
         return tmp.charAt(0).toUpperCase() + tmp.slice(1);
     }
-};
+}
+
+module.exports = Jenkins;

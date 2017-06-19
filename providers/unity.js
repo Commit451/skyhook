@@ -1,19 +1,18 @@
 // unity.js
 // https://build-api.cloud.unity3d.com/docs/1.0.0/index.html#operation-webhooks-intro
 // ========
-module.exports = {
-    parse: function (req, discordPayload) {
-        const body = req.body;
+const BaseProvider = require('../util/BaseProvider');
 
-        discordPayload.setEmbedColor(0x222C37);
+class Unity extends BaseProvider {
+    async parseData() {
+        this.payload.setEmbedColor(0x222C37);
 
-
-        const projectName = body.projectName;
-        const projectTarget = body.buildTargetName;
-        const projectVersion = body.buildNumber;
-        const share = body.links.share_url;
-        const type = body.buildStatus;
-        const ref = body.ref;
+        const projectName = this.body.projectName;
+        const projectTarget = this.body.buildTargetName;
+        const projectVersion = this.body.buildNumber;
+        const share = this.body.links.share_url;
+        const type = this.body.buildStatus;
+        const ref = this.body.ref;
         let content = "No download available.";
         const user = {
             name: projectTarget,
@@ -21,7 +20,7 @@ module.exports = {
         };
         let download = "";
         let link = "";
-        discordPayload.setUser(projectName + "Buildserver", "https://developer.cloud.unity3d.com/images/icon-default.png");
+        this.payload.setUser(projectName + "Buildserver", "https://developer.cloud.unity3d.com/images/icon-default.png");
         switch (type) {
             case "success":
                 if (share !== null) {
@@ -42,11 +41,13 @@ module.exports = {
                 break;
 
         }
-        discordPayload.addEmbed({
+        this.payload.addEmbed({
             title: "[" + projectName + "] " + " version #" + projectVersion,
             url: download,
             author: user,
             description: content
         });
     }
-};
+}
+
+module.exports = Unity;

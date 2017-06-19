@@ -3,16 +3,17 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const request = require('request');
-const DiscordPayload = require('./util/DiscordPayload');
-const appveyor = require('./providers/appveyor');
-const bitbucket = require('./providers/bitbucket');
-const circleci = require('./providers/circleci');
-const gitlab = require('./providers/gitlab');
-const heroku = require('./providers/heroku');
-const travis = require('./providers/travis');
-const unity = require('./providers/unity');
-const jenkins = require('./providers/jenkins');
 let app = express();
+const providers = {
+    appveyor: require('./providers/appveyor'),
+    bitbucket: require('./providers/bitbucket'),
+    circleci: require('./providers/circleci'),
+    gitlab: require('./providers/gitlab'),
+    heroku: require('./providers/heroku'),
+    jenkins: require('./providers/jenkins'),
+    travis: require('./providers/travis'),
+    unity: require('./providers/unity')
+};
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -24,92 +25,65 @@ app.get("/", function (request, response) {
     response.sendFile(__dirname + '/views/index.html');
 });
 
-app.post("/api/webhooks/:hookPart1/:hookPart2/:from", function (req, res) {
-
-    let hookPart1 = req.params.hookPart1;
-    let hookPart2 = req.params.hookPart2;
+app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async function (req, res) {
+    let webhookID = req.params.webhookID;
+    let webhookSecret = req.params.webhookSecret;
     let provider = req.params.from;
     const test = req.get("test");
-    if (!hookPart1 || !hookPart2 || !provider) {
+    if (!webhookID || !webhookSecret || !provider) {
         res.sendStatus(400);
         return;
     }
-    const discordHookUrl = "https://discordapp.com/api/webhooks/" + hookPart1 + "/" + hookPart2;
+    const discordEndpoint = "https://discordapp.com/api/webhooks/" + webhookID + "/" + webhookSecret;
 
     // https://discordapp.com/developers/docs/resources/webhook#execute-webhook
-    let discordPayload = new DiscordPayload();
+    let discordPayload = null;
     let error = false;
-    switch (provider) {
-        case "appveyor":
-            appveyor.parse(req, discordPayload);
-            break;
-        case "bitbucket":
-            bitbucket.parse(req, discordPayload);
-            break;
-        case "circleci":
-            circleci.parse(req, discordPayload);
-            break;
-        case "gitlab":
-            gitlab.parse(req, discordPayload);
-            break;
-        case "heroku":
-            heroku.parse(req, discordPayload);
-            break;
-        case "jenkins":
-            jenkins.parse(req, discordPayload);
-            break;
-        case "travis":
-            travis.parse(req, discordPayload);
-            break;
-        case "unity":
-            unity.parse(req, discordPayload);
-            break;
-        default:
-            console.log("Unknown from: " + provider);
-            error = true;
-            break;
+
+    if (typeof providers[provider] !== 'undefined') {
+        const instance = new providers[provider]();
+        discordPayload = await instance.parse(req);
+    } else {
+        console.log('Unknown provider "' + provider + '"');
     }
 
-    if (error) {
-        res.sendStatus(400);
-        return;
-    }
-    let jsonString = JSON.stringify(discordPayload.getData());
-    //special case for testing. Kinda lame to do that, but meh
-    if (test) {
-        const testHookUrl = process.env.TEST_HOOK_URL;
-        if (testHookUrl) {
-            console.log("Sending to test url: " + testHookUrl);
+    if (discordPayload !== null) {
+        let jsonString = JSON.stringify(discordPayload);
+        if (test) {
+            const testHookUrl = process.env.TEST_HOOK_URL;
+            if (testHookUrl) {
+                console.log("Sending to test url: " + testHookUrl);
+                request.post({
+                    headers: {'content-type': 'application/json'},
+                    url: discordEndpoint + provider,
+                    body: jsonString
+                }, function (error, response, body) {
+                    if (error) {
+                        console.log(error);
+                        res.sendStatus(400);
+                    } else {
+                        res.setHeader('Content-Type', 'application/json');
+                        res.send(jsonString);
+                    }
+                });
+            } else {
+                res.setHeader('Content-Type', 'application/json');
+                res.send(jsonString);
+            }
+        } else {
             request.post({
                 headers: {'content-type': 'application/json'},
-                url: discordHookUrl + provider,
+                url: discordEndpoint,
                 body: jsonString
             }, function (error, response, body) {
                 if (error) {
                     console.log(error);
                     res.sendStatus(400);
                 } else {
-                    res.setHeader('Content-Type', 'application/json');
-                    res.send(jsonString);
+                    res.sendStatus(200);
                 }
             });
-        } else {
-            res.setHeader('Content-Type', 'application/json');
-            res.send(jsonString);
         }
-    } else {
-        request.post({
-            headers: {'content-type': 'application/json'},
-            url: discordHookUrl,
-            body: jsonString
-        }, function (error, response, body) {
-            if (error) {
-                console.log(error);
-                res.sendStatus(400);
-            } else {
-                res.sendStatus(200);
-            }
-        });
     }
 });
 

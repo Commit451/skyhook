@@ -1,17 +1,20 @@
 // circleci.js
 // https://circleci.com/docs/1.0/configuration/#notify
 // ========
-module.exports = {
-    parse: function (req, discordPayload) {
-        const body = req.body;
-        discordPayload.setEmbedColor(0x000000);
-        discordPayload.addEmbed({
-            title: "Build #" + body.payload.build_num,
-            url: body.payload.build_url,
+const BaseProvider = require('../util/BaseProvider');
+
+class CircleCi extends BaseProvider {
+    async parseData(req) {
+        this.payload.setEmbedColor(0x000000);
+        this.payload.addEmbed({
+            title: "Build #" + this.body.payload.build_num,
+            url: this.body.payload.build_url,
             author: {
-                name: body.payload.reponame
+                name: this.body.payload.reponame
             },
-            description: "**Outcome**: " + body.payload.outcome
+            description: "**Outcome**: " + this.body.payload.outcome
         });
     }
-};
+}
+
+module.exports = CircleCi;

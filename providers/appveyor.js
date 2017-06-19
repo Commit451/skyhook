@@ -1,17 +1,20 @@
 // appveyor.js
 // https://www.appveyor.com/docs/notifications/#webhook-payload-default
 // ========
-module.exports = {
-    parse: function (req, discordPayload) {
-        const body = req.body;
-        discordPayload.setEmbedColor(0xFFFFFF);
-        discordPayload.addEmbed({
-            title: "Build #" + body.eventData.buildNumber,
-            url: body.eventData.buildUrl,
+const BaseProvider = require('../util/BaseProvider');
+
+class AppVeyor extends BaseProvider {
+    async parseData() {
+        this.payload.setEmbedColor(0xFFFFFF);
+        this.payload.addEmbed({
+            title: "Build #" + this.body.eventData.buildNumber,
+            url: this.body.eventData.buildUrl,
             author: {
-                name: body.eventData.projectName
+                name: this.body.eventData.projectName
             },
-            description: "**Status**: " + body.eventData.status
+            description: "**Status**: " + this.body.eventData.status
         });
     }
-};
+}
+
+module.exports = AppVeyor;

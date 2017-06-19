@@ -28,9 +28,11 @@ https://skyhook.glitch.me/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/pr
 - [Unity Cloud](https://build-api.cloud.unity3d.com/docs/1.0.0/index.html#operation-webhooks-intro) - `/unity`
 - [Jenkins](https://plugins.jenkins.io/notification) - `/jenkins` (requires the notification plugin)
 
-If you want support for a new provider, just create a pull request and add it!
-
+If you want support for a new provider, just create a pull request and add it!  
 Alternatively, a new provider can also be requested by creating an [issue](https://github.com/Commit451/skyhook/issues).
+
+### Creating a Provider
+If you want to create a new provider please follow the examples shown at our small [documentation](https://github.com/Commit451/skyhook/blob/master/docs/CreateNewProvider.md).
 
 \ ゜o゜)ノ
 
