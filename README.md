@@ -24,15 +24,15 @@ https://skyhook.glitch.me/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/pr
 - [circleci](https://circleci.com/docs/1.0/configuration/#notify) - `/circleci`
 - [GitLab](https://gitlab.com/help/user/project/integrations/webhooks) - `/gitlab`
 - [Heroku](https://devcenter.heroku.com/articles/deploy-hooks#http-post-hook) - `/heroku`
+- [Jenkins](https://plugins.jenkins.io/notification) - `/jenkins` (requires the notification plugin)
 - [Travis](https://docs.travis-ci.com/user/notifications/#Webhooks-Delivery-Format) - `/travis`
 - [Unity Cloud](https://build-api.cloud.unity3d.com/docs/1.0.0/index.html#operation-webhooks-intro) - `/unity`
-- [Jenkins](https://plugins.jenkins.io/notification) - `/jenkins` (requires the notification plugin)
 
 If you want support for a new provider, just create a pull request and add it!  
 Alternatively, a new provider can also be requested by creating an [issue](https://github.com/Commit451/skyhook/issues).
 
 ### Creating a Provider
-If you want to create a new provider please follow the examples shown at our small [documentation](https://github.com/Commit451/skyhook/blob/master/docs/CreateNewProvider.md).
+If you want to create a new provider please follow the examples shown at our small [documentation](docs/CreateNewProvider.md).
 
 \ ゜o゜)ノ
 
