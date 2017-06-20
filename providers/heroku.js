@@ -4,6 +4,10 @@
 const BaseProvider = require('../util/BaseProvider');
 
 class Heroku extends BaseProvider {
+    static getName() {
+        return 'Heroku';
+    }
+
     async parseData(req) {
         this.payload.setEmbedColor(0xC9C3E6);
         this.payload.addEmbed({

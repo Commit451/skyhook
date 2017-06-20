@@ -11,6 +11,10 @@
 const BaseProvider = require('../util/BaseProvider');
 
 class {provider} extends BaseProvider {
+    static getName() {
+        return "{providerName}";
+    }
+    
     async parseData() {
         //do your stuff here and add things to this.payload
     }
@@ -28,6 +32,10 @@ class {provider} extends BaseProvider {
     constructor(){
         super();
         //do some stuff that should be available on all sub methods (e.g. setting the discord embed color)
+    }
+    
+    static getName() {
+        return "{providerName}";
     }
 
     async getType(){

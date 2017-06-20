@@ -19,10 +19,18 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
+app.set('view engine', 'ejs');
 
 // http://expressjs.com/en/starter/basic-routing.html
 app.get("/", function (request, response) {
-    response.sendFile(__dirname + '/views/index.html');
+    //response.sendFile(__dirname + '/views/index.ejs');
+    const templProviders = [];
+    for (const prov in providers) {
+        templProviders.push([prov, providers[prov].getName()]);
+    }
+    templProviders.sort();
+
+    response.render('index', {providers: templProviders});
 });
 
 app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async function (req, res) {

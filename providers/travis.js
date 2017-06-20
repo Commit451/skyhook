@@ -4,6 +4,10 @@
 const BaseProvider = require('../util/BaseProvider');
 
 class TravisCi extends BaseProvider {
+    static getName() {
+        return 'Travis';
+    }
+
     async parseData(){
         this.payload.setEmbedColor(0xC7B398);
         this.payload.addEmbed({
