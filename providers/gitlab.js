@@ -46,7 +46,7 @@ class GitLab extends BaseProvider {
             url: project.url,
             author: {
                 name: this.body.user_name,
-                icon_url: this.body.user_avatar
+                icon_url: GitLab._formatAvatarURL(this.body.user_avatar)
             },
             fields: commits
         });
@@ -70,7 +70,7 @@ class GitLab extends BaseProvider {
                 url: project.url + '/tags/' + tag,
                 author: {
                     name: this.body.user_name,
-                    icon_url: this.body.user_avatar
+                    icon_url: GitLab._formatAvatarURL(this.body.user_avatar)
                 },
                 description: (typeof this.body.message !== 'undefined') ? ((this.body.message.length > 1024) ? this.body.message.substring(0, 1023) + "\u2026" : this.body.message) : ''
             });
@@ -80,7 +80,7 @@ class GitLab extends BaseProvider {
                 url: project.url + '/tags/' + tag,
                 author: {
                     name: this.body.user_name,
-                    icon_url: this.body.user_avatar
+                    icon_url: GitLab._formatAvatarURL(this.body.user_avatar)
                 },
                 description: (typeof this.body.message !== 'undefined') ? ((this.body.message.length > 1024) ? this.body.message.substring(0, 1023) + "\u2026" : this.body.message) : ''
             });
@@ -100,7 +100,7 @@ class GitLab extends BaseProvider {
             url: this.body.object_attributes.url,
             author: {
                 name: this.body.user.name,
-                icon_url: this.body.user.avatar_url
+                icon_url: GitLab._formatAvatarURL(this.body.user.avatar_url)
             },
             fields: [
                 {
@@ -133,7 +133,7 @@ class GitLab extends BaseProvider {
             url: this.body.object_attributes.url,
             author: {
                 name: this.body.user.name,
-                icon_url: this.body.user.avatar_url
+                icon_url: GitLab._formatAvatarURL(this.body.user.avatar_url)
             },
             description: (this.body.object_attributes.note.length > 2048) ? this.body.object_attributes.note.substring(0, 2047) + "\u2026" : this.body.object_attributes.note
         });
@@ -153,7 +153,7 @@ class GitLab extends BaseProvider {
             url: this.body.object_attributes.url,
             author: {
                 name: this.body.user.name,
-                icon_url: this.body.user.avatar_url
+                icon_url: GitLab._formatAvatarURL(this.body.user.avatar_url)
             },
             fields: [
                 {
@@ -176,7 +176,7 @@ class GitLab extends BaseProvider {
             url: this.body.object_attributes.url,
             author: {
                 name: this.body.user.name,
-                icon_url: this.body.user.avatar_url
+                icon_url: GitLab._formatAvatarURL(this.body.user.avatar_url)
             },
             description: (typeof this.body.object_attributes.message !== 'undefined' ) ? (this.body.object_attributes.message.length > 2048) ? this.body.object_attributes.message.substring(0, 2047) + "\u2026" : this.body.object_attributes.message : ''
         });
@@ -189,7 +189,7 @@ class GitLab extends BaseProvider {
             url: this.body.project.web_url + "/pipelines/" + this.body.object_attributes.id,
             author: {
                 name: this.body.user.name,
-                icon_url: this.body.user.avatar_url
+                icon_url: GitLab._formatAvatarURL(this.body.user.avatar_url)
             },
             description: "**Status**: " + this.body.object_attributes.status
         });
@@ -201,10 +201,17 @@ class GitLab extends BaseProvider {
             url: this.body.project.web_url + "/builds/" + this.body.build_id,
             author: {
                 name: this.body.user.name,
-                icon_url: this.body.user.avatar_url
+                icon_url: GitLab._formatAvatarURL(this.body.user.avatar_url)
             },
             description: "**Status**: " + this.body.build_status
         });
+    }
+
+    static _formatAvatarURL(url){
+        if(!/^https?:\/\/|^\/\//i.test(url)){
+            return "https://gitlab.com" + url;
+        }
+        return url;
     }
 }
 
