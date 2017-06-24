@@ -5,11 +5,6 @@ const BaseProvider = require('../util/BaseProvider');
 const rpn = require('request-promise-native');
 const urlMod = require('url');
 
-//Regular Expressions
-const headerRegex = new RegExp('#{1,3} ?(.*)\\n');
-const imageRegex = new RegExp('!\\[.*\]\\((.*)\\)');
-const bulletRegex = new RegExp('\\*', 'g')
-
 class Trello extends BaseProvider {
 
     constructor(){
@@ -55,15 +50,17 @@ class Trello extends BaseProvider {
     }
 
     static _formatMarkdownHeader(str){
+        const headerRegex = new RegExp('#{1,3} ?(.*)');
         let match;
         while(headerRegex.test(str)){
             match = headerRegex.exec(str);
-            str = str.replace(headerRegex, '**' + match[1] + '**\n');
+            str = str.replace(headerRegex, '**' + match[1] + '**');
         }
         return str;
     }
 
     static _formatMarkdownImage(str, embed){
+        const imageRegex = new RegExp('!\\[.*\]\\((.*)\\)');
         if(imageRegex.test(str)){
             let match = imageRegex.exec(str);
             embed.image = {url: match[1]};
@@ -73,6 +70,7 @@ class Trello extends BaseProvider {
     }
 
     static _formatMarkdownBullets(str){
+        const bulletRegex = new RegExp('\\*', 'g');
         if(bulletRegex.test(str)){
             str = str.replace(bulletRegex, '\u2022');
         }
@@ -158,7 +156,7 @@ class Trello extends BaseProvider {
         this.model = this.req.body.model;
 
         //Testing code.
-        //console.info(this.body);
+        //console.info(this.body.action.type);
         //console.info(this.action.data);
 
         //Use the background color of the board if applicable. Otherwise, use the default trello color.
@@ -246,7 +244,7 @@ class Trello extends BaseProvider {
     async addToOrganizationBoard(){
         let embed = this._preparePayload();
         embed.title = 'Created Board in "' + this.action.data.organization.name + '"';
-        embed.description = '[`' + this.action.data.board.name + '`](' + this._resolveFullBoardURL(action.data.board) + ') has been created.';
+        embed.description = '[`' + this.action.data.board.name + '`](' + this._resolveFullBoardURL(this.action.data.board) + ') has been created.';
         embed.url = this._resolveGenericURL(this.action.data.organization.id);
         this.payload.addEmbed(embed);
     }
@@ -636,14 +634,127 @@ class Trello extends BaseProvider {
         
     }
 
-    // TODO
     async updateBoard(){
-        //So many preferences x.x
+        let embed = this._preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] ';
+        embed.url = this._resolveFullBoardURL(this.action.data.board);
+        let field = null;
+        if(this.action.data.old != null){
+            const old = this.action.data.old;
+            if(old.closed != null){
+                if(this.action.data.card.closed){
+                    embed.title = 'Closed Board "' + this.action.data.board.name + '"';
+                } else {
+                    embed.title = 'Reopened Board "' + this.action.data.board.name + '"';
+                }
+            } else if(old.name != null){
+                embed.title = embed.title + 'Renamed Board';
+                embed.description = '`' + old.name + '` \uD83E\uDC6A `' + this.action.data.board.name + '`';
+            } else if(old.prefs != null){
+                embed.title = embed.title + 'Updated Board Preference'
+                if(old.prefs.permissionLevel != null){
+                    field = {
+                        name: 'Permission Level',
+                        value: '`' + old.prefs.permissionLevel + '` \uD83E\uDC6A `' + this.action.data.board.prefs.permissionLevel + '`',
+                        inline: false
+                    };
+                } else if(old.prefs.selfJoin != null){
+                    field = {
+                        name: 'Allow Team Members to Join',
+                        value: '`' + old.prefs.selfJoin + '` \uD83E\uDC6A `' + this.action.data.board.prefs.selfJoin + '`',
+                        inline: false
+                    };
+                } else if(old.prefs.invitations != null){
+                    field = {
+                        name: 'Add/Remove Permissions',
+                        value: '`' + old.prefs.invitations + '` \uD83E\uDC6A `' + this.action.data.board.prefs.invitations + '`',
+                        inline: false
+                    };
+                } else if(old.prefs.comments != null){
+                    field = {
+                        name: 'Commenting Permissions',
+                        value: '`' + old.prefs.comments + '` \uD83E\uDC6A `' + this.action.data.board.prefs.comments + '`',
+                        inline: false
+                    };
+                } else if(old.prefs.cardCovers != null){
+                    field = {
+                        name: 'Enable Card Cover Images',
+                        value: '`' + old.prefs.cardCovers + '` \uD83E\uDC6A `' + this.action.data.board.prefs.cardCovers + '`',
+                        inline: false
+                    };
+                } else if(old.prefs.background != null){
+                    let val = this.defTrelloColors[this.action.data.board.prefs.background] == null ? 'image' : this.action.data.board.prefs.background;
+                    let oldVal = this.defTrelloColors[old.prefs.background] == null ? 'image' : old.prefs.background;
+                    field = {
+                        name: 'Background',
+                        value: '`' + oldVal + '` \uD83E\uDC6A `' + val + '`',
+                        inline: false
+                    };
+                }
+            }
+        }
+        if(field != null){
+            embed.fields = [field];
+        }
+        this.payload.addEmbed(embed);
     }
 
-    // TODO
     async updateCard(){
-        //So many preferences x.x
+        let embed = this._preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] ';
+        embed.url = this._resolveFullCardURL(this.action.data.card);
+        let field = null;
+        if(this.action.data.old != null){
+            let old = this.action.data.old;
+            if(old.name != null){
+                embed.title = embed.title + 'Renamed Card';
+                embed.description = '`' + old.name + '` \uD83E\uDC6A `' + this.action.data.card.name + '`';
+            } else if(old.desc != null){
+                if(!old.desc){
+                    embed.title = embed.title + 'Added Description to Card "' + this.action.data.card.name + '"';
+                    embed.description = Trello._formatLargeString(Trello._formatMarkdown(this.action.data.card.desc, embed));
+                } else if(!this.action.data.card.desc){
+                    embed.title = embed.title + 'Removed Description from Card "' + this.action.data.card.name + '"';
+                    field = {
+                        name: 'Old Value',
+                        value: Trello._formatLargeString(Trello._formatMarkdown(old.desc, embed)),
+                        inline: false
+                    };
+                } else {
+                    embed.title = embed.title + 'Changed Description of Card "' + this.action.data.card.name + '"';
+                    embed.description = Trello._formatLargeString(Trello._formatMarkdown(old.desc, embed)) + '\n`\uD83E\uDC6B`\n' + Trello._formatLargeString(Trello._formatMarkdown(this.action.data.card.desc, embed));
+                }
+            } else if(old.due != null || this.action.data.card.due != null){
+                if(old.due == null){
+                    let d = new Date(this.action.data.card.due);
+                    embed.title = embed.title + 'Added Due Date to "' + this.action.data.card.name + '" \uD83D\uDDD3';
+                    embed.description = '`' + d.toUTCString() + '`';
+                } else if(this.action.data.card.due == null){
+                    let d = new Date(old.due);
+                    embed.title = embed.title + 'Removed Due Date from "' + this.action.data.card.name + '" \uD83D\uDDD3';
+                    field = {
+                        name: 'Old Value',
+                        value: '`' + d.toUTCString() + '`',
+                        inline: false
+                    };
+                } else {
+                    let d = new Date(this.action.data.card.due);
+                    let oldD = new Date(old.due);
+                    embed.title = embed.title + 'Changed Due Date of "' + this.action.data.card.name + '" \uD83D\uDDD3';
+                    embed.description = '`' + oldD.toUTCString() + '` \uD83E\uDC6A `' + d.toUTCString() + '`';
+                }
+            } else if(old.closed != null){
+                if(this.action.data.card.closed){
+                    embed.title = embed.title + 'Archived Card "' + this.action.data.card.name + '"';
+                } else {
+                    embed.title = embed.title + 'Unarchived Card "' + this.action.data.card.name + '"';
+                }
+            }
+        }
+        if(field != null){
+            embed.fields = [field];
+        }
+        this.payload.addEmbed(embed);
     }
 
     async updateCheckItem(){
@@ -679,7 +790,8 @@ class Trello extends BaseProvider {
     async updateLabel(){
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Updated Label';
-        let field = {};
+        embed.url = this._resolveFullBoardURL(this.action.data.board);
+        let field = null;
         if(this.action.data.old != null){
             if(this.action.data.old.color != null){
                 if(this.action.data.label.color){
@@ -725,14 +837,24 @@ class Trello extends BaseProvider {
                 inline: false
             };
         }
-        embed.fields = [field];
+        if(field != null){
+            embed.fields = [field];
+        }
         this.payload.addEmbed(embed);
     }
 
     async updateList(){
         let embed = this._preparePayload();
-        embed.title = '[' + this.action.data.board.name + '] Renamed List';
-        embed.description = '`' + this.action.data.old.name + '` \uD83E\uDC6A `' + this.action.data.list.name + '`';
+        if(this.action.data.old.closed != null){
+            if(this.action.data.list.closed){
+                embed.title = '[' + this.action.data.board.name + '] Archived List "' + this.action.data.card.name + '"';
+            } else {
+                embed.title = '[' + this.action.data.board.name + '] Unarchived List "' + this.action.data.card.name + '"';
+            }
+        } else {
+            embed.title = '[' + this.action.data.board.name + '] Renamed List';
+            embed.description = '`' + this.action.data.old.name + '` \uD83E\uDC6A `' + this.action.data.list.name + '`';
+        }
         embed.url = this._resolveFullBoardURL(this.action.data.board);
         this.payload.addEmbed(embed);
     }
@@ -747,57 +869,62 @@ class Trello extends BaseProvider {
         let field = null;
         const organization = this.action.data.organization;
         const old = this.action.data.old;
+        embed.title = '[' + organization.name + '] ';
+        embed.url = this._resolveGenericURL(organization.id);
         if(old != null){
             if(old.prefs != null){
+                embed.title = embed.title + 'Updated Organization Preference';
                 //Check Prefs
                 if(old.prefs.permissionLevel != null){
                     field = {
-                        name: 'Changed Permission Level of ' + organization.name,
+                        name: 'Permission Level',
                         value: '`' + old.prefs.permissionLevel + '` \uD83E\uDC6A `' + organization.prefs.permissionLevel + '`',
                         inline: false
                     }
                 };
             } else if(old.displayName != null){
-                field = {
-                    name: 'Changed Name of ' + organization.name,
-                    value: '`' + old.displayName + '` \uD83E\uDC6A `' + organization.displayName + '`',
-                    inline: false
-                };
+                embed.title = embed.title + 'Renamed Organization';
+                embed.description = '`' + old.displayName + '` \uD83E\uDC6A `' + organization.displayName + '`';
             } else if(old.name != null){
-                field = {
-                    name: 'Changed Short Name of ' + organization.name,
-                    value: '`' + old.name + '` \uD83E\uDC6A `' + this.model.name + '`',
-                };
+                embed.title = embed.title + 'Changed Short Name of Organization';
+                embed.description = '`' + old.name + '` \uD83E\uDC6A `' + this.model.name + '`';
             } else if(old.website != null){
                 //If new value is empty, organization.website is null
                 if(organization.website == null){
+                    embed.title = embed.title + 'Removed Website from Organization';
                     field = {
-                        name: 'Removed Website from ' + organization.name,
-                        value: 'Old value - ' + old.website,
+                        name: 'Old Value',
+                        value: old.website,
                         inline: false
                     };
                 } else {
-                    field = {
-                        name: 'Changed Website of ' + organization.name,
-                        value: old.website + ' \uD83E\uDC6A ' + organization.website,
-                        inline: false
-                    };
+                    embed.title = embed.title + 'Changed Website of Organization';
+                    embed.description = old.website + ' \uD83E\uDC6A ' + organization.website;
                 }
             } else if(old.desc != null){
-                field = {
-                name: 'Changed Description of ' + organization.name,
-                value: Trello._formatLargeString(old.desc) + '\n`\uD83E\uDC6B`\n' + Trello._formatLargeString(organization.desc),
-                };
+                if(!old.desc){
+                    embed.title = embed.title + 'Added Description to Organization';
+                    embed.description = Trello._formatLargeString(Trello._formatMarkdown(organization.desc, embed));
+                } else if(!organization.desc){
+                    embed.title = embed.title + 'Removed Description from Organization';
+                    field = {
+                        name: 'Old Value',
+                        value: Trello._formatLargeString(Trello._formatMarkdown(old.desc, embed)),
+                        inline: false
+                    };
+                } else {
+                    embed.title = embed.title + 'Changed Description of Organization';
+                    embed.description = Trello._formatLargeString(Trello._formatMarkdown(old.desc, embed)) + '\n`\uD83E\uDC6B`\n' + Trello._formatLargeString(Trello._formatMarkdown(organization.desc, embed));
+                }
             }
         } else {
             //Must have been a website update.
-            field = {
-                name: 'Added Website to ' + organization.name,
-                value: organization.website,
-                inline: false
-            };
+            embed.title = embed.title + 'Added Website to Organization';
+            embed.description = organization.website;
         }
-        embed.fields = [field];
+        if(field != null){
+            embed.fields = [field];
+        }
         this.payload.addEmbed(embed);
     }
 
