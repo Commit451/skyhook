@@ -2,6 +2,13 @@
 // https://developers.trello.com/apis/webhooks
 // ========
 const BaseProvider = require('../util/BaseProvider');
+const rpn = require('request-promise-native');
+const urlMod = require('url');
+
+//Regular Expressions
+const headerRegex = new RegExp('#{1,3} ?(.*)\\n');
+const imageRegex = new RegExp('!\\[.*\]\\((.*)\\)');
+const bulletRegex = new RegExp('\\*', 'g')
 
 class Trello extends BaseProvider {
 
@@ -45,6 +52,39 @@ class Trello extends BaseProvider {
 
     static _formatLargeString(str, limit = 256){
         return (str.length > limit ? str.substring(0, limit-1) + '\u2026' : str);
+    }
+
+    static _formatMarkdownHeader(str){
+        let match;
+        while(headerRegex.test(str)){
+            match = headerRegex.exec(str);
+            str = str.replace(headerRegex, '**' + match[1] + '**\n');
+        }
+        return str;
+    }
+
+    static _formatMarkdownImage(str, embed){
+        if(imageRegex.test(str)){
+            let match = imageRegex.exec(str);
+            embed.image = {url: match[1]};
+            str = str.replace(imageRegex, '');
+        }
+        return str;
+    }
+
+    static _formatMarkdownBullets(str){
+        if(bulletRegex.test(str)){
+            str = str.replace(bulletRegex, '\u2022');
+        }
+        return str;
+    }
+
+    static _formatMarkdown(str, embed){
+        str = Trello._formatMarkdownBullets(str);
+        str = Trello._formatMarkdownHeader(str);
+        str = Trello._formatMarkdownImage(str, embed);
+
+        return str;
     }
 
     _resolveFullCardURL(card){
@@ -117,8 +157,9 @@ class Trello extends BaseProvider {
         this.action = this.req.body.action;
         this.model = this.req.body.model;
 
-        console.info(this.body);
-        console.info(this.action.data);
+        //Testing code.
+        //console.info(this.body);
+        //console.info(this.action.data);
 
         //Use the background color of the board if applicable. Otherwise, use the default trello color.
         if(this.model.prefs != null && this.model.prefs.background != null && this.defTrelloColors[this.model.prefs.background] != null){
@@ -363,9 +404,30 @@ class Trello extends BaseProvider {
         
     }
 
-    async disablePlugin(){ // TODO
+    async disablePlugin(){
         let embed = this._preparePayload();
-
+        embed.url = this._resolveFullBoardURL(this.action.data.board);
+        const opts = {
+            uri: this.action.data.plugin.url,
+            json: true
+        }
+        try {
+            const manifest = await rpn(opts);
+            const desc = Trello._formatMarkdown(manifest.details, embed);
+            embed.title = '[' + this.action.data.board.name + '] Disabled Plugin \u2717';
+            embed.fields = [{
+                name: manifest.name,
+                value: desc,
+                inline: false
+            }];
+            embed.thumbnail = {
+                url: urlMod.resolve(opts.uri, manifest.icon.url)
+            }
+        } catch (err) {
+            console.log('[Trello Provider] Error while retrieving plugin manifest.');
+            console.log(err);
+            embed.title = '[' + this.action.data.board.name + '] Disabled Plugin "' + this.action.data.plugin.name + '"';
+        }
         this.payload.addEmbed(embed);
     }
 
@@ -379,9 +441,30 @@ class Trello extends BaseProvider {
         
     }
 
-    async enablePlugin(){ // TODO
+    async enablePlugin(){
         let embed = this._preparePayload();
-
+        embed.url = this._resolveFullBoardURL(this.action.data.board);
+        const opts = {
+            uri: this.action.data.plugin.url,
+            json: true
+        }
+        try {
+            const manifest = await rpn(opts);
+            const desc = Trello._formatMarkdown(manifest.details, embed);
+            embed.title = '[' + this.action.data.board.name + '] Enabled Plugin \u2713';
+            embed.fields = [{
+                name: manifest.name,
+                value: desc,
+                inline: false
+            }];
+            embed.thumbnail = {
+                url: urlMod.resolve(opts.uri, manifest.icon.url)
+            }
+        } catch (err) {
+            console.log('[Trello Provider] Error while retrieving plugin manifest.');
+            console.log(err);
+            embed.title = '[' + this.action.data.board.name + '] Enabled Plugin "' + this.action.data.plugin.name + '"';
+        }
         this.payload.addEmbed(embed);
     }
 
