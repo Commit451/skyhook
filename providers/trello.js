@@ -1,557 +1,722 @@
 // trello.js
 // https://developers.trello.com/apis/webhooks
 // ========
-const request = require('request');
-const baselink = 'https://trello.com/';
-const avatarurl = 'https://trello-avatars.s3.amazonaws.com/';
-const defTrelloColors = {
-    blue: 0x0079bf,
-    yellow: 0xd9b51c,
-    orange: 0xd29034,
-    green: 0x519839,
-    red: 0xb04632,
-    purple: 0x89609e,
-    pink: 0xcd5a91,
-    lime: 0x4bbf6b,
-    sky: 0x00aecc,
-    grey: 0x838c91
-};
+const BaseProvider = require('../util/BaseProvider');
 
-//Utility
-function _addMemberThumbnail(avatarHash, embed){
-    if(avatarHash != null && avatarHash !== 'null'){
-        embed.thumbnail = {
-            url: avatarurl + avatarHash + '/170.png'
+class Trello extends BaseProvider {
+
+    constructor(){
+        super();
+        //this.payload.setEmbedColor(0x026aa7);
+        this.baseLink = 'https://bitbucket.org/';
+        this.avatarurl = 'https://trello-avatars.s3.amazonaws.com/';
+        this.defTrelloColors = {
+            blue: 0x0079bf,
+            yellow: 0xd9b51c,
+            orange: 0xd29034,
+            green: 0x519839,
+            red: 0xb04632,
+            purple: 0x89609e,
+            pink: 0xcd5a91,
+            lime: 0x4bbf6b,
+            sky: 0x00aecc,
+            grey: 0x838c91,
+            trello: 0x026aa7,
+            nocolor: 0xb6bbbf
         };
     }
-}
 
-function _resolveCardURL(card){
-    return baselink + 'c/' + card.shortLink + '/' + card.idShort + '-' + card.name.replace(/\s/g, '-').toLowerCase();
-}
-
-function _resolveBoardURL(board){
-    return baselink + 'b/' + board.shortLink + '/' + board.name.replace(/\s/g, '-').toLowerCase();
-}
-
-function _resolveCommentURL(card, commentID){
-    return _resolveCardURL(card) + '#comment-' + commentID;
-}
-
-function _formatLargeString(str, limit = 256){
-    return (str.length > limit ? str.substring(0, limit-1) + "\u2026" : str);
-}
-
-function _formatAttachment(attachment, embed){
-    if(attachment.previewUrl != null){
-        embed.image = {url: attachment.previewUrl};
+    async getType(){
+        return this.req.body.action.type;
     }
-    if(attachment.url != null){
-        if(attachment.name !== attachment.url){
-            embed.fields = [{
-                name: attachment.name,
-                value: attachment.url
-            }];
-        } else {
-            embed.description = attachment.url; 
+
+    // Utility Functions
+
+    static async _addMemberThumbnail(avatarHash, embed){
+        if(avatarHash != null && avatarHash !== 'null'){
+            embed.thumbnail = {
+                url: avatarurl + avatarHash + '/170.png'
+            };
         }
-    } else {
-        embed.description = attachment.name;
     }
-}
 
-function _formatLabel(text, value, embed, discordPayload){
-    if(value){
-        discordPayload.setEmbedColor(defTrelloColors[value]);
-    } else {
-        discordPayload.setEmbedColor(0xb6bbbf); // 'No Color'
+    static async _formatLargeString(str, limit = 256){
+        return (str.length > limit ? str.substring(0, limit-1) + "\u2026" : str);
     }
-    if(text){
-        embed.description = '`' + text + '`';
-    }
-}
 
-function _formatPlugin(plugin, embed){
-    return new Promise(function(resolve, reject){
-        request(plugin.url, {timeout: 200}, function(error, response, body){
-            if(error){
-                embed.description = plugin.name;
-                resolve();
-            } else {
-                const manifest = JSON.parse(body)
-                embed.thumbnail = {
-                    url: plugin.url.substring(0, plugin.url.lastIndexOf('/')) + manifest.icon.url.substring(1)
-                };
+    async _resolveFullCardURL(card){
+        return this.baseLink + 'c/' + card.shortLink + '/' + card.idShort + '-' + card.name.replace(/\s/g, '-').toLowerCase();
+    }
+
+    async _resolveFullBoardURL(board){
+        return this.baseLink + 'b/' + board.shortLink + '/' + board.name.replace(/\s/g, '-').toLowerCase();
+    }
+
+    async _resolveFullCommentURL(card, commentID){
+        return _resolveFullCardURL(card) + '#comment-' + commentID;
+    }
+
+    async _resolveCardURL(id){
+        return this.baseLink + 'c/' + id;
+    }
+
+    async _resolveBoardURL(id){
+        return this.baseLink + 'b/' + id;
+    }
+
+    async _resolveCommentURL(cardID, commentID){
+        return _resolveCardURL + '#comment-' + commentID;
+    }
+
+    async _resolveGenericURL(id){
+        return this.baseLink + id;
+    }
+
+    async _formatAttachment(attachment, embed){
+        if(attachment.previewUrl != null){
+            embed.image = {url: attachment.previewUrl};
+        }
+        if(attachment.url != null){
+            if(attachment.name !== attachment.url){
                 embed.fields = [{
-                    name: manifest.name,
-                    value: _formatLargeString(manifest.details),
-                    inline: false
+                    name: attachment.name,
+                    value: attachment.url
                 }];
-                resolve();
-            }
-        });
-    });
-}
-
-function _formatOrganizationUpdate(organization, old, model, embed){
-    let field = null;
-    if(old != null){
-        if(old.prefs != null){
-            //Check Prefs
-            if(old.prefs.permissionLevel != null){
-                field = {
-                    name: 'Changed Permission Level of ' + organization.name,
-                    value: '`' + old.prefs.permissionLevel + '` \uD83E\uDC6A `' + organization.prefs.permissionLevel + '`',
-                    inline: false
-                }
-            };
-        } else if(old.displayName != null){
-            field = {
-                name: 'Changed Name of ' + organization.name,
-                value: '`' + old.displayName + '` \uD83E\uDC6A `' + organization.displayName + '`',
-                inline: false
-            };
-        } else if(old.name != null){
-            field = {
-                name: 'Changed Short Name of ' + organization.name,
-                value: '`' + old.name + '` \uD83E\uDC6A `' + model.name + '`',
-            };
-        } else if(old.website != null){
-            //If new value is empty, organization.website is null
-            if(organization.website == null){
-                field = {
-                    name: 'Removed Website from ' + organization.name,
-                    value: 'Old value - ' + old.website,
-                    inline: false
-                };
             } else {
-                field = {
-                    name: 'Changed Website of ' + organization.name,
-                    value: old.website + ' \uD83E\uDC6A ' + organization.website,
-                    inline: false
-                };
+                embed.description = attachment.url; 
             }
-        } else if(old.desc != null){
-            field = {
-               name: 'Changed Description of ' + organization.name,
-               value: _formatLargeString(old.desc) + '\n`\uD83E\uDC6B`\n' + _formatLargeString(organization.desc),
-            };
+        } else {
+            embed.description = attachment.name;
         }
-    } else {
-        //Must have been a website update.
-        field = {
-            name: 'Added Website to ' + organization.name,
-            value: organization.website,
-            inline: false
+    }
+
+    async _formatLabel(text, value, embed){
+        if(value && defTrelloColors[value] != null){
+            this.payload.setEmbedColor(this.defTrelloColors[value]);
+        } else {
+            this.payload.setEmbedColor(this.defTrelloColors.nocolor);
+        }
+        if(text){
+            embed.description = '"' + text + '"';
+        }
+    }
+
+    async _resolveUser(){
+        const memberCreator = this.req.body.action.memberCreator;
+        return {
+            name: memberCreator.fullName,
+            icon_url: this.avatarurl + memberCreator.avatarHash + '/170.png',
+            url: this.baseLink + memberCreator.username
         };
     }
-    embed.fields = [field];
-}
 
-module.exports = {
-    parse: function (req, discordPayload) {
-        //In order to actually see the json payload. Debug use only.
-        console.info(req.body);
-        console.info(req.body.action.data);
-
-        const body = req.body;
-        const model = body.model;
-        const action = body.action;
-
-        //Our responses are based off of these values so it's important that they are present.
-        if(model == null || action == null){
-            console.error('Trello payload format has changed, provider needs to be updated!');
-            return;
-        }
-
-        const type = action.type;
+    async _preparePayload(){
+        this.action = this.req.body.action;
+        this.model = this.req.body.model;
 
         //Use the background color of the board if applicable. Otherwise, use the default trello color.
-        if(body.model.prefs != null && body.model.prefs.background != null && defTrelloColors[body.model.prefs.background] != null){
-            discordPayload.setEmbedColor(defTrelloColors[body.model.prefs.background]);
+        if(model.prefs != null && model.prefs.background != null && defTrelloColors[model.prefs.background] != null){
+            this.payload.setEmbedColor(this.defTrelloColors[model.prefs.background]);
         } else {
-            discordPayload.setEmbedColor(0x26aa7);
+            this.payload.setEmbedColor(this.defTrelloColors.trello);
         }
 
-        //Embed Shell, reducing redundant code.
-        let ready = false;
-        let embed = {
-            url: body.model.url,
-            author: {
-                name: action.memberCreator.fullName,
-                icon_url: avatarurl + action.memberCreator.avatarHash + '/170.png',
-                url: baselink + action.memberCreator.username
-            }
+        return {
+            author: _resolveUser()
         };
-        if(model.displayName != null){
-            embed.title = '[' + model.displayName + '] ';
-        } else if(model.fullName != null){
-            embed.title = '[' + model.fullName + '] ';
-        } else {
-            embed.title = '[' + model.name + '] ';
-        }
+    }
 
-        switch (type) {
-            case 'addAttachmentToCard':
-                embed.title = embed.title + 'Attachment Added to ' + action.data.card.name;
-                embed.url = _resolveCardURL(action.data.card);
-                _formatAttachment(action.data.attachment, embed);
-                ready = true;
-                break;
-            case 'addBoardsPinnedToMember': //How to Trigger?
-                break;
-            case 'addChecklistToCard':
-                embed.title = embed.title + 'Checklist Added to ' + action.data.card.name;
-                embed.url = _resolveCardURL(action.data.card);
-                embed.description = '`' + action.data.checklist.name + '`';
-                ready = true;
-                break;
-            case 'addLabelToCard':
-                embed.title = embed.title + 'Label Added to ' + action.data.card.name;
-                embed.url = _resolveCardURL(action.data.card);
-                _formatLabel(action.data.text, action.data.value, embed, discordPayload);
-                ready = true;
-                break;
-            case 'addMemberToCard':
-                if(action.memberCreator.id === action.member.id){
-                    embed.title = embed.title + 'User Joined ' + action.data.card.name;
-                } else {
-                    embed.title = embed.title + 'User Added to ' + action.data.card.name;
-                    _addMemberThumbnail(action.member.avatarHash, embed);
-                }
-                embed.url = _resolveCardURL(action.data.card);
-                embed.description = action.member.fullName + ' ([`' + action.member.username + '`](' + baselink + action.member.username + '))';
-                ready = true;
-                break;
-            case 'addMemberToBoard':
-            case 'addMemberToOrganization':
-                if(action.memberCreator.id === action.member.id){
-                    embed.title = embed.title + 'User Joined';
-                } else {
-                    embed.title = embed.title + 'User Added';
-                    _addMemberThumbnail(action.member.avatarHash, embed);
-                }
-                embed.description = action.member.fullName + ' ([`' + action.member.username + '`](' + baselink + action.member.username + '))';
-                ready = true;
-                break;
-            case 'addToOrganizationBoard':
-                embed.title = embed.title + 'Board Added';
-                embed.description = '[`' + action.data.board.name + '`](' + _resolveBoardURL(action.data.board) + ')';
-                ready = true;
-                break;
-            case 'commentCard':
-                embed.title = embed.title + 'Comment on Card ' + action.data.card.name;
-                embed.url = _resolveCommentURL(action.data.card, action.id);
-                embed.description = _formatLargeString(action.data.text);
-                ready = true;
-                break;
-            case 'convertToCardFromCheckItem':
-                embed.title = embed.title + 'Check Item Converted to Card';
-                embed.url = _resolveCardURL(action.data.card);
-                embed.description = '`' + action.data.card.name + '` from [' + action.data.cardSource.name + '](' + _resolveCardURL(action.data.cardSource) + ') was converted to a card.';
-                ready = true;
-                break;
-            case 'copyBoard':
-                embed.title = embed.title + 'Board Copied';
-                embed.url = _resolveBoardURL(action.data.board);
-                embed.description = action.data.board.name + ' was copied from [another board](' + baselink + 'b/' + action.data.boardSource.id + ').'
-                ready = true;
-                break;
-            case 'copyCard':
-                embed.title = embed.title + 'Card Copied';
-                embed.description = '[`' + action.data.cardSource.name + '`](' + _resolveCardURL(action.data.cardSource) + ') \uD83E\uDC6A [`' + action.data.card.name + '`](' + _resolveCardURL(action.data.card) + ')';
-                ready = true;
-                break;
-            case 'copyChecklist':
-                embed.title = embed.title + 'Checklist Copied';
-                embed.description = '`' + action.data.checklistSource.name + '` \uD83E\uDC6A `' + action.data.checklist.name + '`';
-                ready = true;
-                break;
-            case 'createLabel':
-                embed.title = embed.title + 'Label Created';
-                _formatLabel(action.data.label.name, action.data.label.color, embed, discordPayload);
-                ready = true;
-                break;
-            case 'copyCommentCard': //How to Trigger?
-                break;
-            case 'createBoard':
-                embed.title = embed.title + 'Created Board ' + _formatLargeString(action.data.board.name);
-                embed.url = _resolveBoardURL(action.data.board);
-                ready = true;
-                break;
-            case 'createBoardInvitation': //Won't Trigger?
-                break;
-            case 'createBoardPreference': //How to Trigger?
-                break;
-            case 'createCard':
-                embed.title = embed.title + 'Card Created';
-                embed.description = '[`' + action.data.card.name + '`](' + _resolveCardURL(action.data.card) + ') was added to ' + action.data.list.name + '.';
-                ready = true;
-                break;
-            case 'createCheckItem':
-                embed.title = embed.title + 'Check Item Created in ' + action.data.card.name;
-                embed.url = _resolveCardURL(action.data.card);
-                embed.description = '`' + action.data.checkItem.name + '` was added to `' + action.data.checklist.name + '`.';
-                ready = true;
-                break;
-            case 'createChecklist': //How to Trigger?
-                break;
-            case 'createList':
-                embed.title = embed.title + 'List Created';
-                embed.description = '`' + action.data.list.name + '`';
-                ready = true;
-                break;
-            case 'createOrganization':
-                embed.title = embed.title + 'Organization Created';
-                embed.description = '`' + action.data.organization.name + '`';
-                embed.url = baselink + action.data.organization.id;
-                ready = true;
-                break;
-            case 'createOrganizationInvitation': //Won't Trigger?
-                break;
-            case 'deleteAttachmentFromCard':
-                embed.title = embed.title + 'Attachment Removed from ' + action.data.card.name;
-                embed.url = _resolveCardURL(action.data.card);
-                _formatAttachment(action.data.attachment, embed);
-                ready = true;
-                break;
-            case 'deleteBoardInvitation': //Won't Trigger?
-                break;
-            case 'deleteCard':
-                embed.title = embed.title + 'Card Deleted';
-                embed.description = 'A card was deleted from ' + action.data.list.name + '.';
-                ready = true;
-                break;
-            case 'deleteCheckItem':
-                embed.title = embed.title + 'Check Item Deleted from ' + action.data.card.name;
-                embed.url = _resolveCardURL(action.data.card);
-                embed.description = '`' + action.data.checkItem.name + '` was removed from `' + action.data.checklist.name + '`.';
-                ready = true;
-                break;
-            case 'deleteLabel':
-                embed.title = embed.title + 'Label Deleted';
-                ready = true;
-                break;
-            case 'deleteOrganizationInvitation': //Won't Trigger?
-                break;
-            case 'disablePlugin': //On Hold
-                /**
-                 * See comment in enablePlugin
-                 */
-                break;
-            case 'disablePowerUp': //How to Trigger?
-                break;
-            case 'emailCard': //How to Trigger?
-                break;
-            case 'enablePlugin': //On Hold
-                /**
-                 * Plugins return a link to the plugin manifest.
-                 * This contains details about the plugin, in order
-                 * to use that we need to make an async request to
-                 * retrieve the manifest. That won't work with
-                 * the current design.
-                 */
-                break;
-            case 'enablePowerUp': //How to Trigger?
-                break;
-            case 'makeAdminOfBoard':
-            case 'makeAdminOfOrganization':
-                embed.title = embed.title + 'User Set to Admin';
-                embed.description = action.member.fullName + ' ([`' + action.member.username + '`](' + baselink + action.member.username + '))';
-                _addMemberThumbnail(action.member.avatarHash, embed);
-                ready = true;
-                break;
-            case 'makeNormalMemberOfBoard':
-            case 'makeNormalMemberOfOrganization':
-                embed.title = embed.title + 'User Set to Normal Member';
-                emed.description = action.member.fullName + ' ([`' + action.member.username + '`](' + baselink + action.member.username + '))';
-                _addMemberThumbnail(action.member.avatarHash, embed);
-                if(action.data.board != null) {
-                    embed.url = _resolveBoardURL(action.data.board);
-                }
-                ready = true;
-                break;
-            case 'makeObserverOfBoard': //Can't test, business class+ only.
-                embed.title = embed.title + 'User Set to Observer';
-                embed.description = action.member.fullName + ' ([`' + action.member.username + '`](' + baselink + action.member.username + '))';
-                _addMemberThumbnail(action.member.avatarHash, embed);
-                embed.url = _resolveBoardURL(action.data.board);
-                ready = true;
-                break;
-            case 'memberJoinedTrello': //How to Trigger?
-                break;
-            case 'moveCardFromBoard':
-                embed.title = embed.title + 'Card Moved From Board';
-                embed.description = '[' + action.data.card.name + '](' + _resolveCardURL(action.data.card) + ') has been moved from ' + action.data.list.name + 'to [another board](' + baselink + 'b/' + action.data.boardTarget.id + ').';
-                ready = true;
-                break;
-            case 'moveCardToBoard':
-                embed.title = embed.title + 'Card Moved To Board';
-                embed.description = '[' + action.data.card.name + '](' + _resolveCardURL(action.data.card) + ') has been moved to ' + action.data.list.name + ' from [another board](' + baselink + 'b/' + action.data.boardSource.id + ').';
-                ready = true;
-                break;
-            case 'moveListFromBoard':
-                embed.title = embed.title + 'List Moved From Board';
-                embed.description = action.data.list.name + ' has been moved to [another board](' + baselink + 'b/' + action.data.boardTarget.id + ').';
-                ready = true;
-                break;
-            case 'moveListToBoard':
-                embed.title = embed.title + 'List Moved To Board';
-                embed.description = action.data.list.name + ' has been moved from [another board](' + baselink + 'b/' + action.data.boardSource.id + ').';
-                ready = true;
-                break;
-            case 'removeBoardsPinnedFromMember': //How to Trigger?
-                break;
-            case 'removeChecklistFromCard':
-                embed.title = embed.title + 'Checklist Removed from ' + action.data.card.name;
-                embed.url = _resolveCardURL(action.data.card);
-                embed.description = '`' + action.data.checklist.name + '`';
-                ready = true;
-                break;
-            case 'removeFromOrganizationBoard':
-                embed.title = embed.title + 'Board Removed';
-                embed.description = '`' + body.action.data.board.name + '`';
-                ready = true;
-                break;
-            case 'removeLabelFromCard':
-                embed.title = embed.title + 'Label Removed From ' + action.data.card.name;
-                embed.url = _resolveCardURL(action.data.card);
-                _formatLabel(action.data.text, action.data.value, embed, discordPayload);
-                ready = true;
-                break;
-            case 'removeMemberFromCard':
-                if(action.memberCreator.id === action.member.id){
-                    embed.title = embed.title + 'User Left ' + action.data.card.name;
-                } else {
-                    embed.title = embed.title + 'User Removed from ' + action.data.card.name;
-                    _addMemberThumbnail(action.member.avatarHash, embed);
-                }
-                embed.url = _resolveCardURL(action.data.card);
-                embed.description = action.member.fullName + ' ([`' + action.member.username + '`](' + baselink + action.member.username + '))';
-                ready = true;
-                break;
-            case 'removeMemberFromBoard':
-            case 'removeMemberFromOrganization':
-                if(action.memberCreator.id === action.member.id){
-                    embed.title = embed.title + 'User Left';
-                } else {
-                    embed.title = embed.title + 'User Removed';
-                    _addMemberThumbnail(action.member.avatarHash, embed);
-                }
-                embed.description = action.member.fullName + ' ([`' + action.member.username + '`](' + baselink + action.member.username + '))';
-                if(action.data.board != null) {
-                    embed.url = _resolveBoardURL(action.data.board);
-                }
-                ready = true;
-                break;
-            case 'unconfirmedBoardInvitation': //How to Trigger?
-                break;
-            case 'unconfirmedOrganizationInvitation': //How to Trigger?
-                break;
-            case 'updateBoard': //TODO
-                //So many preferences x.x
-                break;
-            case 'updateCard': //TODO
-                //So many preferences x.x
-                break;
-            case 'updateCheckItem':
-                embed.title = embed.title + 'Check Item in ' + action.data.checklist.name + ' Renamed';
-                embed.url = _resolveCardURL(action.data.card);
-                embed.description = '`' + _formatLargeString(action.data.old.name) + '` \uD83E\uDC6A `' + _formatLargeString(action.data.checkItem.name) + '`';
-                ready = true;
-                break;
-            case 'updateCheckItemStateOnCard':
-                let capitalized = action.data.checkItem.state.charAt(0).toUpperCase() + action.data.checkItem.state.slice(1);
-                embed.title = embed.title + 'Check Item Marked ' + capitalized;
-                if(action.data.checkItem.state === 'complete'){
-                    embed.title = embed.title + ' `\u2714`';
-                } else if(action.data.checkItem.state === 'incomplete'){
-                    embed.title = embed.title + ' `\u2718`';
-                }
-                embed.description = '`' + action.data.checkItem.name + '` has been marked as ' + action.data.checkItem.state + ' in `' + action.data.checklist.name + '`.';
-                embed.url = _resolveCardURL(action.data.card);
-                ready = true;
-                break;
-            case 'updateChecklist':
-                embed.title = embed.title + 'Checklist Renamed';
-                embed.description = '`' + _formatLargeString(action.data.old.name) + '` \uD83E\uDC6A `' + _formatLargeString(action.data.checklist.name) + '`';
-                ready = true;
-                break;
-            case 'updateLabel':
-                embed.title = embed.title + 'Label Updated';
-                let field = {};
-                if(action.data.old != null){
-                    if(action.data.old.color != null){
-                        if(action.data.label.color){
-                            field = {
-                                name: 'Color Changed',
-                                value: '`' + action.data.old.color + '` \uD83E\uDC6A `' + action.data.label.color + '`',
-                                inline: false
-                            };
-                        } else {
-                            field = {
-                                name: 'Color Removed',
-                                value: 'Previous color - `' + action.data.old.color + '`',
-                                inline: false
-                            };
-                        }
-                    } else if(action.data.old.name != null){
-                        if(action.data.old.name){
-                            if(action.data.label.name){
-                                field = {
-                                    name: 'Name Changed',
-                                    value: '`' + action.data.old.name + '` \uD83E\uDC6A `' + action.data.label.name + '`',
-                                    inline: false
-                                };
-                            } else {
-                                field = {
-                                    name: 'Name Removed',
-                                    value: 'Previous name - `' + action.data.old.name + '`',
-                                    inline: false
-                                };
-                            }
-                        } else {
-                            field = {
-                                name: 'Name Added',
-                                value: '`' + action.data.label.name + '`',
-                                inline: false
-                            };
-                        }
-                    }
-                } else {
+    // Webhook Type Responses
+
+    async addAttachmentToCard(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Added Attachment to "' + this.action.data.card.name + '"';
+        embed.url = _resolveFullCardURL(this.action.data.card);
+        _formatAttachment(this.action.data.attachment, embed);
+        this.payload.addEmbed(embed);
+    }
+
+    // How to Trigger?
+    async addBoardsPinnedToMember(){
+
+    }
+
+    async addChecklistToCard(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Added Checklist to "' + this.action.data.card.name + '"';
+        embed.url = _resolveFullCardURL(this.action.data.card);
+        embed.description = 'Checklist "' + action.data.checklist.name + '" has been created.';
+    }
+
+    async addLabelToCard(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Added Label to "' + this.action.data.card.name + '"';
+        embed.url = _resolveFullCardURL(this.action.data.card);
+        _formatLabel(this.action.data.text, this.action.data.value, embed, discordPayload);
+        this.payload.addEmbed(embed);
+    }
+
+    async addMemberToCard(){
+        let embed = _preparePayload();
+        if(this.action.memberCreator.id === thos.action.member.id){
+            embed.title = '[' + this.action.data.board.name + '] Joined "' + this.action.data.card.name + '"';
+        } else {
+             embed.title = '[' + this.action.data.board.name + '] Added User to "' + this.action.data.card.name + '"';
+            _addMemberThumbnail(this.action.member.avatarHash, embed);
+            embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + this.baseLink + this.action.member.username + '))';
+        }
+        embed.url = _resolveFullCardURL(this.action.data.card);
+        this.payload.addEmbed(embed);
+    }
+
+    async addMemberToBoard(){
+        let embed = _preparePayload();
+        if(this.action.memberCreator.id === this.action.member.id){
+            embed.title = 'Joined Board "' + this.action.data.board.name + '"';
+        } else {
+             embed.title = 'Added User to Board "' + this.action.data.board.name + '"';
+            _addMemberThumbnail(this.action.member.avatarHash, embed);
+            embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + this.baseLink + this.action.member.username + '))';
+        }
+        embed.url = _resolveFullBoardURL(this.action.data.board);
+        this.payload.addEmbed(embed);
+    }
+
+    async addMemberToOrganization(){
+        let embed = _preparePayload();
+        if(this.action.memberCreator.id === this.action.member.id){
+            embed.title = 'Joined Organization "' + this.action.data.organization.name + '"';
+        } else {
+             embed.title = 'Added User to Organization "' + this.action.data.organization.name + '"';
+            _addMemberThumbnail(this.action.member.avatarHash, embed);
+            embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + this.baseLink + this.action.member.username + '))';
+        }
+        embed.url = _resolveGenericURL(this.action.data.organization.id);
+        this.payload.addEmbed(embed);
+    }
+
+    async addToOrganizationBoard(){
+        let embed = _preparePayload();
+        embed.title = 'Created Board in "' + this.action.data.organization.name + '"';
+        embed.description = '"[' + action.data.board.name + '](' + _resolveFullBoardURL(action.data.board) + ')" has been created.';
+        embed.url = _resolveGenericURL(this.action.data.organization.id);
+        this.payload.addEmbed(embed);
+    }
+
+    async commentCard(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Commented on Card "' + this.action.data.card.name + '"';
+        embed.url = _resolveFullCommentURL(this.action.data.card, this.action.id);
+        embed.description = _formatLargeString(this.action.data.text);
+        this.payload.addEmbed(embed);
+    }
+
+    async convertToCardFromCheckItem(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Converted Check Item to Card';
+        embed.url = _resolveFullCardURL(this.action.data.card);
+        embed.description = '"' + this.action.data.card.name + '" from card "[' + this.action.data.cardSource.name + '](' + _resolveFullCardURL(this.action.data.cardSource) + ')" has been converted to a card.';
+        this.payload.addEmbed(embed);
+    }
+
+    async copyBoard(){
+        let embed = _preparePayload();
+        embed.title = 'Copied Board';
+        embed.url = _resolveFullBoardURL(this.action.data.board);
+        embed.description = '"' + this.action.data.board.name + '" has been copied from [another board](' + _resolveBoardURL(this.action.data.boardSource.id) + ').'
+        this.payload.addEmbed(embed);
+    }
+
+    async copyCard(){
+        let embed = _preparePayload();
+        embed.title = 'Copied Card';
+        embed.description = '"[' + this.action.data.cardSource.name + '](' + _resolveFullCardURL(this.action.data.cardSource) + ')" \uD83E\uDC6A "[' + this.action.data.card.name + '`](' + _resolveFullCardURL(this.action.data.card) + ')"';
+        embed.url = _resolveFullCardURL(this.action.data.card);
+        this.payload.addEmbed(embed);
+    }
+
+    async copyChecklist(){ //REVIEW
+        let embed = _preparePayload();
+        embed.title = 'Copied Checklist';
+        embed.description = '"' + this.action.data.checklistSource.name + '" \uD83E\uDC6A "' + this.action.data.checklist.name + '"';
+        embed.url = _resolveFullBoardURL(this.action.data.board);
+        this.payload.addEmbed(embed);
+    }
+
+    async createLabel(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Created Label';
+        _formatLabel(this.action.data.label.name, this.action.data.label.color, embed);
+        embed.url = _resolveFullBoardURL(this.action.data.board);
+        this.payload.addEmbed(embed);
+    }
+
+    // How to Trigger?
+    async copyCommentCard(){
+        
+    }
+
+    async createBoard(){
+        let embed = _preparePayload();
+        embed.title = 'Created Board "' + _formatLargeString(this.action.data.board.name) + '"';
+        embed.url = _resolveFullBoardURL(this.action.data.board);
+        this.payload.addEmbed(embed);
+    }
+
+    // Won't Trigger?
+    async createBoardInvitation(){
+        
+    }
+
+    // How to Trigger?
+    async createBoardPreference(){
+        
+    }
+
+    async createCard(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Created Card';
+        embed.url = _resolveFullCardURL(this.action.data.card);
+        embed.description = '"' + this.action.data.card.name + '" has been created in list "' + this.action.data.list.name + '".';
+        this.payload.addEmbed(embed);
+    }
+
+    async createCheckItem(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Created Check Item in "' + this.action.data.card.name + '"';
+        embed.url = _resolveFullCardURL(this.action.data.card);
+        embed.description = '"' + this.action.data.checkItem.name + '" was added to checklist "' + this.action.data.checklist.name + '".';
+        this.payload.addEmbed(embed);
+    }
+
+    // How to Trigger?
+    async createChecklist(){
+        
+    }
+
+    async createList(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Created List';
+        embed.description = '"' + this.action.data.list.name + '" has been created.';
+        embed.url = _resolveFullBoardURL(this.action.data.board);
+        this.payload.addEmbed(embed);
+    }
+
+    async createOrganization(){
+        let embed = _preparePayload();
+        embed.title = 'Created Organization';
+        embed.description = '"' + this.action.data.organization.name + '" has been created.';
+        embed.url = _resolveGenericURL(this.action.data.organization.id);
+        this.payload.addEmbed(embed);
+    }
+
+    // Won't Trigger?
+    async createOrganizationInvitation(){
+        
+    }
+
+    async deleteAttachmentFromCard(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Removed Attachment from "' + this.action.data.card.name + '"';
+        embed.url = _resolveFullCardURL(this.action.data.card);
+        _formatAttachment(this.action.data.attachment, embed);
+        this.payload.addEmbed(embed);
+    }
+
+    // Won't Trigger?
+    async deleteBoardInvitation(){
+        
+    }
+
+    async deleteCard(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Deleted Card';
+        embed.description = 'A card was deleted from list "' + this.action.data.list.name + '".';
+        embed.url = _resolveFullBoardURL(this.action.data.board);
+        this.payload.addEmbed(embed);
+    }
+
+    async deleteCheckItem(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Deleted Check Item from "' + this.action.data.card.name + '"';
+        embed.url = _resolveFullCardURL(this.action.data.card);
+        embed.description = '"' + this.action.data.checkItem.name + '" was removed from checklist "' + this.action.data.checklist.name + '".';
+        this.payload.addEmbed(embed);
+    }
+
+    async deleteLabel(){ // REVIEW
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Deleted Label';
+        this.payload.addEmbed(embed);
+    }
+
+    // Won't Trigger?
+    async deleteOrganizationInvitation(){
+        
+    }
+
+    async disablePlugin(){ // REVIEW
+        let embed = _preparePayload();
+
+        this.payload.addEmbed(embed);
+    }
+
+    // How to Trigger?
+    async disablePowerUp(){
+        
+    }
+
+    // How to Trigger?
+    async emailCard(){
+        
+    }
+
+    async enablePlugin(){ // REVIEW
+        let embed = _preparePayload();
+
+        this.payload.addEmbed(embed);
+    }
+
+    // How to Trigger?
+    async enablePowerUp(){
+
+    }
+
+    async makeAdminOfBoard(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Set User to Admin';
+        embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + this.baseLink + this.action.member.username + '))';
+        _addMemberThumbnail(this.action.member.avatarHash, embed);
+        embed.url = _resolveFullBoardURL(this.action.data.board);
+        this.payload.addEmbed(embed);
+    }
+
+    async makeAdminOfOrganization(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.organization.name + '] Set User to Admin';
+        embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + this.baseLink + this.action.member.username + '))';
+        _addMemberThumbnail(this.action.member.avatarHash, embed);
+        embed.url = _resolveGenericURL(this.data.organization.id);
+        this.payload.addEmbed(embed);
+    }
+
+    async makeNormalMemberOfBoard(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Set User to Member';
+        embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + this.baseLink + this.action.member.username + '))';
+        _addMemberThumbnail(this.action.member.avatarHash, embed);
+        embed.url = _resolveFullBoardURL(this.action.data.board);
+        this.payload.addEmbed(embed);
+    }
+
+    async makeNormalMemberOfOrganization(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.organization.name + '] Set User to Member';
+        embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + this.baseLink + this.action.member.username + '))';
+        _addMemberThumbnail(this.action.member.avatarHash, embed);
+        embed.url = _resolveGenericURL(this.data.organization.id);
+        this.payload.addEmbed(embed);
+    }
+    
+    //Unable to test, business class+ feature.
+    async makeObserverOfBoard(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Set User to Observer';
+        embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + this.baseLink + this.action.member.username + '))';
+        _addMemberThumbnail(this.action.member.avatarHash, embed);
+        embed.url = _resolveFullBoardURL(this.action.data.board);
+        this.payload.addEmbed(embed);
+    }
+
+    // How to Trigger?
+    async memberJoinedTrello(){
+        
+    }
+
+    async moveCardFromBoard(){ // REVIEW
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Moved Card to Another Board';
+        embed.description = '"' + this.action.data.card.name + '" has been moved from list "' + this.action.data.list.name + '" to [another board](' + _resolveBoardURL(this.action.data.boardTarget.id) + ').';
+        embed.url = _resolveFullBoardURL(this.action.data.board);
+        this.payload.addEmbed(embed);
+    }
+
+    async moveCardToBoard(){ // REVIEW
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Moved Card to Board';
+        embed.description = '"[' + this.action.data.card.name + '](' + _resolveFullCardURL(this.action.data.card) + ')" has been moved to list "' + action.data.list.name + '" from [another board](' + _resolveBoardURL(this.action.data.boardSource.id) + ').';
+        embed.url = _resolveFullBoardURL(this.action.data.board);
+        this.payload.addEmbed(embed);
+    }
+
+    async moveListFromBoard(){ // REVIEW
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Moved List to Another Board';
+        embed.description = '"' + this.action.data.list.name + '" has been moved to [another board](' + _resolveBoardURL(this.action.data.boardTarget.id) + ').';
+        embed.url = _resolveFullBoardURL(this.action.data.board);
+        this.payload.addEmbed(embed);
+    }
+
+    async moveListToBoard(){ // REVIEW
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Moved List to Board';
+        embed.description = '"' + this.action.data.list.name + '" has been moved from [another board](' + _resolveBoardURL(this.action.data.boardSource.id) + ').';
+        embed.url = _resolveFullBoardURL(this.action.data.board);
+        this.payload.addEmbed(embed);
+    }
+
+    // How to Trigger?
+    async removeBoardsPinnedFromMember(){
+        let embed = _preparePayload();
+
+        this.payload.addEmbed(embed);
+    }
+
+    async removeChecklistFromCard(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Removed Checklist from ' + this.action.data.card.name;
+        embed.url = _resolveFullCardURL(this.action.data.card);
+        embed.description = '"' + this.action.data.checklist.name + '" has been removed.';
+        this.payload.addEmbed(embed);
+    }
+
+    async removeFromOrganizationBoard(){
+        let embed = _preparePayload();
+        embed.title = 'Removed Board from "' + this.action.data.organization.name + '"';
+        embed.description = '"' + this.action.data.board.name + '" has been deleted.';
+        embed.url = _resolveGenericURL(this.action.data.organization.id);
+        this.payload.addEmbed(embed);
+    }
+
+    async removeLabelFromCard(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Removed Label from "' + this.action.data.card.name + '"';
+        embed.url = _resolveFullCardURL(this.action.data.card);
+        _formatLabel(this.action.data.text, this.action.data.value, embed);
+        this.payload.addEmbed(embed);
+    }
+
+    async removeMemberFromCard(){
+        let embed = _preparePayload();
+        if(this.action.memberCreator.id === thos.action.member.id){
+            embed.title = '[' + this.action.data.board.name + '] Left "' + this.action.data.card.name + '"';
+        } else {
+             embed.title = '[' + this.action.data.board.name + '] Removed User from "' + this.action.data.card.name + '"';
+            _addMemberThumbnail(this.action.member.avatarHash, embed);
+            embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + this.baseLink + this.action.member.username + '))';
+        }
+        embed.url = _resolveFullCardURL(this.action.data.card);
+        this.payload.addEmbed(embed);
+    }
+
+    async removeMemberFromBoard(){
+        let embed = _preparePayload();
+        if(this.action.memberCreator.id === this.action.member.id){
+            embed.title = 'Left Board "' + this.action.data.board.name + '"';
+        } else {
+            embed.title = 'Removed User from Board "' + this.action.data.board.name + '"';
+            embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + this.baseLink + this.action.member.username + '))';
+            _addMemberThumbnail(this.action.member.avatarHash, embed);
+        }
+        embed.url = _resolveFullBoardURL(this.action.data.board);
+        this.payload.addEmbed(embed);
+    }
+
+    async removeMemberFromOrganization(){
+        let embed = _preparePayload();
+        if(this.action.memberCreator.id === this.action.member.id){
+            embed.title = 'Left Organization "' + this.action.data.organization.name + '"';
+        } else {
+             embed.title = 'Removed User from Organization "' + this.action.data.organization.name + '"';
+            _addMemberThumbnail(this.action.member.avatarHash, embed);
+            embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + this.baseLink + this.action.member.username + '))';
+        }
+        embed.url = _resolveGenericURL(this.action.data.organization.id);
+        this.payload.addEmbed(embed);
+    }
+
+    // How to Trigger?
+    async unconfirmedBoardInvitation(){
+        
+    }
+
+    // How to trigger?
+    async unconfirmedOrganizationInvitation(){
+        
+    }
+
+    // TODO
+    async updateBoard(){
+        //So many preferences x.x
+    }
+
+    // TODO
+    async updateCard(){
+        //So many preferences x.x
+    }
+
+    async updateCheckItem(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Renamed Item in Checklist "' + this.action.data.checklist.name + '"';
+        embed.url = _resolveFullCardURL(this.action.data.card);
+        embed.description = '"' + this.action.data.old.name + '" \uD83E\uDC6A "' + this.action.data.checkItem.name + '"';
+        this.payload.addEmbed(embed);
+    }
+
+    async updateCheckItemStateOnCard(){
+        let embed = _preparePayload();
+        const capitalized = this.action.data.checkItem.state.charAt(0).toUpperCase() + this.action.data.checkItem.state.slice(1);
+        embed.title = '[' + this.action.data.board.name + '] Marked Item as ' + capitalized;
+        if(this.action.data.checkItem.state === 'complete'){
+            embed.title = embed.title + ' `\u2714`';
+        } else if(this.action.data.checkItem.state === 'incomplete'){
+            embed.title = embed.title + ' `\u2718`';
+        }
+        embed.description = 'Item "' + this.action.data.checkItem.name + '" in "' + this.action.data.checklist.name + '" has been marked as `' + this.action.data.checkItem.state + '`.';
+        embed.url = _resolveFullCardURL(this.action.data.card);
+        this.payload.addEmbed(embed);
+    }
+
+    async updateChecklist(){ // REVIEW
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Renamed Checklist in "' + this.action.data.card.name + '"';
+        embed.description = '"' + _formatLargeString(this.action.data.old.name) + '" \uD83E\uDC6A "' + _formatLargeString(this.action.data.checklist.name) + '"';
+        embed.url = _resolveFullCardURL(this.action.data.card);
+        this.payload.addEmbed(embed);
+    }
+
+    async updateLabel(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Updated Label';
+        let field = {};
+        if(this.action.data.old != null){
+            if(this.action.data.old.color != null){
+                if(this.action.data.label.color){
                     field = {
-                        name: 'Color Added',
-                        value: '`' + action.data.label.color + '`',
+                        name: 'Changed Color',
+                        value: '`' + this.action.data.old.color + '` \uD83E\uDC6A `' + this.action.data.label.color + '`',
+                        inline: false
+                    };
+                 } else {
+                        field = {
+                        name: 'Removed Color',
+                        value: 'Old color - `' + this.action.data.old.color + '`',
                         inline: false
                     };
                 }
-                embed.fields = [field];
-                ready = true;
-                break;
-            case 'updateList':
-                embed.title = embed.title + 'List Renamed';
-                embed.description = '`' + _formatLargeString(action.data.old.name) + '` \uD83E\uDC6A `' + _formatLargeString(action.data.list.name) + '`';
-                ready = true;
-                break;
-            case 'updateMember': //How to Trigger?
-                break;
-            case 'updateOrganization':
-                embed.title = embed.title + 'Updated Information';
-                _formatOrganizationUpdate(action.data.organization, action.data.old, model, embed);
-                ready = true;
-                break;
-            case 'voteOnCard':
-                if(action.data.voted){
-                    embed.title = embed.title + 'Voted on ' + action.data.card.name + ' \u2705';
+            } else if(this.action.data.old.name != null){
+                if(this.action.data.old.name){
+                    if(this.action.data.label.name){
+                        field = {
+                            name: 'Changed Name',
+                            value: '"' + this.action.data.old.name + '" \uD83E\uDC6A "' + this.action.data.label.name + '"',
+                            inline: false
+                        };
+                    } else {
+                        field = {
+                            name: 'Removed Name',
+                            value: 'Old name - "' + this.action.data.old.name + '"',
+                            inline: false
+                        };
+                    }
                 } else {
-                    embed.title = embed.title + 'Removed Vote on ' + action.data.card.name;
+                    field = {
+                        name: 'Added Name',
+                        value: '"' + this.action.data.label.name + '"',
+                        inline: false
+                    };
                 }
-                embed.url = _resolveCardURL(action.data.card);
-                ready = true;
-                break;
+            }
+        } else {
+            field = {
+                name: 'Added Color',
+                value: '`' + this.action.data.label.color + '`',
+                inline: false
+            };
         }
-        if(ready){
-            discordPayload.addEmbed(embed);
-        }
+        embed.fields = [field];
+        this.payload.addEmbed(embed);
     }
-};
+
+    async updateList(){
+        let embed = _preparePayload();
+        embed.title = '[' + this.action.data.board.name + '] Renamed List';
+        embed.description = '"' + this.action.data.old.name + '" \uD83E\uDC6A "' + this.action.data.list.name + '"';
+        this.payload.addEmbed(embed);
+    }
+
+    // How to Trigger?
+    async updateMember(){
+        
+    }
+
+    async updateOrganization(){
+        let embed = _preparePayload();
+        let field = null;
+        const organization = this.action.data.organization;
+        const old = this.action.data.old;
+        if(old != null){
+            if(old.prefs != null){
+                //Check Prefs
+                if(old.prefs.permissionLevel != null){
+                    field = {
+                        name: 'Changed Permission Level of ' + organization.name,
+                        value: '`' + old.prefs.permissionLevel + '` \uD83E\uDC6A `' + organization.prefs.permissionLevel + '`',
+                        inline: false
+                    }
+                };
+            } else if(old.displayName != null){
+                field = {
+                    name: 'Changed Name of ' + organization.name,
+                    value: '`' + old.displayName + '` \uD83E\uDC6A `' + organization.displayName + '`',
+                    inline: false
+                };
+            } else if(old.name != null){
+                field = {
+                    name: 'Changed Short Name of ' + organization.name,
+                    value: '`' + old.name + '` \uD83E\uDC6A `' + this.model.name + '`',
+                };
+            } else if(old.website != null){
+                //If new value is empty, organization.website is null
+                if(organization.website == null){
+                    field = {
+                        name: 'Removed Website from ' + organization.name,
+                        value: 'Old value - ' + old.website,
+                        inline: false
+                    };
+                } else {
+                    field = {
+                        name: 'Changed Website of ' + organization.name,
+                        value: old.website + ' \uD83E\uDC6A ' + organization.website,
+                        inline: false
+                    };
+                }
+            } else if(old.desc != null){
+                field = {
+                name: 'Changed Description of ' + organization.name,
+                value: _formatLargeString(old.desc) + '\n`\uD83E\uDC6B`\n' + _formatLargeString(organization.desc),
+                };
+            }
+        } else {
+            //Must have been a website update.
+            field = {
+                name: 'Added Website to ' + organization.name,
+                value: organization.website,
+                inline: false
+            };
+        }
+        embed.fields = [field];
+        this.payload.addEmbed(embed);
+    }
+
+    async voteOnCard(){
+        let embed = _preparePayload();
+        if(this.action.data.voted){
+            embed.title = '[' + this.action.data.board.name + '] Voted on Card "' + this.action.data.card.name + '" \u2705';
+        } else {
+            embed.title = '[' + this.action.data.board.name + '] Removed Vote on Card "' + this.action.data.card.name + '"';
+        }
+        embed.url = _resolveFullCardURL(this.action.data.card);
+        this.payload.addEmbed(embed);
+    }
+}

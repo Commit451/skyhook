@@ -4,6 +4,10 @@
 const BaseProvider = require('../util/BaseProvider');
 
 class CircleCi extends BaseProvider {
+    static getName() {
+        return 'CircleCi';
+    }
+
     async parseData(req) {
         this.payload.setEmbedColor(0x000000);
         this.payload.addEmbed({

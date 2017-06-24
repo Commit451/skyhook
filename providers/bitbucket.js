@@ -10,6 +10,10 @@ class BitBucket extends BaseProvider {
         this.baseLink = 'https://bitbucket.org/';
     }
 
+    static getName() {
+        return 'BitBucket';
+    }
+
     async getType(){
         return this.req.get('X-Event-Key');
     }
