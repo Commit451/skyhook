@@ -42,3 +42,6 @@ jspm_packages
 
 # WebStorm
 .idea/
+
+# Visual Studio Code
+.vscode

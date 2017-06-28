@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const request = require('request');
+
 let app = express();
 const providers = {
     appveyor: require('./providers/appveyor'),
@@ -11,6 +12,7 @@ const providers = {
     gitlab: require('./providers/gitlab'),
     heroku: require('./providers/heroku'),
     jenkins: require('./providers/jenkins'),
+    trello: require('./providers/trello'),
     travis: require('./providers/travis'),
     unity: require('./providers/unity')
 };
@@ -31,6 +33,11 @@ app.get("/", function (request, response) {
     templProviders.sort();
 
     response.render('index', {providers: templProviders});
+});
+
+// Needed otherwise trello will not allow webhook creation.
+app.get("/api/webhooks/:webhookID/:webhookSecret/:from", function(req, res) {
+    res.sendStatus(200);
 });
 
 app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async function (req, res) {
