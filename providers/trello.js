@@ -5,6 +5,14 @@ const BaseProvider = require('../util/BaseProvider');
 const rpn = require('request-promise-native');
 const urlMod = require('url');
 
+// Regular Expressions
+const mdUL1 = new RegExp('^={3,}$');
+const mdUL2 = new RegExp('^-{3,}$');
+const boldRegex = new RegExp('\\*\\*([^\\\\]*)\\*\\*');
+const cleanupRegex = new RegExp('__([^\\\\]*)__');
+const italicRegex = new RegExp('\\*([^\\\\]*)\\*');
+const imageRegex = new RegExp('!\\[.*\]\\((.*)\\)');
+
 class Trello extends BaseProvider {
 
     constructor(){
@@ -50,17 +58,73 @@ class Trello extends BaseProvider {
     }
 
     static _formatMarkdownHeader(str){
-        const headerRegex = new RegExp('#{1,3} ?(.*)');
+        let lines = str.split('\n');
+        for(let i=0; i<lines.length; i++){
+            let line = lines[i].trim();
+            if(line.startsWith('#')){
+                let start = 0;
+                let end = line.length;
+                let goFront = true;
+                let goBack = true;
+                let finished = false;
+                for(let j=0; j<line.length && !finished; j++){
+                    if(goFront && line.substring(j, j+1) != '#'){
+                        start = j;
+                        goFront = false;
+                    }
+                    if(goBack && line.substring(line.length-1-j, line.length-j) != '#'){
+                        end = line.length-j;
+                        goBack = false;
+                    }
+                    if(!goBack && !goFront) {
+                        finished = true;
+                    }
+                }
+                if(end-start === line.length){
+                    line = '**#**';
+                } else {
+                    line = '**' + line.substring(start, end).trim() + '**';
+                }
+                lines[i] = line;
+            }
+            if(mdUL1.test(line) || mdUL2.test(line)){
+                if(i > 0){
+                    lines[i-1] = '**' + lines[i-1] + '**';
+                }
+                lines.splice(i, 1);
+            }
+        }
+        return lines.join('\n');
+    }
+
+    static _formatMarkdownBold(str){
         let match;
-        while(headerRegex.test(str)){
-            match = headerRegex.exec(str);
-            str = str.replace(headerRegex, '**' + match[1] + '**');
+        while(boldRegex.test(str)){
+            match = boldRegex.exec(str);
+            str = str.replace(boldRegex, '__' + match[1] + '__');
+        }
+        return str;
+    }
+
+    static _cleanupMarkdownBold(str){
+        let match;
+        while(cleanupRegex.test(str)){
+            match = cleanupRegex.exec(str);
+            str = str.replace(cleanupRegex, '**' + match[1] + '**');
+        }
+        return str;
+    }
+
+    static _formatMarkdownItalic(str){
+        let match;
+        while(italicRegex.test(str)){
+            match = italicRegex.exec(str);
+            str = str.replace(italicRegex, '_' + match[1] + '_');
         }
         return str;
     }
 
     static _formatMarkdownImage(str, embed){
-        const imageRegex = new RegExp('!\\[.*\]\\((.*)\\)');
         if(imageRegex.test(str)){
             let match = imageRegex.exec(str);
             embed.image = {url: match[1]};
@@ -70,15 +134,25 @@ class Trello extends BaseProvider {
     }
 
     static _formatMarkdownBullets(str){
-        const bulletRegex = new RegExp('\\*', 'g');
-        if(bulletRegex.test(str)){
-            str = str.replace(bulletRegex, '\u2022');
+        const lines = str.split('\n');
+        for(let i=0; i<lines.length; i++){
+            let line = lines[i].trim();
+            if(line.startsWith('*')){
+                lines[i] = lines[i].replace('*', '\u2022');
+            } else if(line.startsWith('+')){
+                lines[i] = lines[i].replace('+', '\u2022');
+            } else if(line.startsWith('-')){
+                lines[i] = lines[i].replace('-', '\u2022');
+            }
         }
-        return str;
+        return lines.join('\n');
     }
 
     static _formatMarkdown(str, embed){
+        str = Trello._formatMarkdownBold(str);
+        str = Trello._formatMarkdownItalic(str);
         str = Trello._formatMarkdownBullets(str);
+        str = Trello._cleanupMarkdownBold(str);
         str = Trello._formatMarkdownHeader(str);
         str = Trello._formatMarkdownImage(str, embed);
 
