@@ -180,7 +180,7 @@ class Trello extends BaseProvider {
     }
 
     _resolveCommentURL(cardID, commentID){
-        return this._resolveCardURL + '#comment-' + commentID;
+        return this._resolveCardURL(cardID) + '#comment-' + commentID;
     }
 
     _resolveGenericURL(id){
@@ -823,6 +823,11 @@ class Trello extends BaseProvider {
                 } else {
                     embed.title = embed.title + 'Unarchived Card "' + this.action.data.card.name + '"';
                 }
+            } else if(old.idList != null){
+                embed.title = embed.title + 'Moved Card "' + this.action.data.card.name + '" to Another List';
+                embed.description = '`' + this.action.data.listBefore.name + '` \uD83E\uDC6A `' + this.action.data.listAfter.name + '`'
+            } else if(old.pos != null){
+                embed.title = embed.title + 'Updated Position of Card "' + this.action.data.card.name + '"';
             }
         }
         if(field != null){
