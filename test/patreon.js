@@ -386,7 +386,7 @@ const pledgesUpdateJson = { data:
  * Test the /POST route
  */
 describe('/POST patreon', () => {
-    it('repo:push', (done) => {
+    it('pledges:update', (done) => {
         chai.request(server)
             .post('/api/webhooks/test/test/patreon')
             .set("X-Patreon-Event", "pledges:update")
