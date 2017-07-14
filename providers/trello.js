@@ -6,12 +6,12 @@ const rpn = require('request-promise-native');
 const urlMod = require('url');
 
 // Regular Expressions
-const mdUL1 = new RegExp('^={3,}$');
-const mdUL2 = new RegExp('^-{3,}$');
-const boldRegex = new RegExp('\\*\\*([^\\\\]*)\\*\\*');
-const cleanupRegex = new RegExp('__([^\\\\]*)__');
-const italicRegex = new RegExp('\\*([^\\\\]*)\\*');
-const imageRegex = new RegExp('!\\[.*\]\\((.*)\\)');
+const mdUL1 = /^={3,}$/;
+const mdUL2 = /^-{3,}$/;
+const boldRegex = /\*\*([^\\]*)\*\*/;
+const cleanupRegex = /__([^\\]*)/;
+const italicRegex = /\*([^\\]*)\*/;
+const imageRegex = /!\[.*\]\((.*)\)/;
 
 class Trello extends BaseProvider {
 
@@ -795,8 +795,8 @@ class Trello extends BaseProvider {
                         inline: false
                     };
                 } else {
-                    embed.title = embed.title + 'Changed Description of Card "' + this.action.data.card.name + '"';
-                    embed.description = Trello._formatLargeString(Trello._formatMarkdown(old.desc, embed)) + '\n`\uD83E\uDC6B`\n' + Trello._formatLargeString(Trello._formatMarkdown(this.action.data.card.desc, embed));
+                    embed.title = embed.title + 'Updated Description of Card "' + this.action.data.card.name + '"';
+                    embed.description = Trello._formatLargeString(Trello._formatMarkdown(this.action.data.card.desc, embed));
                 }
             } else if(old.due != null || this.action.data.card.due != null){
                 if(old.due == null){

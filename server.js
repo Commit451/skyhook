@@ -12,6 +12,7 @@ const providers = {
     gitlab: require('./providers/gitlab'),
     heroku: require('./providers/heroku'),
     jenkins: require('./providers/jenkins'),
+    patreon: require('./providers/patreon'),
     trello: require('./providers/trello'),
     travis: require('./providers/travis'),
     unity: require('./providers/unity')
@@ -35,9 +36,14 @@ app.get("/", function (request, response) {
     response.render('index', {providers: templProviders});
 });
 
-// Needed otherwise trello will not allow webhook creation.
 app.get("/api/webhooks/:webhookID/:webhookSecret/:from", function(req, res) {
-    res.sendStatus(200);
+    //Return 200 if the provider is valid to show this url is ready.
+    let provider = req.params.from;
+    if(provider == null || providers[provider] == null){
+        res.sendStatus(400);
+    } else {
+        res.sendStatus(200);
+    }
 });
 
 app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async function (req, res) {
