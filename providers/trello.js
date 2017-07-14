@@ -828,7 +828,7 @@ class Trello extends BaseProvider {
                 embed.description = '`' + this.action.data.listBefore.name + '` \uD83E\uDC6A `' + this.action.data.listAfter.name + '`'
             } else if(old.pos != null){
                 embed.title = embed.title + 'Updated Position of Card "' + this.action.data.card.name + '"';
-            }1
+            }
         }
         if(field != null){
             embed.fields = [field];
