@@ -185,7 +185,7 @@ class BitBucket extends BaseProvider {
         this.payload.addEmbed({
             author: user,
             title: "Wrote a comment to Issue #" + this.body.issue.id + " on " + this.body.repository.name,
-            url: baseLink + this.body.repository.full_name + "/issues/" + this.body.issue.id,
+            url: this.baseLink + this.body.repository.full_name + "/issues/" + this.body.issue.id,
             description: (this.body.comment.content.html.replace(/<.*?>/g, '').length > 1024) ? this.body.comment.content.html.replace(/<.*?>/g, '').substring(0, 1023) + "\u2026" : this.body.comment.content.html.replace(/<.*?>/g, '')
         });
     }
