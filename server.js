@@ -9,6 +9,7 @@ const providers = {
     appveyor: require('./providers/appveyor'),
     bitbucket: require('./providers/bitbucket'),
     circleci: require('./providers/circleci'),
+    codacy: require('./providers/codacy'),
     gitlab: require('./providers/gitlab'),
     heroku: require('./providers/heroku'),
     jenkins: require('./providers/jenkins'),
