@@ -37,10 +37,10 @@ app.get("/", function (request, response) {
     response.render('index', {providers: templProviders});
 });
 
-app.get("/api/webhooks/:webhookID/:webhookSecret/:from", function(req, res) {
+app.get("/api/webhooks/:webhookID/:webhookSecret/:from", function (req, res) {
     //Return 200 if the provider is valid to show this url is ready.
     let provider = req.params.from;
-    if(provider == null || providers[provider] == null){
+    if (provider === null || providers[provider] === null) {
         res.sendStatus(400);
     } else {
         res.sendStatus(200);

@@ -8,11 +8,11 @@ class Jenkins extends BaseProvider {
         return 'Jenkins-Ci';
     }
 
-    async parseData(){
+    async parseData() {
         this.payload.setEmbedColor(0xF0D6B7);
         const phase = this.body.build.phase;
 
-        switch(phase){
+        switch (phase) {
             case "STARTED":
                 this.payload.addEmbed({
                     title: "Project " + this.body.name,
@@ -31,7 +31,7 @@ class Jenkins extends BaseProvider {
         }
     }
 
-    static capitalize(str){
+    static capitalize(str) {
         const tmp = str.toLowerCase();
         return tmp.charAt(0).toUpperCase() + tmp.slice(1);
     }

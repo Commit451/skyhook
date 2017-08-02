@@ -17,7 +17,7 @@ class GitLab extends BaseProvider {
         return this.body.object_kind;
     }
 
-    async push(){
+    async push() {
         let branch = this.body.ref.split("/");
         branch.shift();
         branch.shift();
@@ -52,7 +52,7 @@ class GitLab extends BaseProvider {
         });
     }
 
-    async tagPush(){
+    async tagPush() {
         let tmpTag = this.body.ref.split("/");
         tmpTag.shift();
         tmpTag.shift();
@@ -87,7 +87,7 @@ class GitLab extends BaseProvider {
         }
     }
 
-    async issue(){
+    async issue() {
         const actions = {
             open: "Opened",
             close: "Closed",
@@ -111,7 +111,7 @@ class GitLab extends BaseProvider {
         });
     }
 
-    async note(){
+    async note() {
         let type = null;
         switch (this.body.object_attributes.noteable_type) {
             case "Commit":
@@ -139,7 +139,7 @@ class GitLab extends BaseProvider {
         });
     }
 
-    async mergeRequest(){
+    async mergeRequest() {
         const actions = {
             open: "Opened",
             close: "Closed",
@@ -207,8 +207,8 @@ class GitLab extends BaseProvider {
         });
     }
 
-    static _formatAvatarURL(url){
-        if(!/^https?:\/\/|^\/\//i.test(url)){
+    static _formatAvatarURL(url) {
+        if (!/^https?:\/\/|^\/\//i.test(url)) {
             return "https://gitlab.com" + url;
         }
         return url;

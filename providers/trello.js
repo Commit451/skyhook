@@ -15,7 +15,7 @@ const imageRegex = /!\[.*\]\((.*)\)/;
 
 class Trello extends BaseProvider {
 
-    constructor(){
+    constructor() {
         super();
         this.baseLink = 'https://trello.com/';
         this.avatarurl = 'https://trello-avatars.s3.amazonaws.com/';
@@ -39,57 +39,57 @@ class Trello extends BaseProvider {
         return 'Trello';
     }
 
-    async getType(){
+    async getType() {
         return this.req.body.action.type;
     }
 
     // Utility Functions
 
-    static _addMemberThumbnail(avatarHash, embed){
-        if(avatarHash != null && avatarHash !== 'null'){
+    static _addMemberThumbnail(avatarHash, embed) {
+        if (avatarHash != null && avatarHash !== 'null') {
             embed.thumbnail = {
                 url: this.avatarurl + avatarHash + '/170.png'
             };
         }
     }
 
-    static _formatLargeString(str, limit = 256){
-        return (str.length > limit ? str.substring(0, limit-1) + '\u2026' : str);
+    static _formatLargeString(str, limit = 256) {
+        return (str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str);
     }
 
-    static _formatMarkdownHeader(str){
+    static _formatMarkdownHeader(str) {
         let lines = str.split('\n');
-        for(let i=0; i<lines.length; i++){
+        for (let i = 0; i < lines.length; i++) {
             let line = lines[i].trim();
-            if(line.startsWith('#')){
+            if (line.startsWith('#')) {
                 let start = 0;
                 let end = line.length;
                 let goFront = true;
                 let goBack = true;
                 let finished = false;
-                for(let j=0; j<line.length && !finished; j++){
-                    if(goFront && line.substring(j, j+1) != '#'){
+                for (let j = 0; j < line.length && !finished; j++) {
+                    if (goFront && line.substring(j, j + 1) != '#') {
                         start = j;
                         goFront = false;
                     }
-                    if(goBack && line.substring(line.length-1-j, line.length-j) != '#'){
-                        end = line.length-j;
+                    if (goBack && line.substring(line.length - 1 - j, line.length - j) != '#') {
+                        end = line.length - j;
                         goBack = false;
                     }
-                    if(!goBack && !goFront) {
+                    if (!goBack && !goFront) {
                         finished = true;
                     }
                 }
-                if(end-start === line.length){
+                if (end - start === line.length) {
                     line = '**#**';
                 } else {
                     line = '**' + line.substring(start, end).trim() + '**';
                 }
                 lines[i] = line;
             }
-            if(mdUL1.test(line) || mdUL2.test(line)){
-                if(i > 0){
-                    lines[i-1] = '**' + lines[i-1] + '**';
+            if (mdUL1.test(line) || mdUL2.test(line)) {
+                if (i > 0) {
+                    lines[i - 1] = '**' + lines[i - 1] + '**';
                 }
                 lines.splice(i, 1);
             }
@@ -97,35 +97,35 @@ class Trello extends BaseProvider {
         return lines.join('\n');
     }
 
-    static _formatMarkdownBold(str){
+    static _formatMarkdownBold(str) {
         let match;
-        while(boldRegex.test(str)){
+        while (boldRegex.test(str)) {
             match = boldRegex.exec(str);
             str = str.replace(boldRegex, '__' + match[1] + '__');
         }
         return str;
     }
 
-    static _cleanupMarkdownBold(str){
+    static _cleanupMarkdownBold(str) {
         let match;
-        while(cleanupRegex.test(str)){
+        while (cleanupRegex.test(str)) {
             match = cleanupRegex.exec(str);
             str = str.replace(cleanupRegex, '**' + match[1] + '**');
         }
         return str;
     }
 
-    static _formatMarkdownItalic(str){
+    static _formatMarkdownItalic(str) {
         let match;
-        while(italicRegex.test(str)){
+        while (italicRegex.test(str)) {
             match = italicRegex.exec(str);
             str = str.replace(italicRegex, '_' + match[1] + '_');
         }
         return str;
     }
 
-    static _formatMarkdownImage(str, embed){
-        if(imageRegex.test(str)){
+    static _formatMarkdownImage(str, embed) {
+        if (imageRegex.test(str)) {
             let match = imageRegex.exec(str);
             embed.image = {url: match[1]};
             str = str.replace(imageRegex, '');
@@ -133,22 +133,22 @@ class Trello extends BaseProvider {
         return str;
     }
 
-    static _formatMarkdownBullets(str){
+    static _formatMarkdownBullets(str) {
         const lines = str.split('\n');
-        for(let i=0; i<lines.length; i++){
+        for (let i = 0; i < lines.length; i++) {
             let line = lines[i].trim();
-            if(line.startsWith('*')){
+            if (line.startsWith('*')) {
                 lines[i] = lines[i].replace('*', '\u2022');
-            } else if(line.startsWith('+')){
+            } else if (line.startsWith('+')) {
                 lines[i] = lines[i].replace('+', '\u2022');
-            } else if(line.startsWith('-')){
+            } else if (line.startsWith('-')) {
                 lines[i] = lines[i].replace('-', '\u2022');
             }
         }
         return lines.join('\n');
     }
 
-    static _formatMarkdown(str, embed){
+    static _formatMarkdown(str, embed) {
         str = Trello._formatMarkdownBold(str);
         str = Trello._formatMarkdownItalic(str);
         str = Trello._formatMarkdownBullets(str);
@@ -159,64 +159,64 @@ class Trello extends BaseProvider {
         return str;
     }
 
-    _resolveFullCardURL(card){
+    _resolveFullCardURL(card) {
         return this.baseLink + 'c/' + card.shortLink + '/' + card.idShort + '-' + card.name.replace(/\s/g, '-').toLowerCase();
     }
 
-    _resolveFullBoardURL(board){
+    _resolveFullBoardURL(board) {
         return this.baseLink + 'b/' + board.shortLink + '/' + board.name.replace(/\s/g, '-').toLowerCase();
     }
 
-    _resolveFullCommentURL(card, commentID){
+    _resolveFullCommentURL(card, commentID) {
         return this._resolveFullCardURL(card) + '#comment-' + commentID;
     }
 
-    _resolveCardURL(id){
+    _resolveCardURL(id) {
         return this.baseLink + 'c/' + id;
     }
 
-    _resolveBoardURL(id){
+    _resolveBoardURL(id) {
         return this.baseLink + 'b/' + id;
     }
 
-    _resolveCommentURL(cardID, commentID){
+    _resolveCommentURL(cardID, commentID) {
         return this._resolveCardURL(cardID) + '#comment-' + commentID;
     }
 
-    _resolveGenericURL(id){
+    _resolveGenericURL(id) {
         return this.baseLink + id;
     }
 
-    _formatAttachment(attachment, embed){
-        if(attachment.previewUrl != null){
+    _formatAttachment(attachment, embed) {
+        if (attachment.previewUrl != null) {
             embed.image = {url: attachment.previewUrl};
         }
-        if(attachment.url != null){
-            if(attachment.name !== attachment.url){
+        if (attachment.url != null) {
+            if (attachment.name !== attachment.url) {
                 embed.fields = [{
                     name: attachment.name,
                     value: attachment.url
                 }];
             } else {
-                embed.description = attachment.url; 
+                embed.description = attachment.url;
             }
         } else {
             embed.description = attachment.name;
         }
     }
 
-    _formatLabel(text, value, embed){
-        if(value && this.defTrelloColors[value] != null){
+    _formatLabel(text, value, embed) {
+        if (value && this.defTrelloColors[value] != null) {
             this.payload.setEmbedColor(this.defTrelloColors[value]);
         } else {
             this.payload.setEmbedColor(this.defTrelloColors.nocolor);
         }
-        if(text){
+        if (text) {
             embed.description = '`' + text + '`';
         }
     }
 
-    _resolveUser(){
+    _resolveUser() {
         const memberCreator = this.req.body.action.memberCreator;
         return {
             name: memberCreator.fullName,
@@ -225,7 +225,7 @@ class Trello extends BaseProvider {
         };
     }
 
-    _preparePayload(){
+    _preparePayload() {
         this.action = this.req.body.action;
         this.model = this.req.body.model;
 
@@ -234,7 +234,7 @@ class Trello extends BaseProvider {
         //console.info(this.action.data);
 
         //Use the background color of the board if applicable. Otherwise, use the default trello color.
-        if(this.model.prefs != null && this.model.prefs.background != null && this.defTrelloColors[this.model.prefs.background] != null){
+        if (this.model.prefs != null && this.model.prefs.background != null && this.defTrelloColors[this.model.prefs.background] != null) {
             this.payload.setEmbedColor(this.defTrelloColors[this.model.prefs.background]);
         } else {
             this.payload.setEmbedColor(this.defTrelloColors.trello);
@@ -247,7 +247,7 @@ class Trello extends BaseProvider {
 
     // Webhook Type Responses
 
-    async addAttachmentToCard(){
+    async addAttachmentToCard() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Added Attachment to "' + this.action.data.card.name + '"';
         embed.url = this._resolveFullCardURL(this.action.data.card);
@@ -256,11 +256,11 @@ class Trello extends BaseProvider {
     }
 
     // How to Trigger?
-    async addBoardsPinnedToMember(){
+    async addBoardsPinnedToMember() {
 
     }
 
-    async addChecklistToCard(){
+    async addChecklistToCard() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Added Checklist to "' + this.action.data.card.name + '"';
         embed.url = this._resolveFullCardURL(this.action.data.card);
@@ -268,7 +268,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async addLabelToCard(){
+    async addLabelToCard() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Added Label to "' + this.action.data.card.name + '"';
         embed.url = this._resolveFullCardURL(this.action.data.card);
@@ -276,12 +276,12 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async addMemberToCard(){
+    async addMemberToCard() {
         let embed = this._preparePayload();
-        if(this.action.memberCreator.id === thos.action.member.id){
+        if (this.action.memberCreator.id === thos.action.member.id) {
             embed.title = '[' + this.action.data.board.name + '] Joined "' + this.action.data.card.name + '"';
         } else {
-             embed.title = '[' + this.action.data.board.name + '] Added User to "' + this.action.data.card.name + '"';
+            embed.title = '[' + this.action.data.board.name + '] Added User to "' + this.action.data.card.name + '"';
             Trello._addMemberThumbnail(this.action.member.avatarHash, embed);
             embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + this.baseLink + this.action.member.username + '))';
         }
@@ -289,12 +289,12 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async addMemberToBoard(){
+    async addMemberToBoard() {
         let embed = this._preparePayload();
-        if(this.action.memberCreator.id === this.action.member.id){
+        if (this.action.memberCreator.id === this.action.member.id) {
             embed.title = 'Joined Board "' + this.action.data.board.name + '"';
         } else {
-             embed.title = 'Added User to Board "' + this.action.data.board.name + '"';
+            embed.title = 'Added User to Board "' + this.action.data.board.name + '"';
             Trello._addMemberThumbnail(this.action.member.avatarHash, embed);
             embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + this.baseLink + this.action.member.username + '))';
         }
@@ -302,12 +302,12 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async addMemberToOrganization(){
+    async addMemberToOrganization() {
         let embed = this._preparePayload();
-        if(this.action.memberCreator.id === this.action.member.id){
+        if (this.action.memberCreator.id === this.action.member.id) {
             embed.title = 'Joined Organization "' + this.action.data.organization.name + '"';
         } else {
-             embed.title = 'Added User to Organization "' + this.action.data.organization.name + '"';
+            embed.title = 'Added User to Organization "' + this.action.data.organization.name + '"';
             Trello._addMemberThumbnail(this.action.member.avatarHash, embed);
             embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + this.baseLink + this.action.member.username + '))';
         }
@@ -315,7 +315,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async addToOrganizationBoard(){
+    async addToOrganizationBoard() {
         let embed = this._preparePayload();
         embed.title = 'Created Board in "' + this.action.data.organization.name + '"';
         embed.description = '[`' + this.action.data.board.name + '`](' + this._resolveFullBoardURL(this.action.data.board) + ') has been created.';
@@ -323,7 +323,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async commentCard(){
+    async commentCard() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Commented on Card "' + this.action.data.card.name + '"';
         embed.url = this._resolveFullCommentURL(this.action.data.card, this.action.id);
@@ -331,7 +331,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async convertToCardFromCheckItem(){
+    async convertToCardFromCheckItem() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Converted Check Item to Card';
         embed.url = this._resolveFullCardURL(this.action.data.card);
@@ -339,7 +339,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async copyBoard(){
+    async copyBoard() {
         let embed = this._preparePayload();
         embed.title = 'Copied Board';
         embed.url = this._resolveFullBoardURL(this.action.data.board);
@@ -347,7 +347,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async copyCard(){
+    async copyCard() {
         let embed = this._preparePayload();
         embed.title = 'Copied Card';
         embed.description = '[`' + this.action.data.cardSource.name + '`](' + this._resolveFullCardURL(this.action.data.cardSource) + ') \uD83E\uDC6A [`' + this.action.data.card.name + '``](' + this._resolveFullCardURL(this.action.data.card) + ')';
@@ -355,7 +355,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async copyChecklist(){
+    async copyChecklist() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Copied Checklist';
         embed.description = '`' + this.action.data.checklistSource.name + '` \uD83E\uDC6A `' + this.action.data.checklist.name + '`';
@@ -363,7 +363,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async createLabel(){
+    async createLabel() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Created Label';
         this._formatLabel(this.action.data.label.name, this.action.data.label.color, embed);
@@ -372,11 +372,11 @@ class Trello extends BaseProvider {
     }
 
     // How to Trigger?
-    async copyCommentCard(){
-        
+    async copyCommentCard() {
+
     }
 
-    async createBoard(){
+    async createBoard() {
         let embed = this._preparePayload();
         embed.title = 'Created Board "' + Trello._formatLargeString(this.action.data.board.name) + '"';
         embed.url = this._resolveFullBoardURL(this.action.data.board);
@@ -384,16 +384,16 @@ class Trello extends BaseProvider {
     }
 
     // Won't Trigger?
-    async createBoardInvitation(){
-        
+    async createBoardInvitation() {
+
     }
 
     // How to Trigger?
-    async createBoardPreference(){
-        
+    async createBoardPreference() {
+
     }
 
-    async createCard(){
+    async createCard() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Created Card';
         embed.url = this._resolveFullCardURL(this.action.data.card);
@@ -401,7 +401,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async createCheckItem(){
+    async createCheckItem() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Created Check Item in "' + this.action.data.card.name + '"';
         embed.url = this._resolveFullCardURL(this.action.data.card);
@@ -410,11 +410,11 @@ class Trello extends BaseProvider {
     }
 
     // How to Trigger?
-    async createChecklist(){
-        
+    async createChecklist() {
+
     }
 
-    async createList(){
+    async createList() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Created List';
         embed.description = '`' + this.action.data.list.name + '` has been created.';
@@ -422,7 +422,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async createOrganization(){
+    async createOrganization() {
         let embed = this._preparePayload();
         embed.title = 'Created Organization';
         embed.description = '`' + this.action.data.organization.name + '` has been created.';
@@ -431,11 +431,11 @@ class Trello extends BaseProvider {
     }
 
     // Won't Trigger?
-    async createOrganizationInvitation(){
-        
+    async createOrganizationInvitation() {
+
     }
 
-    async deleteAttachmentFromCard(){
+    async deleteAttachmentFromCard() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Removed Attachment from "' + this.action.data.card.name + '"';
         embed.url = this._resolveFullCardURL(this.action.data.card);
@@ -444,11 +444,11 @@ class Trello extends BaseProvider {
     }
 
     // Won't Trigger?
-    async deleteBoardInvitation(){
-        
+    async deleteBoardInvitation() {
+
     }
 
-    async deleteCard(){
+    async deleteCard() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Deleted Card';
         embed.description = 'A card was deleted from list `' + this.action.data.list.name + '`.';
@@ -456,7 +456,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async deleteCheckItem(){
+    async deleteCheckItem() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Deleted Check Item from "' + this.action.data.card.name + '"';
         embed.url = this._resolveFullCardURL(this.action.data.card);
@@ -464,7 +464,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async deleteLabel(){
+    async deleteLabel() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Deleted Label';
         embed.url = this._resolveFullBoardURL(this.action.data.board);
@@ -472,11 +472,11 @@ class Trello extends BaseProvider {
     }
 
     // Won't Trigger?
-    async deleteOrganizationInvitation(){
-        
+    async deleteOrganizationInvitation() {
+
     }
 
-    async disablePlugin(){
+    async disablePlugin() {
         let embed = this._preparePayload();
         embed.url = this._resolveFullBoardURL(this.action.data.board);
         const opts = {
@@ -504,16 +504,16 @@ class Trello extends BaseProvider {
     }
 
     // How to Trigger?
-    async disablePowerUp(){
-        
+    async disablePowerUp() {
+
     }
 
     // How to Trigger?
-    async emailCard(){
-        
+    async emailCard() {
+
     }
 
-    async enablePlugin(){
+    async enablePlugin() {
         let embed = this._preparePayload();
         embed.url = this._resolveFullBoardURL(this.action.data.board);
         const opts = {
@@ -541,11 +541,11 @@ class Trello extends BaseProvider {
     }
 
     // How to Trigger?
-    async enablePowerUp(){
+    async enablePowerUp() {
 
     }
 
-    async makeAdminOfBoard(){
+    async makeAdminOfBoard() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Set User to Admin';
         embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + this.baseLink + this.action.member.username + '))';
@@ -554,7 +554,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async makeAdminOfOrganization(){
+    async makeAdminOfOrganization() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.organization.name + '] Set User to Admin';
         embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + this.baseLink + this.action.member.username + '))';
@@ -563,7 +563,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async makeNormalMemberOfBoard(){
+    async makeNormalMemberOfBoard() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Set User to Member';
         embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + this.baseLink + this.action.member.username + '))';
@@ -572,7 +572,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async makeNormalMemberOfOrganization(){
+    async makeNormalMemberOfOrganization() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.organization.name + '] Set User to Member';
         embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + this.baseLink + this.action.member.username + '))';
@@ -580,9 +580,9 @@ class Trello extends BaseProvider {
         embed.url = this._resolveGenericURL(this.data.organization.id);
         this.payload.addEmbed(embed);
     }
-    
+
     //Unable to test, business class+ feature.
-    async makeObserverOfBoard(){
+    async makeObserverOfBoard() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Set User to Observer';
         embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + this.baseLink + this.action.member.username + '))';
@@ -592,11 +592,11 @@ class Trello extends BaseProvider {
     }
 
     // How to Trigger?
-    async memberJoinedTrello(){
-        
+    async memberJoinedTrello() {
+
     }
 
-    async moveCardFromBoard(){
+    async moveCardFromBoard() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Moved Card to Another Board';
         embed.description = '[`' + this.action.data.card.name + '`](' + this._resolveCardURL(this.action.data.card.id) + ') has been moved from list `' + this.action.data.list.name + '` to [another board](' + this._resolveBoardURL(this.action.data.boardTarget.id) + ').';
@@ -604,7 +604,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async moveCardToBoard(){
+    async moveCardToBoard() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Moved Card to Board';
         embed.description = '[`' + this.action.data.card.name + '`](' + this._resolveFullCardURL(this.action.data.card) + ') has been moved to list `' + this.action.data.list.name + '` from [another board](' + this._resolveBoardURL(this.action.data.boardSource.id) + ').';
@@ -612,7 +612,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async moveListFromBoard(){
+    async moveListFromBoard() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Moved List to Another Board';
         embed.description = '`' + this.action.data.list.name + '` has been moved to [another board](' + this._resolveBoardURL(this.action.data.boardTarget.id) + ').';
@@ -620,7 +620,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async moveListToBoard(){
+    async moveListToBoard() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Moved List to Board';
         embed.description = '`' + this.action.data.list.name + '` has been moved from [another board](' + this._resolveBoardURL(this.action.data.boardSource.id) + ').';
@@ -629,13 +629,13 @@ class Trello extends BaseProvider {
     }
 
     // How to Trigger?
-    async removeBoardsPinnedFromMember(){
+    async removeBoardsPinnedFromMember() {
         let embed = this._preparePayload();
 
         this.payload.addEmbed(embed);
     }
 
-    async removeChecklistFromCard(){
+    async removeChecklistFromCard() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Removed Checklist from "' + this.action.data.card.name + '"';
         embed.url = this._resolveFullCardURL(this.action.data.card);
@@ -643,7 +643,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async removeFromOrganizationBoard(){
+    async removeFromOrganizationBoard() {
         let embed = this._preparePayload();
         embed.title = 'Removed Board from "' + this.action.data.organization.name + '"';
         embed.description = '`' + this.action.data.board.name + '` has been deleted.';
@@ -651,7 +651,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async removeLabelFromCard(){
+    async removeLabelFromCard() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Removed Label from "' + this.action.data.card.name + '"';
         embed.url = this._resolveFullCardURL(this.action.data.card);
@@ -659,9 +659,9 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async removeMemberFromCard(){
+    async removeMemberFromCard() {
         let embed = this._preparePayload();
-        if(this.action.memberCreator.id === thos.action.member.id){
+        if (this.action.memberCreator.id === thos.action.member.id) {
             embed.title = '[' + this.action.data.board.name + '] Left "' + this.action.data.card.name + '"';
         } else {
             embed.title = '[' + this.action.data.board.name + '] Removed User from "' + this.action.data.card.name + '"';
@@ -672,9 +672,9 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async removeMemberFromBoard(){
+    async removeMemberFromBoard() {
         let embed = this._preparePayload();
-        if(this.action.memberCreator.id === this.action.member.id){
+        if (this.action.memberCreator.id === this.action.member.id) {
             embed.title = 'Left Board "' + this.action.data.board.name + '"';
         } else {
             embed.title = 'Removed User from Board "' + this.action.data.board.name + '"';
@@ -685,9 +685,9 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async removeMemberFromOrganization(){
+    async removeMemberFromOrganization() {
         let embed = this._preparePayload();
-        if(this.action.memberCreator.id === this.action.member.id){
+        if (this.action.memberCreator.id === this.action.member.id) {
             embed.title = 'Left Organization "' + this.action.data.organization.name + '"';
         } else {
             embed.title = 'Removed User from Organization "' + this.action.data.organization.name + '"';
@@ -699,64 +699,64 @@ class Trello extends BaseProvider {
     }
 
     // How to Trigger?
-    async unconfirmedBoardInvitation(){
-        
+    async unconfirmedBoardInvitation() {
+
     }
 
     // How to trigger?
-    async unconfirmedOrganizationInvitation(){
-        
+    async unconfirmedOrganizationInvitation() {
+
     }
 
-    async updateBoard(){
+    async updateBoard() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] ';
         embed.url = this._resolveFullBoardURL(this.action.data.board);
         let field = null;
-        if(this.action.data.old != null){
+        if (this.action.data.old != null) {
             const old = this.action.data.old;
-            if(old.closed != null){
-                if(this.action.data.card.closed){
+            if (old.closed != null) {
+                if (this.action.data.card.closed) {
                     embed.title = 'Closed Board "' + this.action.data.board.name + '"';
                 } else {
                     embed.title = 'Reopened Board "' + this.action.data.board.name + '"';
                 }
-            } else if(old.name != null){
+            } else if (old.name != null) {
                 embed.title = embed.title + 'Renamed Board';
                 embed.description = '`' + old.name + '` \uD83E\uDC6A `' + this.action.data.board.name + '`';
-            } else if(old.prefs != null){
+            } else if (old.prefs != null) {
                 embed.title = embed.title + 'Updated Board Preference'
-                if(old.prefs.permissionLevel != null){
+                if (old.prefs.permissionLevel != null) {
                     field = {
                         name: 'Permission Level',
                         value: '`' + old.prefs.permissionLevel + '` \uD83E\uDC6A `' + this.action.data.board.prefs.permissionLevel + '`',
                         inline: false
                     };
-                } else if(old.prefs.selfJoin != null){
+                } else if (old.prefs.selfJoin != null) {
                     field = {
                         name: 'Allow Team Members to Join',
                         value: '`' + old.prefs.selfJoin + '` \uD83E\uDC6A `' + this.action.data.board.prefs.selfJoin + '`',
                         inline: false
                     };
-                } else if(old.prefs.invitations != null){
+                } else if (old.prefs.invitations != null) {
                     field = {
                         name: 'Add/Remove Permissions',
                         value: '`' + old.prefs.invitations + '` \uD83E\uDC6A `' + this.action.data.board.prefs.invitations + '`',
                         inline: false
                     };
-                } else if(old.prefs.comments != null){
+                } else if (old.prefs.comments != null) {
                     field = {
                         name: 'Commenting Permissions',
                         value: '`' + old.prefs.comments + '` \uD83E\uDC6A `' + this.action.data.board.prefs.comments + '`',
                         inline: false
                     };
-                } else if(old.prefs.cardCovers != null){
+                } else if (old.prefs.cardCovers != null) {
                     field = {
                         name: 'Enable Card Cover Images',
                         value: '`' + old.prefs.cardCovers + '` \uD83E\uDC6A `' + this.action.data.board.prefs.cardCovers + '`',
                         inline: false
                     };
-                } else if(old.prefs.background != null){
+                } else if (old.prefs.background != null) {
                     let val = this.defTrelloColors[this.action.data.board.prefs.background] == null ? 'image' : this.action.data.board.prefs.background;
                     let oldVal = this.defTrelloColors[old.prefs.background] == null ? 'image' : old.prefs.background;
                     field = {
@@ -767,27 +767,27 @@ class Trello extends BaseProvider {
                 }
             }
         }
-        if(field != null){
+        if (field != null) {
             embed.fields = [field];
         }
         this.payload.addEmbed(embed);
     }
 
-    async updateCard(){
+    async updateCard() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] ';
         embed.url = this._resolveFullCardURL(this.action.data.card);
         let field = null;
-        if(this.action.data.old != null){
+        if (this.action.data.old != null) {
             let old = this.action.data.old;
-            if(old.name != null){
+            if (old.name != null) {
                 embed.title = embed.title + 'Renamed Card';
                 embed.description = '`' + old.name + '` \uD83E\uDC6A `' + this.action.data.card.name + '`';
-            } else if(old.desc != null){
-                if(!old.desc){
+            } else if (old.desc != null) {
+                if (!old.desc) {
                     embed.title = embed.title + 'Added Description to Card "' + this.action.data.card.name + '"';
                     embed.description = Trello._formatLargeString(Trello._formatMarkdown(this.action.data.card.desc, embed));
-                } else if(!this.action.data.card.desc){
+                } else if (!this.action.data.card.desc) {
                     embed.title = embed.title + 'Removed Description from Card "' + this.action.data.card.name + '"';
                     field = {
                         name: 'Old Value',
@@ -798,12 +798,12 @@ class Trello extends BaseProvider {
                     embed.title = embed.title + 'Updated Description of Card "' + this.action.data.card.name + '"';
                     embed.description = Trello._formatLargeString(Trello._formatMarkdown(this.action.data.card.desc, embed));
                 }
-            } else if(old.due != null || this.action.data.card.due != null){
-                if(old.due == null){
+            } else if (old.due != null || this.action.data.card.due != null) {
+                if (old.due == null) {
                     let d = new Date(this.action.data.card.due);
                     embed.title = embed.title + 'Added Due Date to "' + this.action.data.card.name + '" \uD83D\uDDD3';
                     embed.description = '`' + d.toUTCString() + '`';
-                } else if(this.action.data.card.due == null){
+                } else if (this.action.data.card.due == null) {
                     let d = new Date(old.due);
                     embed.title = embed.title + 'Removed Due Date from "' + this.action.data.card.name + '" \uD83D\uDDD3';
                     field = {
@@ -817,26 +817,26 @@ class Trello extends BaseProvider {
                     embed.title = embed.title + 'Changed Due Date of "' + this.action.data.card.name + '" \uD83D\uDDD3';
                     embed.description = '`' + oldD.toUTCString() + '` \uD83E\uDC6A `' + d.toUTCString() + '`';
                 }
-            } else if(old.closed != null){
-                if(this.action.data.card.closed){
+            } else if (old.closed != null) {
+                if (this.action.data.card.closed) {
                     embed.title = embed.title + 'Archived Card "' + this.action.data.card.name + '"';
                 } else {
                     embed.title = embed.title + 'Unarchived Card "' + this.action.data.card.name + '"';
                 }
-            } else if(old.idList != null){
+            } else if (old.idList != null) {
                 embed.title = embed.title + 'Moved Card "' + this.action.data.card.name + '" to Another List';
                 embed.description = '`' + this.action.data.listBefore.name + '` \uD83E\uDC6A `' + this.action.data.listAfter.name + '`'
-            } else if(old.pos != null){
+            } else if (old.pos != null) {
                 embed.title = embed.title + 'Updated Position of Card "' + this.action.data.card.name + '"';
             }
         }
-        if(field != null){
+        if (field != null) {
             embed.fields = [field];
         }
         this.payload.addEmbed(embed);
     }
 
-    async updateCheckItem(){
+    async updateCheckItem() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Renamed Item in Checklist "' + this.action.data.checklist.name + '"';
         embed.url = this._resolveFullCardURL(this.action.data.card);
@@ -844,13 +844,13 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async updateCheckItemStateOnCard(){
+    async updateCheckItemStateOnCard() {
         let embed = this._preparePayload();
         const capitalized = this.action.data.checkItem.state.charAt(0).toUpperCase() + this.action.data.checkItem.state.slice(1);
         embed.title = '[' + this.action.data.board.name + '] Marked Item as ' + capitalized;
-        if(this.action.data.checkItem.state === 'complete'){
+        if (this.action.data.checkItem.state === 'complete') {
             embed.title = embed.title + ' `\u2714`';
-        } else if(this.action.data.checkItem.state === 'incomplete'){
+        } else if (this.action.data.checkItem.state === 'incomplete') {
             embed.title = embed.title + ' `\u2718`';
         }
         embed.description = 'Item `' + this.action.data.checkItem.name + '` in `' + this.action.data.checklist.name + '` has been marked as `' + this.action.data.checkItem.state + '`.';
@@ -858,7 +858,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async updateChecklist(){
+    async updateChecklist() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Renamed Checklist';
         embed.description = '`' + Trello._formatLargeString(this.action.data.old.name) + '` \uD83E\uDC6A `' + Trello._formatLargeString(this.action.data.checklist.name) + '`';
@@ -866,29 +866,29 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async updateLabel(){
+    async updateLabel() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Updated Label';
         embed.url = this._resolveFullBoardURL(this.action.data.board);
         let field = null;
-        if(this.action.data.old != null){
-            if(this.action.data.old.color != null){
-                if(this.action.data.label.color){
+        if (this.action.data.old != null) {
+            if (this.action.data.old.color != null) {
+                if (this.action.data.label.color) {
                     field = {
                         name: 'Changed Color',
                         value: '`' + this.action.data.old.color + '` \uD83E\uDC6A `' + this.action.data.label.color + '`',
                         inline: false
                     };
-                 } else {
-                        field = {
+                } else {
+                    field = {
                         name: 'Removed Color',
                         value: 'Old color - `' + this.action.data.old.color + '`',
                         inline: false
                     };
                 }
-            } else if(this.action.data.old.name != null){
-                if(this.action.data.old.name){
-                    if(this.action.data.label.name){
+            } else if (this.action.data.old.name != null) {
+                if (this.action.data.old.name) {
+                    if (this.action.data.label.name) {
                         field = {
                             name: 'Changed Name',
                             value: '`' + this.action.data.old.name + '` \uD83E\uDC6A `' + this.action.data.label.name + '`',
@@ -916,16 +916,16 @@ class Trello extends BaseProvider {
                 inline: false
             };
         }
-        if(field != null){
+        if (field != null) {
             embed.fields = [field];
         }
         this.payload.addEmbed(embed);
     }
 
-    async updateList(){
+    async updateList() {
         let embed = this._preparePayload();
-        if(this.action.data.old.closed != null){
-            if(this.action.data.list.closed){
+        if (this.action.data.old.closed != null) {
+            if (this.action.data.list.closed) {
                 embed.title = '[' + this.action.data.board.name + '] Archived List "' + this.action.data.card.name + '"';
             } else {
                 embed.title = '[' + this.action.data.board.name + '] Unarchived List "' + this.action.data.card.name + '"';
@@ -939,37 +939,38 @@ class Trello extends BaseProvider {
     }
 
     // How to Trigger?
-    async updateMember(){
-        
+    async updateMember() {
+
     }
 
-    async updateOrganization(){
+    async updateOrganization() {
         let embed = this._preparePayload();
         let field = null;
         const organization = this.action.data.organization;
         const old = this.action.data.old;
         embed.title = '[' + organization.name + '] ';
         embed.url = this._resolveGenericURL(organization.id);
-        if(old != null){
-            if(old.prefs != null){
+        if (old != null) {
+            if (old.prefs != null) {
                 embed.title = embed.title + 'Updated Organization Preference';
                 //Check Prefs
-                if(old.prefs.permissionLevel != null){
+                if (old.prefs.permissionLevel != null) {
                     field = {
                         name: 'Permission Level',
                         value: '`' + old.prefs.permissionLevel + '` \uD83E\uDC6A `' + organization.prefs.permissionLevel + '`',
                         inline: false
                     }
-                };
-            } else if(old.displayName != null){
+                }
+                ;
+            } else if (old.displayName != null) {
                 embed.title = embed.title + 'Renamed Organization';
                 embed.description = '`' + old.displayName + '` \uD83E\uDC6A `' + organization.displayName + '`';
-            } else if(old.name != null){
+            } else if (old.name != null) {
                 embed.title = embed.title + 'Changed Short Name of Organization';
                 embed.description = '`' + old.name + '` \uD83E\uDC6A `' + this.model.name + '`';
-            } else if(old.website != null){
+            } else if (old.website != null) {
                 //If new value is empty, organization.website is null
-                if(organization.website == null){
+                if (organization.website == null) {
                     embed.title = embed.title + 'Removed Website from Organization';
                     field = {
                         name: 'Old Value',
@@ -980,11 +981,11 @@ class Trello extends BaseProvider {
                     embed.title = embed.title + 'Changed Website of Organization';
                     embed.description = old.website + ' \uD83E\uDC6A ' + organization.website;
                 }
-            } else if(old.desc != null){
-                if(!old.desc){
+            } else if (old.desc != null) {
+                if (!old.desc) {
                     embed.title = embed.title + 'Added Description to Organization';
                     embed.description = Trello._formatLargeString(Trello._formatMarkdown(organization.desc, embed));
-                } else if(!organization.desc){
+                } else if (!organization.desc) {
                     embed.title = embed.title + 'Removed Description from Organization';
                     field = {
                         name: 'Old Value',
@@ -1001,15 +1002,15 @@ class Trello extends BaseProvider {
             embed.title = embed.title + 'Added Website to Organization';
             embed.description = organization.website;
         }
-        if(field != null){
+        if (field != null) {
             embed.fields = [field];
         }
         this.payload.addEmbed(embed);
     }
 
-    async voteOnCard(){
+    async voteOnCard() {
         let embed = this._preparePayload();
-        if(this.action.data.voted){
+        if (this.action.data.voted) {
             embed.title = '[' + this.action.data.board.name + '] Voted on Card "' + this.action.data.card.name + '" \u2705';
         } else {
             embed.title = '[' + this.action.data.board.name + '] Removed Vote on Card "' + this.action.data.card.name + '"';

@@ -8,7 +8,7 @@ class TravisCi extends BaseProvider {
         return 'Travis';
     }
 
-    async parseData(){
+    async parseData() {
         this.payload.setEmbedColor(0xC7B398);
         this.payload.addEmbed({
             title: "Build #" + this.body.number,

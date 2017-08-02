@@ -4,7 +4,7 @@
 const BaseProvider = require('../util/BaseProvider');
 
 class BitBucket extends BaseProvider {
-    constructor(){
+    constructor() {
         super();
         this.payload.setEmbedColor(0x205081);
         this.baseLink = 'https://bitbucket.org/';
@@ -14,11 +14,11 @@ class BitBucket extends BaseProvider {
         return 'BitBucket';
     }
 
-    async getType(){
+    async getType() {
         return this.req.get('X-Event-Key');
     }
 
-    async repoPush(){
+    async repoPush() {
         let project = {
             name: this.body.repository.name,
             url: this.baseLink + this.body.repository.full_name,
@@ -30,7 +30,7 @@ class BitBucket extends BaseProvider {
             icon_url: this.body.actor.links.avatar.href,
             url: this.baseLink + this.body.actor.username
         };
-        for (let i = 0; (i < this.body.push.changes.length && i <4); i++) {
+        for (let i = 0; (i < this.body.push.changes.length && i < 4); i++) {
             let change = this.body.push.changes[i];
             project.branch = (change.old !== null) ? change.old.name : change.new.name;
             project.commits = change.commits;
@@ -57,7 +57,7 @@ class BitBucket extends BaseProvider {
         }
     }
 
-    async repoFork(){
+    async repoFork() {
         let user = {
             name: this.body.actor.display_name,
             icon_url: this.body.actor.links.avatar.href,
@@ -69,7 +69,7 @@ class BitBucket extends BaseProvider {
         });
     }
 
-    async repoUpdated(){
+    async repoUpdated() {
         let user = {
             name: this.body.actor.display_name,
             icon_url: this.body.actor.links.avatar.href,
@@ -98,7 +98,7 @@ class BitBucket extends BaseProvider {
         });
     }
 
-    async repoCommitCommentCreated(){
+    async repoCommitCommentCreated() {
         let user = {
             name: this.body.actor.display_name,
             icon_url: this.body.actor.links.avatar.href,
@@ -113,7 +113,7 @@ class BitBucket extends BaseProvider {
         });
     }
 
-    async repoCommitStatusCreated(){
+    async repoCommitStatusCreated() {
         this.payload.addEmbed({
             author: {
                 name: this.body.repository.name,
@@ -190,7 +190,7 @@ class BitBucket extends BaseProvider {
         });
     }
 
-    async pullrequestCreated(){
+    async pullrequestCreated() {
         let user = {
             name: this.body.actor.display_name,
             icon_url: this.body.actor.links.avatar.href,
