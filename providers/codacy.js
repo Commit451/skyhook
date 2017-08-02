@@ -9,7 +9,7 @@ class Codacy extends BaseProvider {
     }
 
     async parseData() {
-        this.payload.setEmbedColor(0x222222);
+        this.payload.setEmbedColor(0x242c33);
         this.payload.addEmbed({
             title: 'New Commit',
             url: this.body.commit.data.urls.delta,
