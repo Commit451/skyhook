@@ -7,6 +7,7 @@ const request = require('request');
 let app = express();
 const providers = {
     appveyor: require('./providers/appveyor'),
+    bintray: require('./providers/bintray'),
     bitbucket: require('./providers/bitbucket'),
     circleci: require('./providers/circleci'),
     codacy: require('./providers/codacy'),

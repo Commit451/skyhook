@@ -2,7 +2,6 @@
 // https://www.patreon.com/platform/documentation/webhooks
 // ========
 const BaseProvider = require('../util/BaseProvider');
-const rpn = require('request-promise-native');
 
 // HTML Regular Expressions
 const boldRegex = /<strong>(.*?)<\/strong>/;
