@@ -2,16 +2,9 @@
 // https://developers.trello.com/apis/webhooks
 // ========
 const BaseProvider = require('../util/BaseProvider');
+const MarkdownUtil = require('../util/MarkdownUtil');
 const rpn = require('request-promise-native');
 const urlMod = require('url');
-
-// Regular Expressions
-const mdUL1 = /^={3,}$/;
-const mdUL2 = /^-{3,}$/;
-const boldRegex = /\*\*([^\\]*)\*\*/;
-const cleanupRegex = /__([^\\]*)/;
-const italicRegex = /\*([^\\]*)\*/;
-const imageRegex = /!\[.*\]\((.*)\)/;
 
 class Trello extends BaseProvider {
 
@@ -55,108 +48,6 @@ class Trello extends BaseProvider {
 
     static _formatLargeString(str, limit = 256) {
         return (str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str);
-    }
-
-    static _formatMarkdownHeader(str) {
-        let lines = str.split('\n');
-        for (let i = 0; i < lines.length; i++) {
-            let line = lines[i].trim();
-            if (line.startsWith('#')) {
-                let start = 0;
-                let end = line.length;
-                let goFront = true;
-                let goBack = true;
-                let finished = false;
-                for (let j = 0; j < line.length && !finished; j++) {
-                    if (goFront && line.substring(j, j + 1) != '#') {
-                        start = j;
-                        goFront = false;
-                    }
-                    if (goBack && line.substring(line.length - 1 - j, line.length - j) != '#') {
-                        end = line.length - j;
-                        goBack = false;
-                    }
-                    if (!goBack && !goFront) {
-                        finished = true;
-                    }
-                }
-                if (end - start === line.length) {
-                    line = '**#**';
-                } else {
-                    line = '**' + line.substring(start, end).trim() + '**';
-                }
-                lines[i] = line;
-            }
-            if (mdUL1.test(line) || mdUL2.test(line)) {
-                if (i > 0) {
-                    lines[i - 1] = '**' + lines[i - 1] + '**';
-                }
-                lines.splice(i, 1);
-            }
-        }
-        return lines.join('\n');
-    }
-
-    static _formatMarkdownBold(str) {
-        let match;
-        while (boldRegex.test(str)) {
-            match = boldRegex.exec(str);
-            str = str.replace(boldRegex, '__' + match[1] + '__');
-        }
-        return str;
-    }
-
-    static _cleanupMarkdownBold(str) {
-        let match;
-        while (cleanupRegex.test(str)) {
-            match = cleanupRegex.exec(str);
-            str = str.replace(cleanupRegex, '**' + match[1] + '**');
-        }
-        return str;
-    }
-
-    static _formatMarkdownItalic(str) {
-        let match;
-        while (italicRegex.test(str)) {
-            match = italicRegex.exec(str);
-            str = str.replace(italicRegex, '_' + match[1] + '_');
-        }
-        return str;
-    }
-
-    static _formatMarkdownImage(str, embed) {
-        if (imageRegex.test(str)) {
-            let match = imageRegex.exec(str);
-            embed.image = {url: match[1]};
-            str = str.replace(imageRegex, '');
-        }
-        return str;
-    }
-
-    static _formatMarkdownBullets(str) {
-        const lines = str.split('\n');
-        for (let i = 0; i < lines.length; i++) {
-            let line = lines[i].trim();
-            if (line.startsWith('*')) {
-                lines[i] = lines[i].replace('*', '\u2022');
-            } else if (line.startsWith('+')) {
-                lines[i] = lines[i].replace('+', '\u2022');
-            } else if (line.startsWith('-')) {
-                lines[i] = lines[i].replace('-', '\u2022');
-            }
-        }
-        return lines.join('\n');
-    }
-
-    static _formatMarkdown(str, embed) {
-        str = Trello._formatMarkdownBold(str);
-        str = Trello._formatMarkdownItalic(str);
-        str = Trello._formatMarkdownBullets(str);
-        str = Trello._cleanupMarkdownBold(str);
-        str = Trello._formatMarkdownHeader(str);
-        str = Trello._formatMarkdownImage(str, embed);
-
-        return str;
     }
 
     _resolveFullCardURL(card) {
@@ -485,7 +376,7 @@ class Trello extends BaseProvider {
         }
         try {
             const manifest = await rpn(opts);
-            const desc = Trello._formatMarkdown(manifest.details, embed);
+            const desc = MarkdownUtil._formatMarkdown(manifest.details, embed);
             embed.title = '[' + this.action.data.board.name + '] Disabled Plugin \u2717';
             embed.fields = [{
                 name: manifest.name,
@@ -522,7 +413,7 @@ class Trello extends BaseProvider {
         }
         try {
             const manifest = await rpn(opts);
-            const desc = Trello._formatMarkdown(manifest.details, embed);
+            const desc = MarkdownUtil._formatMarkdown(manifest.details, embed);
             embed.title = '[' + this.action.data.board.name + '] Enabled Plugin \u2713';
             embed.fields = [{
                 name: manifest.name,
@@ -786,17 +677,17 @@ class Trello extends BaseProvider {
             } else if (old.desc != null) {
                 if (!old.desc) {
                     embed.title = embed.title + 'Added Description to Card "' + this.action.data.card.name + '"';
-                    embed.description = Trello._formatLargeString(Trello._formatMarkdown(this.action.data.card.desc, embed));
+                    embed.description = Trello._formatLargeString(MarkdownUtil._formatMarkdown(this.action.data.card.desc, embed));
                 } else if (!this.action.data.card.desc) {
                     embed.title = embed.title + 'Removed Description from Card "' + this.action.data.card.name + '"';
                     field = {
                         name: 'Old Value',
-                        value: Trello._formatLargeString(Trello._formatMarkdown(old.desc, embed)),
+                        value: Trello._formatLargeString(MarkdownUtil._formatMarkdown(old.desc, embed)),
                         inline: false
                     };
                 } else {
                     embed.title = embed.title + 'Updated Description of Card "' + this.action.data.card.name + '"';
-                    embed.description = Trello._formatLargeString(Trello._formatMarkdown(this.action.data.card.desc, embed));
+                    embed.description = Trello._formatLargeString(MarkdownUtil._formatMarkdown(this.action.data.card.desc, embed));
                 }
             } else if (old.due != null || this.action.data.card.due != null) {
                 if (old.due == null) {
@@ -984,17 +875,17 @@ class Trello extends BaseProvider {
             } else if (old.desc != null) {
                 if (!old.desc) {
                     embed.title = embed.title + 'Added Description to Organization';
-                    embed.description = Trello._formatLargeString(Trello._formatMarkdown(organization.desc, embed));
+                    embed.description = Trello._formatLargeString(MarkdownUtil._formatMarkdown(organization.desc, embed));
                 } else if (!organization.desc) {
                     embed.title = embed.title + 'Removed Description from Organization';
                     field = {
                         name: 'Old Value',
-                        value: Trello._formatLargeString(Trello._formatMarkdown(old.desc, embed)),
+                        value: Trello._formatLargeString(MarkdownUtil._formatMarkdown(old.desc, embed)),
                         inline: false
                     };
                 } else {
                     embed.title = embed.title + 'Changed Description of Organization';
-                    embed.description = Trello._formatLargeString(Trello._formatMarkdown(old.desc, embed)) + '\n`\uD83E\uDC6B`\n' + Trello._formatLargeString(Trello._formatMarkdown(organization.desc, embed));
+                    embed.description = Trello._formatLargeString(MarkdownUtil._formatMarkdown(old.desc, embed)) + '\n`\uD83E\uDC6B`\n' + Trello._formatLargeString(MarkdownUtil._formatMarkdown(organization.desc, embed));
                 }
             }
         } else {
