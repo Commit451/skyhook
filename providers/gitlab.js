@@ -197,8 +197,8 @@ class GitLab extends BaseProvider {
 
     async build() {
         this.payload.addEmbed({
-            title: "Build #" + build_id + " on " + this.body.project.name,
-            url: this.body.project.web_url + "/builds/" + this.body.build_id,
+            title: "Build #" + this.body.build_id + " on " + this.body.repository.name,
+            url: this.body.repository.homepage + "/builds/" + this.body.build_id,
             author: {
                 name: this.body.user.name,
                 icon_url: GitLab._formatAvatarURL(this.body.user.avatar_url)
