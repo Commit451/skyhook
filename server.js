@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const request = require('request');
+const winston = require('winston');
 
 let app = express();
 const providers = {
@@ -20,6 +21,13 @@ const providers = {
     unity: require('./providers/unity')
 };
 
+if (process.env.PRODUCTION) {
+    winston.level = 'error';
+} else {
+    winston.level = 'debug';
+    winston.debug("Setting winston log level to debug")
+}
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 // http://expressjs.com/en/starter/static-files.html
@@ -36,6 +44,10 @@ app.get("/", function (request, response) {
     templProviders.sort();
 
     response.render('index', {providers: templProviders});
+});
+
+app.get("/providers", function (request, response) {
+    response.status(200).send(getListOfProviderNamesSorted());
 });
 
 app.get("/api/webhooks/:webhookID/:webhookSecret/:from", function (req, res) {
@@ -67,7 +79,7 @@ app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async function (req, r
         const instance = new providers[provider]();
         discordPayload = await instance.parse(req);
     } else {
-        console.log('Unknown provider "' + provider + '"');
+        winston.error('Unknown provider "' + provider + '"');
     }
 
     if (discordPayload !== null) {
@@ -75,7 +87,7 @@ app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async function (req, r
         if (test) {
             const testHookUrl = process.env.TEST_HOOK_URL;
             if (testHookUrl) {
-                console.log("Sending to test url: " + testHookUrl);
+                winston.log("Sending to test url: " + testHookUrl);
                 request.post({
                     headers: {'content-type': 'application/json'},
                     url: discordEndpoint + provider,
@@ -100,7 +112,7 @@ app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async function (req, r
                 body: jsonString
             }, function (error, response, body) {
                 if (error) {
-                    console.log(error);
+                    winston.error(error);
                     res.sendStatus(400);
                 } else {
                     res.sendStatus(200);
@@ -116,14 +128,23 @@ app.use(function (req, res, next) {
 });
 
 app.use(function (err, req, res, next) {
-    console.error(err.stack);
+    winston.error(err.stack);
     res.status(500).send('Internal Server Error')
 });
 
 // listen for requests :)
 const server = app.listen(process.env.PORT || 8080, function () {
-    console.log('Your app is listening on port ' + server.address().port);
+    winston.debug('Your app is listening on port ' + server.address().port);
 });
+
+function getListOfProviderNamesSorted() {
+    const sortedProviders = [];
+    for (const prov in providers) {
+        sortedProviders.push(providers[prov].getName());
+    }
+    sortedProviders.sort();
+    return sortedProviders
+}
 
 //for the tests!
 module.exports = server;
