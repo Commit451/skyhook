@@ -110,6 +110,16 @@ app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async function (req, r
     }
 });
 
+//Keep these two at the end
+app.use(function (req, res, next) {
+    res.status(404).send("Not Found")
+});
+
+app.use(function (err, req, res, next) {
+    console.error(err.stack);
+    res.status(500).send('Internal Server Error')
+});
+
 // listen for requests :)
 const server = app.listen(process.env.PORT || 8080, function () {
     console.log('Your app is listening on port ' + server.address().port);
