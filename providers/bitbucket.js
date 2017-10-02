@@ -168,10 +168,52 @@ class BitBucket extends BaseProvider {
             icon_url: this.body.actor.links.avatar.href,
             url: this.baseLink + this.body.actor.username
         };
+
+        let changes = [];
+        if (typeof this.body.changes !== "undefined") {
+            const states = ['old', 'new'];
+
+            ['Assignee', 'Responsible'].forEach((label) => {
+                const actor = this.body.changes[label.toLowerCase()],
+                    actorNames = {};
+
+                if (actor === 'undefined') {
+                    return;
+                }
+
+                states.forEach((state) => {
+                    if (typeof actor[state] === 'object' && typeof actor[state].username === 'string') {
+                        actorNames[state] = actor[state].username;
+                    }
+                });
+
+                if (!Object.keys(actorNames).length) {
+                    return;
+                }
+
+                states.forEach((state) => {
+                    if (typeof actorNames[state] === 'undefined') {
+                        actorNames[state] = '***null***';
+                    }
+                });
+
+                changes.push("**" + label + ":** \"" + actorNames.old + "\" -> \"" + actorNames.new + "\"");
+            });
+
+            ['Priority', 'Status', 'Content', 'Kind'].forEach((label) => {
+                const property = this.body.changes[label.toLowerCase()];
+
+                if (typeof property !== "undefined") {
+                    changes.push("**" + label + ":** \"" + property.old + "\" -> \"" + property.new + "\"");
+                }
+            });
+        }
+
         this.payload.addEmbed({
             author: user,
             title: "Updated Issue #" + this.body.issue.id + " on " + this.body.repository.name,
-            url: this.baseLink + this.body.repository.full_name + "/issues/" + this.body.issue.id
+            url: this.baseLink + this.body.repository.full_name + "/issues/" + this.body.issue.id,
+            description: changes.join("\n")
         });
     }
 
