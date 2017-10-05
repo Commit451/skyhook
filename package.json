@@ -23,6 +23,9 @@
   "repository": {
     "url": "https://github.com/Commit451/skyhook"
   },
+  "bugs": {
+    "url": "https://github.com/Commit451/skyhook/issues"
+  },
   "license": "MIT",
   "keywords": [
     "node",
