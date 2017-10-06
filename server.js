@@ -18,7 +18,8 @@ const providers = {
     patreon: require('./providers/patreon'),
     trello: require('./providers/trello'),
     travis: require('./providers/travis'),
-    unity: require('./providers/unity')
+	unity: require('./providers/unity'),
+	vsts: require('./providers/vsts')
 };
 
 if (process.env.PRODUCTION) {
