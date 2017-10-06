@@ -14,6 +14,10 @@ class BitBucket extends BaseProvider {
         return 'BitBucket';
     }
 
+    static _formatLargeString(str, limit = 256) {
+        return (str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str);
+    }
+
     async getType() {
         return this.req.get('X-Event-Key');
     }
@@ -196,6 +200,7 @@ class BitBucket extends BaseProvider {
                         actorNames[state] = '***null***';
                     }
                 });
+                changes.push(`**${label}:** "${actorNames.old}" -> "${actorNames.new}"`);
 
                 changes.push("**" + label + ":** \"" + actorNames.old + "\" -> \"" + actorNames.new + "\"");
             });
@@ -204,16 +209,25 @@ class BitBucket extends BaseProvider {
                 const property = this.body.changes[label.toLowerCase()];
 
                 if (typeof property !== "undefined") {
-                    changes.push("**" + label + ":** \"" + property.old + "\" -> \"" + property.new + "\"");
+                    changes.push(`**${label}:** "${property.old}" -> "${property.new}"`);
                 }
             });
+
+            {
+                const label = 'Content',
+                    property = this.body.changes[label.toLowerCase()];
+
+                if (typeof property !== "undefined") {
+                    changes.push(`**${label}:** "${property.old}" -> "${property.new}"`);
+                }
+            }
         }
 
         this.payload.addEmbed({
             author: user,
             title: "Updated Issue #" + this.body.issue.id + " on " + this.body.repository.name,
             url: this.baseLink + this.body.repository.full_name + "/issues/" + this.body.issue.id,
-            description: changes.join("\n")
+            description: BitBucket._formatLargeString(changes.join("\n"))
         });
     }
 
