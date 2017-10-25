@@ -173,12 +173,12 @@ class BitBucket extends BaseProvider {
             states.push('**Assignee:** ' + '[`' + this.body.issue.assignee.display_name + '`](' + this.body.issue.assignee.links.html.href + ')');
         }
 
-        states.push('**State:** ' + BitBucket._titleCase(this.body.issue.state));
-        states.push('**Kind:** ' + BitBucket._titleCase(this.body.issue.kind));
-        states.push('**Priority:** ' + BitBucket._titleCase(this.body.issue.priority));
+        states.push('**State:** `' + BitBucket._titleCase(this.body.issue.state) + '`');
+        states.push('**Kind:** `' + BitBucket._titleCase(this.body.issue.kind) + '`');
+        states.push('**Priority:** `' + BitBucket._titleCase(this.body.issue.priority) + '`');
 
         if (this.body.issue.content.raw) {
-            states.push('**Content:**\n' + BitBucket._formatLargeString(MarkdownUtil._formatMarkdown(this.body.issue.content.raw, embed)));
+            states.push('**Content:**\n' + MarkdownUtil._formatMarkdown(BitBucket._formatLargeString(this.body.issue.content.raw, embed)));
         }
 
         embed.description = states.join('\n');
@@ -242,7 +242,7 @@ class BitBucket extends BaseProvider {
                 const property = this.body.changes[label.toLowerCase()];
 
                 if (typeof property !== 'undefined') {
-                    changes.push('**New ' + label + ':** \n' + BitBucket._formatLargeString(MarkdownUtil._formatMarkdown(property.new, embed)));
+                    changes.push('**New ' + label + ':** \n' + MarkdownUtil._formatMarkdown(BitBucket._formatLargeString(property.new, embed)));
                 }
             }
         }
@@ -259,12 +259,15 @@ class BitBucket extends BaseProvider {
             url: this.baseLink + this.body.actor.username
         };
 
-        this.payload.addEmbed({
+        const embed = {
             author: user,
-            title: "Wrote a comment to Issue #" + this.body.issue.id + " on " + this.body.repository.name,
-            url: this.baseLink + this.body.repository.full_name + "/issues/" + this.body.issue.id,
-            description: (this.body.comment.content.html.replace(/<.*?>/g, '').length > 1024) ? this.body.comment.content.html.replace(/<.*?>/g, '').substring(0, 1023) + "\u2026" : this.body.comment.content.html.replace(/<.*?>/g, '')
-        });
+            title: '[' + this.body.repository.owner.username + '/' + this.body.repository.name + '] New comment on issue #' + this.body.issue.id + ': ' + this.body.issue.title,
+            url: this.baseLink + this.body.repository.full_name + "/issues/" + this.body.issue.id
+        };
+
+        embed.description = MarkdownUtil._formatMarkdown(BitBucket._formatLargeString(this.body.comment.content.raw), embed);
+
+        this.payload.addEmbed(embed);
     }
 
     async pullrequestCreated() {
