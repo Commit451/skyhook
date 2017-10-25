@@ -2,12 +2,17 @@
 // https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html
 // ========
 const BaseProvider = require('../util/BaseProvider');
+const MarkdownUtil = require('../util/MarkdownUtil');
 
 class BitBucket extends BaseProvider {
     constructor() {
         super();
         this.payload.setEmbedColor(0x205081);
         this.baseLink = 'https://bitbucket.org/';
+    }
+
+    static _formatLargeString(str, limit = 256) {
+        return (str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str);
     }
 
     static getName() {
@@ -168,11 +173,66 @@ class BitBucket extends BaseProvider {
             icon_url: this.body.actor.links.avatar.href,
             url: this.baseLink + this.body.actor.username
         };
-        this.payload.addEmbed({
+
+        let changes = [];
+
+        let embed = {
             author: user,
             title: "Updated Issue #" + this.body.issue.id + " on " + this.body.repository.name,
             url: this.baseLink + this.body.repository.full_name + "/issues/" + this.body.issue.id
-        });
+        };
+
+        if (typeof this.body.changes !== "undefined") {
+            const states = ['old', 'new'];
+
+            //Assignee Changes
+            ['Assignee', 'Responsible'].forEach((label) => {
+                const actor = this.body.changes[label.toLowerCase()];
+
+                if (actor == null) {
+                    return;
+                }
+
+                const actorNames = {};
+                const unassigned = '`Unassigned`';
+
+                states.forEach((state) => {
+                    if (actor[state] != null && actor[state].username != null) {
+                        actorNames[state] = '[`' + actor[state].display_name + '`](' + actor[state].links.html.href + ')';
+                    } else {
+                        actorNames[state] = unassigned;
+                    }
+                });
+
+                if (!Object.keys(actorNames).length || (actorNames.old === unassigned && actorNames.new === unassigned)) {
+                    return;
+                }
+
+                changes.push("**" + label + ":** " + actorNames.old + " \uD83E\uDC6A " + actorNames.new);
+            });
+
+            //Status Changes
+            ['Priority', 'Status', 'Kind'].forEach((label) => {
+                const property = this.body.changes[label.toLowerCase()];
+
+                if (typeof property !== "undefined") {
+                    changes.push("**" + label + ":** `" + property.old.charAt(0).toUpperCase() + property.old.slice(1) + "` \uD83E\uDC6A `" + property.new.charAt(0).toUpperCase() + property.new.slice(1) + "`");
+                }
+            });
+
+            {
+                const label = 'Content';
+                const property = this.body.changes[label.toLowerCase()];
+
+                if (typeof property !== "undefined") {
+                    changes.push("**" + 'New ' + label + ":** \n" + BitBucket._formatLargeString(MarkdownUtil._formatMarkdown(property.new, embed)));
+                }
+            }
+        }
+
+        embed.description = changes.join("\n");
+
+        this.payload.addEmbed(embed);
     }
 
     async issueCommentCreated() {
