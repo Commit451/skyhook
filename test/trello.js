@@ -7,8 +7,8 @@ const should = chai.should();
 
 chai.use(chaiHttp);
 
-const commentJSON = { 
-    model: { 
+const commentJSON = {
+    model: {
         id: '594474056f0b649912106a39',
         name: 'Example Board',
         desc: '',
@@ -18,7 +18,7 @@ const commentJSON = {
         pinned: false,
         url: 'https://trello.com/b/EcmJGI6e/example-board',
         shortUrl: 'https://trello.com/b/EcmJGI6e',
-        prefs: { 
+        prefs: {
             permissionLevel: 'org',
             voting: 'members',
             comments: 'members',
@@ -36,7 +36,7 @@ const commentJSON = {
             canBePublic: true,
             canBeOrg: true,
             canBePrivate: true,
-            canInvite: true 
+            canInvite: true
         },
         labelNames: {
             green: '',
@@ -48,7 +48,7 @@ const commentJSON = {
             sky: '',
             lime: '',
             pink: '',
-            black: '' 
+            black: ''
         }
     },
     action: {
@@ -79,11 +79,11 @@ const commentJSON = {
             avatarHash: '1a36134efab762cad3aadd250440b715',
             fullName: 'Daniel Scalzi',
             initials: 'DS',
-            username: 'danielscalzi' 
+            username: 'danielscalzi'
         },
-        display: { 
+        display: {
             translationKey: 'action_comment_on_card',
-            entities: { 
+            entities: {
                 contextOn: {
                     type: 'translatable',
                     translationKey: 'action_on',
@@ -107,7 +107,7 @@ const commentJSON = {
                     username: 'danielscalzi',
                     text: 'Daniel Scalzi'
                 }
-            } 
+            }
         }
     }
 };
@@ -116,17 +116,17 @@ const commentJSON = {
 * Test the /POST route
 */
 describe('/POST trello', () => {
-	it('commentCard', (done) => {
-		chai.request(server)
-			.post('/api/webhooks/test/test/trello')
-			.set('test', 'true')
-			.send(commentJSON)
-			.end((err, res) => {
-				res.should.have.status(200);
-				console.log(res.body);
-				res.body.should.be.a('object');
-				res.body.should.have.property('embeds');
-				done();
-			});
-	});
+    it('commentCard', (done) => {
+        chai.request(server)
+            .post('/api/webhooks/test/test/trello')
+            .set('test', 'true')
+            .send(commentJSON)
+            .end((err, res) => {
+                res.should.have.status(200);
+                console.log(res.body);
+                res.body.should.be.a('object');
+                res.body.should.have.property('embeds');
+                done();
+            });
+    });
 });

@@ -30,7 +30,8 @@
   "keywords": [
     "node",
     "glitch",
-    "express"
+    "skyhook",
+    "discord"
   ],
   "devDependencies": {
     "chai": "^3.5.0",

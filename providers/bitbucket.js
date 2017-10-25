@@ -16,12 +16,12 @@ class BitBucket extends BaseProvider {
     }
 
     static _titleCase(str) {
-        if(str.length < 1) {
+        if (str.length < 1) {
             return str;
         }
         str = str.toLowerCase().split(' ');
         for (let i = 0; i < str.length; i++) {
-          str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1); 
+            str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1);
         }
         return str.join(' ');
     }

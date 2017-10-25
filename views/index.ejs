@@ -1,84 +1,85 @@
 <!DOCTYPE html>
 <html>
 
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>skyhook</title>
-        <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-        <link rel="icon" href="favicon.ico" type="image/x-icon">
-        <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
-        <link rel="stylesheet" type="text/css" href="style.css">
-    </head>
-    <header class="mdc-toolbar mdc-toolbar--fixed">
-        <div class="mdc-toolbar__row">
-            <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
-                <span class="mdc-toolbar__title">skyhook</span>
-            </section>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>skyhook</title>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<header class="mdc-toolbar mdc-toolbar--fixed">
+    <div class="mdc-toolbar__row">
+        <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
+            <span class="mdc-toolbar__title">skyhook</span>
+        </section>
+    </div>
+</header>
+<main>
+
+    <body class="mdc-typography">
+
+    <div class="mdc-card demo-card">
+        <p>
+            Skyhook parses webhooks and forwards them in the proper format to Discord.
+        </p>
+        <p>
+            In order to have skyhook parse your webhooks properly, you must generate a webhook URL. Once you have the
+            URL generated,
+            you can pass it along to the provider you selected.
+        </p>
+        <br/>
+        <div class="mdc-form-field">
+            <div class="mdc-textfield mdc-textfield--multiline mdc-textfield--fullwidth"
+                 data-mdc-auto-init="MDCTextfield">
+                <input id="url" type="text" class="mdc-textfield__input">
+                <label for="url" class="mdc-textfield__label">
+                    Discord Webhook URL
+                </label>
+            </div>
         </div>
-    </header>
-    <main>
 
-        <body class="mdc-typography">
-
-            <div class="mdc-card demo-card">
-                <p>
-                    Skyhook parses webhooks and forwards them in the proper format to Discord.
-                </p>
-                <p>
-                    In order to have skyhook parse your webhooks properly, you must generate a webhook URL. Once you have the
-                    URL generated,
-                    you can pass it along to the provider you selected.
-                </p>
-                <br/>
-                <div class="mdc-form-field">
-                    <div class="mdc-textfield mdc-textfield--multiline mdc-textfield--fullwidth"
-                            data-mdc-auto-init="MDCTextfield">
-                        <input id="url" type="text" class="mdc-textfield__input">
-                        <label for="url" class="mdc-textfield__label">
-                            Discord Webhook URL
-                        </label>
+        <p>Provider</p>
+        <section>
+            <% providers.forEach(function (c, i){ %>
+            <div class="mdc-form-field">
+                <div class="mdc-radio">
+                    <input class="mdc-radio__native-control" type="radio" id="ex2-radio<%= i %>" name="ex2"
+                           value="<%= c[0] %>">
+                    <div class="mdc-radio__background">
+                        <div class="mdc-radio__outer-circle"></div>
+                        <div class="mdc-radio__inner-circle"></div>
                     </div>
                 </div>
-
-                <p>Provider</p>
-                <section>
-                    <% providers.forEach(function (c, i){ %>
-                    <div class="mdc-form-field">
-                        <div class="mdc-radio">
-                            <input class="mdc-radio__native-control" type="radio" id="ex2-radio<%=i%>" name="ex2" value="<%=c[0]%>">
-                            <div class="mdc-radio__background">
-                                <div class="mdc-radio__outer-circle"></div>
-                                <div class="mdc-radio__inner-circle"></div>
-                            </div>
-                        </div>
-                        <label id="ex2-radio1-labe<%=i%>" for="ex2-radio<%=i%>"><%=c[1]%></label>
-                    </div>
-                    <% }) %>
-                </section>
-                <br/>
-                <button id="button-generate" class="mdc-button
+                <label id="ex2-radio1-labe<%= i %>" for="ex2-radio<%= i %>"><%= c[1] %></label>
+            </div>
+            <% }) %>
+        </section>
+        <br/>
+        <button id="button-generate" class="mdc-button
         mdc-button--raised
         mdc-button--primary
         mdc-ripple-surface" data-mdc-auto-init="MDCRipple">
-                    Generate
-                </button>
+            Generate
+        </button>
 
-                <div id="mdc-js-snackbar" class="mdc-snackbar" aria-live="assertive" aria-atomic="true" aria-hidden="true">
-                    <div class="mdc-snackbar__text"></div>
-                    <div class="mdc-snackbar__action-wrapper">
-                        <button type="button" class="mdc-button mdc-snackbar__action-button"></button>
-                    </div>
-                </div>
+        <div id="mdc-js-snackbar" class="mdc-snackbar" aria-live="assertive" aria-atomic="true" aria-hidden="true">
+            <div class="mdc-snackbar__text"></div>
+            <div class="mdc-snackbar__action-wrapper">
+                <button type="button" class="mdc-button mdc-snackbar__action-button"></button>
             </div>
-        </body>
-    </main>
-    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
-    <script src="./copyToClipboard.min.js"></script>
-    <script src="https://code.jquery.com/jquery-2.2.1.min.js"
-            integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="
-            crossorigin="anonymous"></script>
-    <script src="./client.js"></script>
+        </div>
+    </div>
+    </body>
+</main>
+<script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+<script src="./copyToClipboard.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.2.1.min.js"
+        integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="
+        crossorigin="anonymous"></script>
+<script src="./client.js"></script>
 
 </html>

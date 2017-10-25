@@ -78,17 +78,17 @@ const pushJson = {
 * Test the /POST route
 */
 describe('/POST gitlab', () => {
-  it('gitlab push', (done) => {
-    chai.request(server)
-      .post('/api/webhooks/test/test/gitlab')
-      .set("test", "true")
-      .send(pushJson)
-      .end((err, res) => {
-        res.should.have.status(200);
-        console.log(res.body);
-        res.body.should.be.a('object');
-        res.body.should.have.property('embeds');
-        done();
-      });
-  });
+    it('gitlab push', (done) => {
+        chai.request(server)
+            .post('/api/webhooks/test/test/gitlab')
+            .set("test", "true")
+            .send(pushJson)
+            .end((err, res) => {
+                res.should.have.status(200);
+                console.log(res.body);
+                res.body.should.be.a('object');
+                res.body.should.have.property('embeds');
+                done();
+            });
+    });
 });

@@ -16,7 +16,7 @@ class Bintray extends BaseProvider {
             title: this.body.package + ' v' + this.body.version + ' Released',
             timestamp: this.body.released
         };
-        if(this.body.release_notes != null && this.body.release_notes){
+        if (this.body.release_notes != null && this.body.release_notes) {
             embed.fields = [
                 {
                     name: 'Release Notes',

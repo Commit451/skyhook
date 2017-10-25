@@ -15,12 +15,12 @@ const json = {
                 "delta": "https://www.codacy.com/public/jquery/jquery.git/commit?bid=21776&cid=6037089"
             }
         },
-        "results":{
+        "results": {
             "fixed_count": 1,
             "new_count": 0
         }
     }
- };
+};
 
 /*
  * Test the /POST route

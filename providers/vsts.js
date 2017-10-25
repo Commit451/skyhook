@@ -48,7 +48,7 @@ class VSTS extends BaseProvider {
             this.fields.push({
                 name: "Commit from " + this.body.resource.pushedBy.displayName,
                 value: "([`" + commit.commitId.substring(0, 7) + "`](" +
-                        this.body.resource.repository.remoteUrl + "/commit/" + commit.commitId + ")) " + commit.comment,
+                this.body.resource.repository.remoteUrl + "/commit/" + commit.commitId + ")) " + commit.comment,
                 inline: false
             });
         }
@@ -64,7 +64,7 @@ class VSTS extends BaseProvider {
         this.fields.push({
             name: "Check in from " + this.user.name,
             value: "([`" + this.body.resource.changesetId + "`](" +
-                    this.body.resource.url + ")) " + this.body.resource.comment,
+            this.body.resource.url + ")) " + this.body.resource.comment,
             inline: false
         });
         this.addMinimalMessage();
@@ -79,7 +79,7 @@ class VSTS extends BaseProvider {
         this.fields.push({
             name: "Pull Request from " + this.body.resource.createdBy.displayName,
             value: "([`" + this.body.resource.title + "`](" +
-                    this.body.resource.repository.remoteUrl + ")) " + this.body.resource.description,
+            this.body.resource.repository.remoteUrl + ")) " + this.body.resource.description,
             inline: false
         });
         this.addMinimalMessage();
@@ -94,7 +94,7 @@ class VSTS extends BaseProvider {
         this.fields.push({
             name: "Pull Request Merge Commit from " + this.body.resource.createdBy.displayName,
             value: "([`" + this.body.resource.title + "`](" +
-                    this.body.resource.repository.remoteUrl + ")) " + this.body.resource.description,
+            this.body.resource.repository.remoteUrl + ")) " + this.body.resource.description,
             inline: false
         });
         this.addMinimalMessage();
@@ -109,7 +109,7 @@ class VSTS extends BaseProvider {
         this.fields.push({
             name: "Pull Request Updated by " + this.body.resource.createdBy.displayName,
             value: "([`" + this.body.resource.title + "`](" +
-                    this.body.resource.repository.remoteUrl + ")) " + this.body.resource.description,
+            this.body.resource.repository.remoteUrl + ")) " + this.body.resource.description,
             inline: false
         });
         this.addMinimalMessage();
@@ -153,6 +153,7 @@ class VSTS extends BaseProvider {
     async msVssReleaseReleaseCreatedEvent() {
         this.addMinimalMessage();
     }
+
     //RELEASE ABANDONED
     async msVssReleaseReleaseAbandonedEvent() {
         this.addMinimalMessage();
