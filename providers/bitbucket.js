@@ -2,12 +2,28 @@
 // https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html
 // ========
 const BaseProvider = require('../util/BaseProvider');
+const MarkdownUtil = require('../util/MarkdownUtil');
 
 class BitBucket extends BaseProvider {
     constructor() {
         super();
         this.payload.setEmbedColor(0x205081);
         this.baseLink = 'https://bitbucket.org/';
+    }
+
+    static _formatLargeString(str, limit = 256) {
+        return (str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str);
+    }
+
+    static _titleCase(str) {
+        if(str.length < 1) {
+            return str;
+        }
+        str = str.toLowerCase().split(' ');
+        for (let i = 0; i < str.length; i++) {
+          str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1); 
+        }
+        return str.join(' ');
     }
 
     static getName() {
@@ -146,20 +162,28 @@ class BitBucket extends BaseProvider {
             url: this.baseLink + this.body.actor.username
         };
 
-        this.payload.addEmbed({
+        const states = [];
+        const embed = {
             author: user,
-            title: "Created a new Issue on " + this.body.repository.name,
-            url: this.baseLink + this.body.repository.full_name + "/issues/" + this.body.issue.id,
-            description: "",
-            fields: [
-                {
-                    name: this.body.issue.title,
-                    value: "**State:** " + this.body.issue.state + "\n" +
-                    "**Type:** " + this.body.issue.type + "\n" +
-                    "**Priority:** " + this.body.issue.priority + "\n"
-                }
-            ]
-        });
+            title: '[' + this.body.repository.owner.username + '/' + this.body.repository.name + '] Issue Opened: #' + this.body.issue.id + ' ' + this.body.issue.title,
+            url: this.baseLink + this.body.repository.full_name + '/issues/' + this.body.issue.id
+        };
+
+        if (this.body.issue.assignee != null && this.body.issue.assignee.display_name != null) {
+            states.push('**Assignee:** ' + '[`' + this.body.issue.assignee.display_name + '`](' + this.body.issue.assignee.links.html.href + ')');
+        }
+
+        states.push('**State:** `' + BitBucket._titleCase(this.body.issue.state) + '`');
+        states.push('**Kind:** `' + BitBucket._titleCase(this.body.issue.kind) + '`');
+        states.push('**Priority:** `' + BitBucket._titleCase(this.body.issue.priority) + '`');
+
+        if (this.body.issue.content.raw) {
+            states.push('**Content:**\n' + MarkdownUtil._formatMarkdown(BitBucket._formatLargeString(this.body.issue.content.raw, embed)));
+        }
+
+        embed.description = states.join('\n');
+
+        this.payload.addEmbed(embed);
     }
 
     async issueUpdated() {
@@ -168,11 +192,64 @@ class BitBucket extends BaseProvider {
             icon_url: this.body.actor.links.avatar.href,
             url: this.baseLink + this.body.actor.username
         };
-        this.payload.addEmbed({
+
+        let changes = [];
+
+        const embed = {
             author: user,
-            title: "Updated Issue #" + this.body.issue.id + " on " + this.body.repository.name,
-            url: this.baseLink + this.body.repository.full_name + "/issues/" + this.body.issue.id
-        });
+            title: '[' + this.body.repository.owner.username + '/' + this.body.repository.name + '] Issue Updated: #' + this.body.issue.id + ' ' + this.body.issue.title,
+            url: this.baseLink + this.body.repository.full_name + '/issues/' + this.body.issue.id
+        };
+
+        if (typeof this.body.changes !== 'undefined') {
+            const states = ['old', 'new'];
+
+            ['Assignee', 'Responsible'].forEach((label) => {
+                const actor = this.body.changes[label.toLowerCase()];
+
+                if (actor == null) {
+                    return;
+                }
+
+                const actorNames = {};
+                const unassigned = '`Unassigned`';
+
+                states.forEach((state) => {
+                    if (actor[state] != null && actor[state].username != null) {
+                        actorNames[state] = '[`' + actor[state].display_name + '`](' + actor[state].links.html.href + ')';
+                    } else {
+                        actorNames[state] = unassigned;
+                    }
+                });
+
+                if (!Object.keys(actorNames).length || (actorNames.old === unassigned && actorNames.new === unassigned)) {
+                    return;
+                }
+
+                changes.push('**' + label + ':** ' + actorNames.old + ' \uD83E\uDC6A ' + actorNames.new);
+            });
+
+            ['Kind', 'Priority', 'Status'].forEach((label) => {
+                const property = this.body.changes[label.toLowerCase()];
+
+                if (typeof property !== 'undefined') {
+                    changes.push('**' + label + ':** `' + BitBucket._titleCase(property.old) + '` \uD83E\uDC6A `' + BitBucket._titleCase(property.new) + '`');
+                }
+            });
+
+            {
+                const label = 'Content';
+                const property = this.body.changes[label.toLowerCase()];
+
+                if (typeof property !== 'undefined') {
+                    changes.push('**New ' + label + ':** \n' + MarkdownUtil._formatMarkdown(BitBucket._formatLargeString(property.new, embed)));
+                }
+            }
+        }
+
+        embed.description = changes.join('\n');
+
+        this.payload.addEmbed(embed);
     }
 
     async issueCommentCreated() {
@@ -182,12 +259,15 @@ class BitBucket extends BaseProvider {
             url: this.baseLink + this.body.actor.username
         };
 
-        this.payload.addEmbed({
+        const embed = {
             author: user,
-            title: "Wrote a comment to Issue #" + this.body.issue.id + " on " + this.body.repository.name,
-            url: this.baseLink + this.body.repository.full_name + "/issues/" + this.body.issue.id,
-            description: (this.body.comment.content.html.replace(/<.*?>/g, '').length > 1024) ? this.body.comment.content.html.replace(/<.*?>/g, '').substring(0, 1023) + "\u2026" : this.body.comment.content.html.replace(/<.*?>/g, '')
-        });
+            title: '[' + this.body.repository.owner.username + '/' + this.body.repository.name + '] New comment on issue #' + this.body.issue.id + ': ' + this.body.issue.title,
+            url: this.baseLink + this.body.repository.full_name + "/issues/" + this.body.issue.id
+        };
+
+        embed.description = MarkdownUtil._formatMarkdown(BitBucket._formatLargeString(this.body.comment.content.raw), embed);
+
+        this.payload.addEmbed(embed);
     }
 
     async pullrequestCreated() {
