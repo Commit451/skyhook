@@ -15,6 +15,17 @@ class BitBucket extends BaseProvider {
         return (str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str);
     }
 
+    static _titleCase(str) {
+        if(str.length < 1) {
+            return str;
+        }
+        str = str.toLowerCase().split(' ');
+        for (let i = 0; i < str.length; i++) {
+          str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1); 
+        }
+        return str.join(' ');
+    }
+
     static getName() {
         return 'BitBucket';
     }
@@ -151,20 +162,28 @@ class BitBucket extends BaseProvider {
             url: this.baseLink + this.body.actor.username
         };
 
-        this.payload.addEmbed({
+        const states = [];
+        const embed = {
             author: user,
-            title: "Created a new Issue on " + this.body.repository.name,
-            url: this.baseLink + this.body.repository.full_name + "/issues/" + this.body.issue.id,
-            description: "",
-            fields: [
-                {
-                    name: this.body.issue.title,
-                    value: "**State:** " + this.body.issue.state + "\n" +
-                    "**Type:** " + this.body.issue.type + "\n" +
-                    "**Priority:** " + this.body.issue.priority + "\n"
-                }
-            ]
-        });
+            title: '[' + this.body.repository.owner.username + '/' + this.body.repository.name + '] Issue Opened: #' + this.body.issue.id + ' ' + this.body.issue.title,
+            url: this.baseLink + this.body.repository.full_name + '/issues/' + this.body.issue.id
+        };
+
+        if (this.body.issue.assignee != null && this.body.issue.assignee.display_name != null) {
+            states.push('**Assignee:** ' + '[`' + this.body.issue.assignee.display_name + '`](' + this.body.issue.assignee.links.html.href + ')');
+        }
+
+        states.push('**State:** ' + BitBucket._titleCase(this.body.issue.state));
+        states.push('**Kind:** ' + BitBucket._titleCase(this.body.issue.kind));
+        states.push('**Priority:** ' + BitBucket._titleCase(this.body.issue.priority));
+
+        if (this.body.issue.content.raw) {
+            states.push('**Content:**\n' + BitBucket._formatLargeString(MarkdownUtil._formatMarkdown(this.body.issue.content.raw, embed)));
+        }
+
+        embed.description = states.join('\n');
+
+        this.payload.addEmbed(embed);
     }
 
     async issueUpdated() {
@@ -176,16 +195,15 @@ class BitBucket extends BaseProvider {
 
         let changes = [];
 
-        let embed = {
+        const embed = {
             author: user,
-            title: "Updated Issue #" + this.body.issue.id + " on " + this.body.repository.name,
-            url: this.baseLink + this.body.repository.full_name + "/issues/" + this.body.issue.id
+            title: '[' + this.body.repository.owner.username + '/' + this.body.repository.name + '] Issue Updated: #' + this.body.issue.id + ' ' + this.body.issue.title,
+            url: this.baseLink + this.body.repository.full_name + '/issues/' + this.body.issue.id
         };
 
-        if (typeof this.body.changes !== "undefined") {
+        if (typeof this.body.changes !== 'undefined') {
             const states = ['old', 'new'];
 
-            //Assignee Changes
             ['Assignee', 'Responsible'].forEach((label) => {
                 const actor = this.body.changes[label.toLowerCase()];
 
@@ -208,15 +226,14 @@ class BitBucket extends BaseProvider {
                     return;
                 }
 
-                changes.push("**" + label + ":** " + actorNames.old + " \uD83E\uDC6A " + actorNames.new);
+                changes.push('**' + label + ':** ' + actorNames.old + ' \uD83E\uDC6A ' + actorNames.new);
             });
 
-            //Status Changes
-            ['Priority', 'Status', 'Kind'].forEach((label) => {
+            ['Kind', 'Priority', 'Status'].forEach((label) => {
                 const property = this.body.changes[label.toLowerCase()];
 
-                if (typeof property !== "undefined") {
-                    changes.push("**" + label + ":** `" + property.old.charAt(0).toUpperCase() + property.old.slice(1) + "` \uD83E\uDC6A `" + property.new.charAt(0).toUpperCase() + property.new.slice(1) + "`");
+                if (typeof property !== 'undefined') {
+                    changes.push('**' + label + ':** `' + BitBucket._titleCase(property.old) + '` \uD83E\uDC6A `' + BitBucket._titleCase(property.new) + '`');
                 }
             });
 
@@ -224,13 +241,13 @@ class BitBucket extends BaseProvider {
                 const label = 'Content';
                 const property = this.body.changes[label.toLowerCase()];
 
-                if (typeof property !== "undefined") {
-                    changes.push("**" + 'New ' + label + ":** \n" + BitBucket._formatLargeString(MarkdownUtil._formatMarkdown(property.new, embed)));
+                if (typeof property !== 'undefined') {
+                    changes.push('**New ' + label + ':** \n' + BitBucket._formatLargeString(MarkdownUtil._formatMarkdown(property.new, embed)));
                 }
             }
         }
 
-        embed.description = changes.join("\n");
+        embed.description = changes.join('\n');
 
         this.payload.addEmbed(embed);
     }
