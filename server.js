@@ -61,6 +61,15 @@ app.get("/api/webhooks/:webhookID/:webhookSecret/:from", function (req, res) {
     }
 });
 
+// Validate twitch
+app.get("/api/webhooks/:webhookID/:webhookSecret/twitch", function (req, res) {
+    if(req.query['hub.challenge'] != null){
+        res.status(202).send(req.query['hub.challenge']);
+    } else {
+        res.sendStatus(200);
+    }
+});
+
 app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async function (req, res) {
     let webhookID = req.params.webhookID;
     let webhookSecret = req.params.webhookSecret;
