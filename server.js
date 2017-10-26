@@ -53,19 +53,16 @@ app.get("/providers", function (request, response) {
 });
 
 app.get("/api/webhooks/:webhookID/:webhookSecret/:from", function (req, res) {
-    //Return 200 if the provider is valid to show this url is ready.
+    //Return 200 if the provider is valid to show this url is ready
+    console.log('get got')
     let provider = req.params.from;
+    if (provider === 'twitch') {
+        if (validateTwitch(req, res)) {
+            return;
+        }
+    }
     if (provider === null || providers[provider] === null) {
         res.sendStatus(400);
-    } else {
-        res.sendStatus(200);
-    }
-});
-
-// Validate twitch
-app.get("/api/webhooks/:webhookID/:webhookSecret/twitch", function (req, res) {
-    if(req.query['hub.challenge'] != null){
-        res.status(202).send(req.query['hub.challenge']);
     } else {
         res.sendStatus(200);
     }
@@ -89,6 +86,7 @@ app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async function (req, r
     if (typeof providers[provider] !== 'undefined') {
         const instance = new providers[provider]();
         try {
+            console.log('was posted to')
             discordPayload = await instance.parse(req);
         } catch (error) {
             console.log('Error during parse:', error);
@@ -161,6 +159,14 @@ function getListOfProviderNamesSorted() {
     }
     sortedProviders.sort();
     return sortedProviders
+}
+
+function validateTwitch(req, res) {
+    if(req.query['hub.challenge'] != null){
+        console.log('Success')
+        res.status(202).send(req.query['hub.challenge']);
+        return true;
+    }
 }
 
 //for the tests!
