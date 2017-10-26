@@ -18,6 +18,7 @@ const providers = {
     patreon: require('./providers/patreon'),
     trello: require('./providers/trello'),
     travis: require('./providers/travis'),
+    twitch: require('./providers/twitch'),
     unity: require('./providers/unity'),
     vsts: require('./providers/vsts')
 };
