@@ -105,7 +105,7 @@ class Patreon extends BaseProvider {
             embed.description = '---';
             const field = {
                 name: 'Unlocked \'' + reward.attributes.title + '\'',
-                value: '[$' + (reward.attributes.amount_cents / 100).toFixed(2) + '+ per month](https://www.patreon.com' + reward.attributes.url + ')\n' + this._formatHTML(reward.attributes.description, embed.url),
+                value: '[$' + (reward.attributes.amount_cents / 100).toFixed(2) + '+ per month](https://www.patreon.com' + reward.attributes.url + ')\n' + Patreon._formatHTML(reward.attributes.description, embed.url),
                 inline: false
             };
             if (type === 'delete') {
