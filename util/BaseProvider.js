@@ -17,7 +17,7 @@ class BaseProvider {
         type = BaseProvider.formatType(type);
 
         if (typeof this[type] !== 'undefined') {
-            console.log('[' + (new Date()).toUTCString() + '] Calling ' + type + '() in ' + this.constructor.name + ' provider.')
+            console.log('[' + (new Date()).toUTCString() + '] Calling ' + type + '() in ' + this.constructor.name + ' provider.');
             await this[type]();
         }
 

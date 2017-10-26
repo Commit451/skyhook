@@ -281,7 +281,7 @@ class BitBucket extends BaseProvider {
             author: user,
             title: "Created a new pull request on " + this.body.repository.name,
             url: this.baseLink + this.body.repository.full_name + "/pull-requests/" + this.body.pullrequest.id,
-            description: body.pullrequest.description,
+            description: this.body.pullrequest.description,
             fields: [
                 {
                     name: this.body.pullrequest.title,
