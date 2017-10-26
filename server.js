@@ -87,6 +87,7 @@ app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async function (req, r
         }
     } else {
         winston.error('Unknown provider "' + provider + '"');
+        res.sendStatus(400)
     }
 
     if (discordPayload !== null) {
