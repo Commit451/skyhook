@@ -2,6 +2,12 @@ const DiscordPayload = require('./DiscordPayload');
 const camel = require('camelcase');
 
 class BaseProvider {
+
+    static formatType(type) {
+        type = type.replace(/:/, '_'); // needed because of BitBucket
+        return camel(type);
+    }
+
     constructor() {
         this.payload = new DiscordPayload();
     }
@@ -22,11 +28,6 @@ class BaseProvider {
         }
 
         return this.payload.getData();
-    }
-
-    static formatType(type) {
-        type = type.replace(/:/, '_'); // needed because of BitBucket
-        return camel(type);
     }
 }
 

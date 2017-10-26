@@ -14,16 +14,11 @@ const imageRegex = /<img.*src="(.*?)">/;
 
 class Patreon extends BaseProvider {
 
-    constructor() {
-        super();
-        this.payload.setEmbedColor(0xF96854);
-    }
-
     static getName() {
         return 'Patreon';
     }
 
-    _formatHTML(html, baseLink) {
+    static _formatHTML(html, baseLink) {
         const newLineRegex = /<br>/g;
         //Match lists
         while (ulRegex.test(html)) {
@@ -65,6 +60,11 @@ class Patreon extends BaseProvider {
         //Replace all br tags
         html = html.replace(newLineRegex, '\n');
         return html;
+    }
+
+    constructor() {
+        super();
+        this.payload.setEmbedColor(0xF96854);
     }
 
     async getType() {

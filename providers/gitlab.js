@@ -4,13 +4,21 @@
 const BaseProvider = require('../util/BaseProvider');
 
 class GitLab extends BaseProvider {
-    constructor() {
-        super();
-        this.payload.setEmbedColor(0xFCA326);
-    }
 
     static getName() {
         return 'GitLab';
+    }
+
+    static _formatAvatarURL(url) {
+        if (!/^https?:\/\/|^\/\//i.test(url)) {
+            return "https://gitlab.com" + url;
+        }
+        return url;
+    }
+
+    constructor() {
+        super();
+        this.payload.setEmbedColor(0xFCA326);
     }
 
     async getType() {
@@ -36,7 +44,7 @@ class GitLab extends BaseProvider {
 
             commits.push({
                 name: "Commit from " + commit.author.name,
-                value: "(" + "[`" + commit.id.substring(0, 7) + "`](" + commit.url + ")" + ") " + message.replace(/\n/g, " ").replace(/\r/g, " "),
+                value: "(" + "[`" + commit.id.substring(0, 7) + "`](" + commit.url + ")" + ") " + (message === null ? "" : message.replace(/\n/g, " ").replace(/\r/g, " ")),
                 inline: false
             });
         }
@@ -205,13 +213,6 @@ class GitLab extends BaseProvider {
             },
             description: "**Status**: " + this.body.build_status
         });
-    }
-
-    static _formatAvatarURL(url) {
-        if (!/^https?:\/\/|^\/\//i.test(url)) {
-            return "https://gitlab.com" + url;
-        }
-        return url;
     }
 }
 

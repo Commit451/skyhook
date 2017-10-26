@@ -8,7 +8,7 @@ class Heroku extends BaseProvider {
         return 'Heroku';
     }
 
-    async parseData(req) {
+    async parseData() {
         this.payload.setEmbedColor(0xC9C3E6);
         this.payload.addEmbed({
             title: "Deployed App " + this.body.app,

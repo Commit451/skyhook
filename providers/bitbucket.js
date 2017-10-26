@@ -5,11 +5,6 @@ const BaseProvider = require('../util/BaseProvider');
 const MarkdownUtil = require('../util/MarkdownUtil');
 
 class BitBucket extends BaseProvider {
-    constructor() {
-        super();
-        this.payload.setEmbedColor(0x205081);
-        this.baseLink = 'https://bitbucket.org/';
-    }
 
     static _formatLargeString(str, limit = 256) {
         return (str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str);
@@ -28,6 +23,12 @@ class BitBucket extends BaseProvider {
 
     static getName() {
         return 'BitBucket';
+    }
+
+    constructor() {
+        super();
+        this.payload.setEmbedColor(0x205081);
+        this.baseLink = 'https://bitbucket.org/';
     }
 
     async getType() {

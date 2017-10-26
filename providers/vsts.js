@@ -5,6 +5,11 @@
 const BaseProvider = require('../util/BaseProvider');
 
 class VSTS extends BaseProvider {
+
+    static getName() {
+        return 'VSTS';
+    }
+
     constructor() {
         super();
         this.payload.setEmbedColor(0x68217a);
@@ -14,11 +19,6 @@ class VSTS extends BaseProvider {
             width: 150
         };
         this.fields = [];
-        this.user;
-    }
-
-    static getName() {
-        return 'VSTS';
     }
 
     async getType() {
@@ -34,8 +34,6 @@ class VSTS extends BaseProvider {
             fields: this.fields
         });
     }
-
-    // *************** CODE *************** 
 
     //PUSH
     async gitPush() {

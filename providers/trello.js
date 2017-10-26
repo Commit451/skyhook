@@ -8,6 +8,24 @@ const urlMod = require('url');
 
 class Trello extends BaseProvider {
 
+    static getName() {
+        return 'Trello';
+    }
+
+    // Utility Functions
+
+    static _addMemberThumbnail(avatarHash, embed) {
+        if (avatarHash != null && avatarHash !== 'null') {
+            embed.thumbnail = {
+                url: this.avatarurl + avatarHash + '/170.png'
+            };
+        }
+    }
+
+    static _formatLargeString(str, limit = 256) {
+        return (str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str);
+    }
+
     constructor() {
         super();
         this.baseLink = 'https://trello.com/';
@@ -28,26 +46,8 @@ class Trello extends BaseProvider {
         };
     }
 
-    static getName() {
-        return 'Trello';
-    }
-
     async getType() {
         return this.req.body.action.type;
-    }
-
-    // Utility Functions
-
-    static _addMemberThumbnail(avatarHash, embed) {
-        if (avatarHash != null && avatarHash !== 'null') {
-            embed.thumbnail = {
-                url: this.avatarurl + avatarHash + '/170.png'
-            };
-        }
-    }
-
-    static _formatLargeString(str, limit = 256) {
-        return (str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str);
     }
 
     _resolveFullCardURL(card) {
