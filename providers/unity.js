@@ -14,9 +14,11 @@ class Unity extends BaseProvider {
         const projectName = this.body.projectName;
         const projectTarget = this.body.buildTargetName;
         const projectVersion = this.body.buildNumber;
-        const share = this.body.links.share_url;
+        let share = null;
+        if (this.body.links !== null) {
+            share = this.body.links.share_url;
+        }
         const type = this.body.buildStatus;
-        const ref = this.body.ref;
         let content = "No download available.";
         const user = {
             name: projectTarget,
