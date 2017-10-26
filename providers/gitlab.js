@@ -105,7 +105,7 @@ class GitLab extends BaseProvider {
             fields: [
                 {
                     name: this.body.object_attributes.title,
-                    value: (this.body.object_attributes.description.length > 1024) ? this.body.object_attributes.description.substring(0, 1023) + "\u2026" : this.body.object_attributes.description
+                    value: (this.body.object_attributes.description !== null && this.body.object_attributes.description.length > 1024) ? this.body.object_attributes.description.substring(0, 1023) + "\u2026" : this.body.object_attributes.description
                 }
             ]
         });
