@@ -29,7 +29,7 @@ class Unity extends BaseProvider {
         this.payload.setUser(projectName + "Buildserver", "https://developer.cloud.unity3d.com/images/icon-default.png");
         switch (type) {
             case "success":
-                if (share !== null) {
+                if (share) {
                     download = share.href;
                     content = "[`Download it here`](" + download + ")";
                 }

@@ -8,14 +8,14 @@
     "test": "mocha"
   },
   "dependencies": {
-    "body-parser": "^1.17.1",
+    "body-parser": "^1.18.2",
     "camelcase": "^4.1.0",
     "dotenv": "^4.0.0",
-    "ejs": "^2.5.6",
-    "express": "^4.15.2",
-    "request": "^2.81.0",
-    "request-promise-native": "^1.0.4",
-    "winston": "^2.3.1"
+    "ejs": "^2.5.7",
+    "express": "^4.16.2",
+    "request": "^2.83.0",
+    "request-promise-native": "^1.0.5",
+    "winston": "^2.4.0"
   },
   "engines": {
     "node": "8.1.x"
