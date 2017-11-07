@@ -18,7 +18,7 @@
     "winston": "^2.4.0"
   },
   "engines": {
-    "node": "8.1.x"
+    "node": "8.9.x"
   },
   "repository": {
     "url": "https://github.com/Commit451/skyhook"
