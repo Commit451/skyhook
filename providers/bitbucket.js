@@ -10,7 +10,10 @@ class BitBucket extends BaseProvider {
         return (str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str);
     }
 
-    static _titleCase(str) {
+    static _titleCase(str, ifNull = 'None') {
+        if (str == null) {
+            return ifNull;
+        }
         if (str.length < 1) {
             return str;
         }
@@ -178,6 +181,18 @@ class BitBucket extends BaseProvider {
         states.push('**Kind:** `' + BitBucket._titleCase(this.body.issue.kind) + '`');
         states.push('**Priority:** `' + BitBucket._titleCase(this.body.issue.priority) + '`');
 
+        if (this.body.issue.component != null && this.body.issue.component.name != null) {
+            states.push('**Component:** `' + BitBucket._titleCase(this.body.issue.component.name) + '`')
+        }
+
+        if (this.body.issue.milestone != null && this.body.issue.milestone.name != null) {
+            states.push('**Milestone:** `' + BitBucket._titleCase(this.body.issue.milestone.name) + '`')
+        }
+
+        if (this.body.issue.version != null && this.body.issue.version.name != null) {
+            states.push('**Version:** `' + BitBucket._titleCase(this.body.issue.version.name) + '`')
+        }
+
         if (this.body.issue.content.raw) {
             states.push('**Content:**\n' + MarkdownUtil._formatMarkdown(BitBucket._formatLargeString(this.body.issue.content.raw, embed)));
         }
@@ -230,7 +245,7 @@ class BitBucket extends BaseProvider {
                 changes.push('**' + label + ':** ' + actorNames.old + ' \uD83E\uDC6A ' + actorNames.new);
             });
 
-            ['Kind', 'Priority', 'Status'].forEach((label) => {
+            ['Kind', 'Priority', 'Status', 'Component', 'Milestone', 'Version'].forEach((label) => {
                 const property = this.body.changes[label.toLowerCase()];
 
                 if (typeof property !== 'undefined') {
