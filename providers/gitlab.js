@@ -44,7 +44,7 @@ class GitLab extends BaseProvider {
 
             commits.push({
                 name: "Commit from " + commit.author.name,
-                value: "(" + "[`" + commit.id.substring(0, 7) + "`](" + commit.url + ")" + ") " + (message === null ? "" : message.replace(/\n/g, " ").replace(/\r/g, " ")),
+                value: "(" + "[`" + commit.id.substring(0, 7) + "`](" + commit.url + ")" + ") " + (message == null ? "" : message.replace(/\n/g, " ").replace(/\r/g, " ")),
                 inline: false
             });
         }
