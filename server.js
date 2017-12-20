@@ -12,6 +12,7 @@ const providers = {
     bitbucket: require('./providers/bitbucket'),
     circleci: require('./providers/circleci'),
     codacy: require('./providers/codacy'),
+    dockerhub: require('./providers/dockerhub'),
     gitlab: require('./providers/gitlab'),
     heroku: require('./providers/heroku'),
     jenkins: require('./providers/jenkins'),
