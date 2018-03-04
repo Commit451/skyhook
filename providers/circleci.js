@@ -9,7 +9,7 @@ class CircleCi extends BaseProvider {
     }
 
     async parseData(req) {
-        this.payload.setEmbedColor('#343433');
+        this.payload.setEmbedColor(0x343433);
         this.payload.addEmbed({
             title: `Build #${this.body.payload.build_num}`,
             url: this.body.payload.build_url,
