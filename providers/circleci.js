@@ -9,6 +9,8 @@ class CircleCi extends BaseProvider {
     }
 
     async parseData(req) {
+        let subject = this.body.payload.subject.length > 48 ? `${this.body.payload.subject.substring(0,48)}\u2026` : this.body.payload.subject;
+
         this.payload.setEmbedColor(0x343433);
         this.payload.addEmbed({
             title: `Build #${this.body.payload.build_num}`,
@@ -17,7 +19,7 @@ class CircleCi extends BaseProvider {
                 name: `${this.body.payload.reponame}:${this.body.payload.branch}`,
                 icon_url: `https://github.com/${this.body.payload.committer_name}.png`
             },
-            description: `[\`${this.body.payload.vcs_revision.slice(0,7)}\`](${this.body.payload.compare}) : ${this.body.payload.subject} - ${this.body.payload.committer_name}\n\`Outcome\`: ${this.body.payload.outcome}`
+            description: `[\`${this.body.payload.vcs_revision.slice(0,7)}\`](${this.body.payload.compare}) : ${subject} - ${this.body.payload.committer_name}\n\`Outcome\`: ${this.body.payload.outcome}`
         });
     }
 }
