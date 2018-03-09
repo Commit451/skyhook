@@ -18,7 +18,7 @@
     "winston": "^2.4.0"
   },
   "engines": {
-    "node": "8.9.x"
+    "node": "8.10.x"
   },
   "repository": {
     "url": "https://github.com/Commit451/skyhook"
@@ -36,6 +36,6 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
-    "mocha": "^3.2.0"
+    "mocha": "^3.5.3"
   }
 }
