@@ -46,7 +46,7 @@ describe('/POST circleci', () => {
                 res.should.have.status(200);
                 console.log(res.body);
                 res.body.should.be.a('object');
-                res.body.should.have.property('embeds')
+                res.body.should.have.property('embeds');
                 done();
             });
     });

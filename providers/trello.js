@@ -234,7 +234,7 @@ class Trello extends BaseProvider {
         let embed = this._preparePayload();
         embed.title = 'Copied Board';
         embed.url = this._resolveFullBoardURL(this.action.data.board);
-        embed.description = '`' + this.action.data.board.name + '` has been copied from [another board](' + this._resolveBoardURL(this.action.data.boardSource.id) + ').'
+        embed.description = '`' + this.action.data.board.name + '` has been copied from [another board](' + this._resolveBoardURL(this.action.data.boardSource.id) + ').';
         this.payload.addEmbed(embed);
     }
 
@@ -373,7 +373,7 @@ class Trello extends BaseProvider {
         const opts = {
             uri: this.action.data.plugin.url,
             json: true
-        }
+        };
         try {
             const manifest = await rpn(opts);
             const desc = MarkdownUtil._formatMarkdown(manifest.details, embed);
@@ -410,7 +410,7 @@ class Trello extends BaseProvider {
         const opts = {
             uri: this.action.data.plugin.url,
             json: true
-        }
+        };
         try {
             const manifest = await rpn(opts);
             const desc = MarkdownUtil._formatMarkdown(manifest.details, embed);
@@ -616,7 +616,7 @@ class Trello extends BaseProvider {
                 embed.title = embed.title + 'Renamed Board';
                 embed.description = '`' + old.name + '` \uD83E\uDC6A `' + this.action.data.board.name + '`';
             } else if (old.prefs != null) {
-                embed.title = embed.title + 'Updated Board Preference'
+                embed.title = embed.title + 'Updated Board Preference';
                 if (old.prefs.permissionLevel != null) {
                     field = {
                         name: 'Permission Level',
@@ -852,7 +852,6 @@ class Trello extends BaseProvider {
                         inline: false
                     }
                 }
-                ;
             } else if (old.displayName != null) {
                 embed.title = embed.title + 'Renamed Organization';
                 embed.description = '`' + old.displayName + '` \uD83E\uDC6A `' + organization.displayName + '`';

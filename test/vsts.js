@@ -82,7 +82,7 @@ const json = {
         }
     },
     "createdDate": "2016-09-19T13:03:27.0379153Z"
-}
+};
 
 /*
  *	Test the /POST route

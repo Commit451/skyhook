@@ -521,7 +521,7 @@ const pledgesUpdateJson = {
                 type: 'goal'
             }],
     links: {self: 'https://www.patreon.com/api/pledges/1'}
-}
+};
 
 
 /*

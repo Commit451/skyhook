@@ -73,9 +73,18 @@ class Patreon extends BaseProvider {
 
     _createUpdateCommon(type) {
         let embed = {};
-        const creator_id = this.body.data.relationships.creator.data.id;
-        const patron_id = this.body.data.relationships.patron.data.id;
-        const reward_id = this.body.data.relationships.reward.data.id;
+        let creator_id = null;
+        let patron_id = null;
+        let reward_id = null;
+        if (this.body.data.relationships.creator != null) {
+             creator_id = this.body.data.relationships.creator.data.id;
+        }
+        if (this.body.data.relationships.patron != null) {
+            patron_id = this.body.data.relationships.patron.data.id;
+        }
+        if (this.body.data.relationships.reward != null) {
+            reward_id = this.body.data.relationships.reward.data.id;
+        }
 
         const incl = this.body.included;
         let reward = null;
@@ -88,9 +97,6 @@ class Patreon extends BaseProvider {
                     embed.title = 'Pledged $' + (this.body.data.attributes.amount_cents / 100).toFixed(2) + ' to ' + attr.attributes.full_name;
                 }
                 embed.url = attr.attributes.url;
-                /*embed.thumbnail = {
-                    url: attr.attributes.image_url
-                };*/
             } else if (attr.id === patron_id) {
                 embed.author = {
                     name: attr.attributes.full_name,
