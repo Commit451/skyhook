@@ -12,9 +12,10 @@ class BaseProvider {
         this.payload = new DiscordPayload();
     }
 
-    async parse(req) {
+    async parse(req, res) {
         this.req = req;
         this.body = req.body;
+        this.res = res;
 
         let type = 'parseData';
         if (typeof this['getType'] !== 'undefined') {

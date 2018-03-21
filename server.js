@@ -8,6 +8,7 @@ const winston = require('winston');
 let app = express();
 const providers = {
     appveyor: require('./providers/appveyor'),
+    asana: require('./providers/asana'),
     bintray: require('./providers/bintray'),
     bitbucket: require('./providers/bitbucket'),
     circleci: require('./providers/circleci'),
@@ -80,7 +81,7 @@ app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async function (req, r
     if (typeof providers[provider] !== 'undefined') {
         const instance = new providers[provider]();
         try {
-            discordPayload = await instance.parse(req);
+            discordPayload = await instance.parse(req, res);
         } catch (error) {
             console.log('Error during parse:', error);
             res.sendStatus(500);

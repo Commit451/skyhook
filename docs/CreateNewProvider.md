@@ -1,6 +1,7 @@
 ## Resources available in a provider class  
-`this.req` - whole HTTP request object ([Reference](http://expressjs.com/de/4x/api.html#req))  
+`this.req` - whole HTTP request object ([Reference](http://expressjs.com/en/api.html#req))  
 `this.body` - only the body of the request object  
+`this.res` - the HTTP response that an Express app sends when it gets an HTTP request ([Reference](http://expressjs.com/en/api.html#res))  
 `this.payload` - a [DiscordPayload](util/DiscordPayload.md)
 
 ## Example for providers without multiple methods

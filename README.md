@@ -20,6 +20,7 @@ https://skyhook.glitch.me/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/pr
 ```
 ## Supported Providers
 - [AppVeyor](https://www.appveyor.com/docs/notifications/#webhook-payload-default) - `/appveyor`
+- [Asana](https://asana.com/developers/api-reference/webhooks) - `/asana`
 - [Bintray](https://bintray.com/docs/api/#_webhooks) - `/bintray`
 - [BitBucket](https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html) - `/bitbucket`
 - [circleci](https://circleci.com/docs/1.0/configuration/#notify) - `/circleci`
