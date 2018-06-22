@@ -40,8 +40,5 @@ jspm_packages
 # env
 .env
 
-# WebStorm
-.idea/
-
-# Visual Studio Code
-.vscode
+# Custom
+dist
