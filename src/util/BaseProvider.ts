@@ -5,14 +5,18 @@ const camel = require('camelcase')
 
 class BaseProvider {
 
-    public static formatType(type: string) {
+    public static getName(): string {
+        return ""
+    }
+
+    public static formatType(type: string): string {
         type = type.replace(/:/, '_') // needed because of BitBucket
         return camel(type)
     }
 
-    private payload: DiscordPayload
-    private req: Request
-    private body: any
+    protected payload: DiscordPayload
+    protected req: Request
+    protected body: any
 
     constructor() {
         this.payload = new DiscordPayload()

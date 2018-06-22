@@ -1,10 +1,10 @@
 // trello.js
 // https://developers.trello.com/apis/webhooks
 // ========
-const BaseProvider = require('../util/BaseProvider');
-const MarkdownUtil = require('../util/MarkdownUtil');
-const rpn = require('request-promise-native');
-const urlMod = require('url');
+const BaseProvider = require('../util/BaseProvider')
+const MarkdownUtil = require('../util/MarkdownUtil')
+const rpn = require('request-promise-native')
+const urlMod = require('url')
 
 class Trello extends BaseProvider {
 

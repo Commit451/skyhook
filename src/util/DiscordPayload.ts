@@ -1,7 +1,10 @@
+/**
+ * https://discordapp.com/developers/docs/resources/webhook#execute-webhook
+ */
 class DiscordPayload {
 
     private data: any
-    private embedColor: string
+    private embedColor: number
 
     constructor() {
         this.data = {}

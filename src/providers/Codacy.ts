@@ -1,15 +1,16 @@
-// codacy.js
-// https://support.codacy.com/hc/en-us/articles/207280359-WebHook-Notifications
-// ========
-const BaseProvider = require('../util/BaseProvider');
+import { BaseProvider } from "../util/BaseProvider"
 
+/**
+ * https://support.codacy.com/hc/en-us/articles/207280359-WebHook-Notifications
+ */
 class Codacy extends BaseProvider {
-    static getName() {
-        return 'Codacy';
+
+    public static getName(): string {
+        return 'Codacy'
     }
 
-    async parseData() {
-        this.payload.setEmbedColor(0x242c33);
+    public async parseData() {
+        this.payload.setEmbedColor(0x242c33)
         this.payload.addEmbed({
             title: 'New Commit',
             url: this.body.commit.data.urls.delta,
@@ -17,16 +18,16 @@ class Codacy extends BaseProvider {
                 {
                     name: 'Fixed Issues',
                     value: this.body.commit.results.fixed_count,
-                    inline: true
+                    inline: true,
                 },
                 {
                     name: 'New Issues',
                     value: this.body.commit.results.new_count,
-                    inline: true
-                }
-            ]
-        });
+                    inline: true,
+                },
+            ],
+        })
     }
 }
 
-module.exports = Codacy;
+export { Codacy }
