@@ -19,6 +19,8 @@ class {provider} extends BaseProvider {
         //do your stuff here and add things to this.payload
     }
 }
+
+module.exports = {provider};
 ```
 
 ## Example for providers with multiple methods
@@ -51,4 +53,6 @@ class {provider} extends BaseProvider {
         //do your stuff here and add things to this.payload
     }
 }
+
+module.exports = {provider};
 ```
