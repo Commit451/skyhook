@@ -1,5 +1,6 @@
 const DiscordPayload = require('./DiscordPayload');
 const camel = require('camelcase');
+const winston = require('winston');
 
 class BaseProvider {
 
@@ -10,6 +11,7 @@ class BaseProvider {
 
     constructor() {
         this.payload = new DiscordPayload();
+        this.logger = winston.loggers.get('logger');
     }
 
     async parse(req) {
@@ -23,7 +25,7 @@ class BaseProvider {
         type = BaseProvider.formatType(type);
 
         if (typeof this[type] !== 'undefined') {
-            console.log('[' + (new Date()).toUTCString() + '] Calling ' + type + '() in ' + this.constructor.name + ' provider.');
+            this.logger.info(`Calling ${type}() in ${this.constructor.name} provider.`);
             await this[type]();
         }
 

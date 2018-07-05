@@ -2,8 +2,26 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
+const moment = require('moment');
 const request = require('request');
 const winston = require('winston');
+
+// Set up a logger.
+winston.loggers.add('logger', {
+    format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.printf(info => `[${moment().format('YYYY-MM-DD hh:mm:ss').trim()}] [${info.level}]: ${info.message}`)
+    ),
+    level: process.env.PRODUCTION ? 'info' : 'debug',
+    transports: [
+        new winston.transports.Console()
+    ]
+});
+
+const logger = winston.loggers.get('logger');
+logger.debug('Winston setup successfully.');
+
+// Setup app.
 
 let app = express();
 const providers = {
@@ -23,13 +41,6 @@ const providers = {
     unity: require('./providers/unity'),
     vsts: require('./providers/vsts')
 };
-
-if (process.env.PRODUCTION) {
-    winston.level = 'error';
-} else {
-    winston.level = 'debug';
-    winston.debug("Setting winston log level to debug")
-}
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -83,12 +94,13 @@ app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async function (req, r
         try {
             discordPayload = await instance.parse(req);
         } catch (error) {
-            console.log('Error during parse:', error);
             res.sendStatus(500);
-            //Winston doesn't log errors?? winston.error(error)
+            // Note sure of a better way to log errors in winston.
+            logger.error('Error during parse: ' + error.stack);
+            //console.log('Error during parse:', error);
         }
     } else {
-        winston.error('Unknown provider "' + provider + '"');
+        logger.error('Unknown provider "' + provider + '"');
         res.sendStatus(400)
     }
 
@@ -97,7 +109,7 @@ app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async function (req, r
         if (test) {
             const testHookUrl = process.env.TEST_HOOK_URL;
             if (testHookUrl) {
-                winston.log("Sending to test url: " + testHookUrl);
+                logger.debug("Sending to test url: " + testHookUrl);
                 request.post({
                     headers: {'content-type': 'application/json'},
                     url: discordEndpoint + provider,
@@ -122,7 +134,7 @@ app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async function (req, r
                 body: jsonString
             }, function (error, response, body) {
                 if (error) {
-                    winston.error(error);
+                    logger.error(error);
                     res.sendStatus(400);
                 } else {
                     res.sendStatus(200);
@@ -134,17 +146,17 @@ app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async function (req, r
 
 //Keep these two at the end
 app.use(function (req, res, next) {
-    res.status(404).send("Not Found")
+    res.status(404).send('Not Found');
 });
 
 app.use(function (err, req, res, next) {
-    winston.error(err.stack);
-    res.status(500).send('Internal Server Error')
+    logger.error(err.stack);
+    res.status(500).send('Internal Server Error');
 });
 
 // listen for requests :)
 const server = app.listen(process.env.PORT || 8080, function () {
-    winston.debug('Your app is listening on port ' + server.address().port);
+    logger.debug(`Your app is listening on port ${server.address().port}.`);
 });
 
 function getListOfProviderNamesSorted() {
@@ -153,7 +165,7 @@ function getListOfProviderNamesSorted() {
         sortedProviders.push(providers[prov].getName());
     }
     sortedProviders.sort();
-    return sortedProviders
+    return sortedProviders;
 }
 
 //for the tests!
