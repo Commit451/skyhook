@@ -1,3 +1,4 @@
+import { Embed } from "../model/Embed"
 import { BaseProvider } from "../util/BaseProvider"
 
 /**
@@ -11,9 +12,7 @@ class Unity extends BaseProvider {
 
     public async parseData() {
         this.setEmbedColor(0x222C37)
-
         const projectName = this.body.projectName
-        const projectTarget = this.body.buildTargetName
         const projectVersion = this.body.buildNumber
         let share = null
         if (this.body.links !== null) {
@@ -21,20 +20,13 @@ class Unity extends BaseProvider {
         }
         const type = this.body.buildStatus
         let content = "No download available."
-        const user = {
-            name: projectTarget,
-            icon_url: "https://developer.cloud.unity3d.com/images/icon-default.png",
-        }
         let download = ""
-        let link = ""
-        this.payload.setUser(projectName + "Buildserver", "https://developer.cloud.unity3d.com/images/icon-default.png")
         switch (type) {
             case "success":
                 if (share) {
                     download = share.href
                     content = "[`Download it here`](" + download + ")"
                 }
-                link = ""
                 content = "**New build**\n" + content
                 break
             case "queued":
@@ -48,12 +40,11 @@ class Unity extends BaseProvider {
                 break
 
         }
-        this.addEmbed({
-            title: "[" + projectName + "] " + " version #" + projectVersion,
-            url: download,
-            author: user,
-            description: content,
-        })
+        const embed = new Embed()
+        embed.title = "[" + projectName + "] " + " version #" + projectVersion
+        embed.url = download
+        embed.description = content
+        this.addEmbed(embed)
     }
 }
 export { Unity }
