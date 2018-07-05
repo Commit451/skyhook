@@ -1,7 +1,7 @@
 ## Resources available in a provider class  
 `this.req` - whole HTTP request object ([Reference](http://expressjs.com/de/4x/api.html#req))  
 `this.body` - only the body of the request object  
-`this.payload` - a [DiscordPayload](util/DiscordPayload.md)
+`this.payload` - a [DiscordPayload](util/DiscordPayload.md)  
 `this.logger` - a [winston](https://github.com/winstonjs/winston) logger.
 
 ## Example for providers without multiple methods
