@@ -153,7 +153,8 @@ class GitLab extends BaseProvider {
             close: "Closed",
             reopen: "Reopened",
             update: "Updated",
-            merge: "Merged"
+            merge: "Merged",
+            approved: "Approved"
         };
 
         this.payload.addEmbed({
