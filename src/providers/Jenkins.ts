@@ -16,7 +16,7 @@ class Jenkins extends BaseProvider {
     }
 
     public async parseData() {
-        this.payload.setEmbedColor(0xF0D6B7)
+        this.setEmbedColor(0xF0D6B7)
         const phase = this.body.build.phase
         const embed = new Embed()
         embed.title = "Project " + this.body.name
@@ -30,7 +30,7 @@ class Jenkins extends BaseProvider {
                 embed.description = Jenkins.capitalize(phase) + " build #" + this.body.build.number + " with status: " + this.body.build.status
                 break
         }
-        this.payload.addEmbed(embed)
+        this.addEmbed(embed)
     }
 }
 

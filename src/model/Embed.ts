@@ -2,6 +2,9 @@ import { EmbedAuthor } from "./EmbedAuthor"
 import { EmbedField } from "./EmbedField"
 import { EmbedFooter } from "./EmbedFooter"
 
+/**
+ * https://discordapp.com/developers/docs/resources/channel#embed-object-embed-structure
+ */
 class Embed {
     public title: string
     public type: string

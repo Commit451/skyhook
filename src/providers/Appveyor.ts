@@ -11,12 +11,12 @@ class AppVeyor extends BaseProvider {
     }
 
     public async parseData() {
-        this.payload.setEmbedColor(0xFFFFFF)
+        this.setEmbedColor(0xFFFFFF)
         const embed = new Embed()
         embed.description = "**Status**: " + this.body.eventData.status
         embed.title = "Build #" + this.body.eventData.buildNumber
         embed.url = this.body.eventData.buildUrl
-        this.payload.addEmbed(embed)
+        this.addEmbed(embed)
     }
 }
 

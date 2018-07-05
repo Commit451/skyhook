@@ -10,11 +10,11 @@ class DockerHub extends BaseProvider {
     }
 
     public async parseData() {
-        this.payload.setEmbedColor(0xFFFFFF)
+        this.setEmbedColor(0xFFFFFF)
         const embed = new Embed()
         embed.title = "New push for tag: " + this.body.push_data.tag
         embed.url = this.body.repository.repo_url
-        this.payload.addEmbed(embed)
+        this.addEmbed(embed)
     }
 }
 export { DockerHub }

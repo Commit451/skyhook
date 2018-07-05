@@ -12,7 +12,7 @@ class Codacy extends BaseProvider {
     }
 
     public async parseData() {
-        this.payload.setEmbedColor(0x242c33)
+        this.setEmbedColor(0x242c33)
         const embed = new Embed()
         embed.title = 'New Commit'
         embed.url = this.body.commit.data.urls.delta
@@ -30,7 +30,7 @@ class Codacy extends BaseProvider {
         newIssuesField.inline = true
         fields.push(newIssuesField)
 
-        this.payload.addEmbed(embed)
+        this.addEmbed(embed)
     }
 }
 

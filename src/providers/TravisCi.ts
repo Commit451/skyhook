@@ -12,7 +12,7 @@ class TravisCi extends BaseProvider {
     }
 
     public async parseData() {
-        this.payload.setEmbedColor(0xC7B398)
+        this.setEmbedColor(0xC7B398)
         const embed = new Embed()
         embed.title = "Build #" + this.body.number
         embed.url = this.body.build_url

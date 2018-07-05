@@ -12,7 +12,7 @@ class Bintray extends BaseProvider {
     }
 
     public async parseData() {
-        this.payload.setEmbedColor(0x43a047)
+        this.setEmbedColor(0x43a047)
         const embed = new Embed()
         embed.timestamp = this.body.released
         embed.title = this.body.package + ' v' + this.body.version + ' Released'
@@ -25,7 +25,7 @@ class Bintray extends BaseProvider {
             fields.push(field)
         }
         embed.fields = fields
-        this.payload.addEmbed(embed)
+        this.addEmbed(embed)
     }
 }
 

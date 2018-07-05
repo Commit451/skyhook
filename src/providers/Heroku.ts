@@ -12,14 +12,14 @@ class Heroku extends BaseProvider {
     }
 
     public async parseData() {
-        this.payload.setEmbedColor(0xC9C3E6)
+        this.setEmbedColor(0xC9C3E6)
         const embed = new Embed()
         embed.title = "Deployed App " + this.body.app
         embed.url = this.body.url
         const author = new EmbedAuthor()
         author.name = this.body.user
         embed.author = author
-        this.payload.addEmbed(embed)
+        this.addEmbed(embed)
     }
 }
 

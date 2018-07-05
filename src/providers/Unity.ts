@@ -10,7 +10,7 @@ class Unity extends BaseProvider {
     }
 
     public async parseData() {
-        this.payload.setEmbedColor(0x222C37)
+        this.setEmbedColor(0x222C37)
 
         const projectName = this.body.projectName
         const projectTarget = this.body.buildTargetName
@@ -48,7 +48,7 @@ class Unity extends BaseProvider {
                 break
 
         }
-        this.payload.addEmbed({
+        this.addEmbed({
             title: "[" + projectName + "] " + " version #" + projectVersion,
             url: download,
             author: user,

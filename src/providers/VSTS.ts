@@ -11,8 +11,7 @@ class VSTS extends BaseProvider {
 
     constructor() {
         super()
-        this.payload.setEmbedColor(0x68217a)
-        this.fields = []
+        this.setEmbedColor(0x68217a)
     }
 
     public async getType() {

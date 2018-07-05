@@ -15,7 +15,7 @@ class Pingdom extends BaseProvider {
             const embed = new Embed()
             embed.title = "State changed"
             embed.description = "State change from " + this.body.previous_state + " to " + this.body.current_state
-            this.payload.setEmbedColor((this.body.current_state === "UP") ? 0x4caf50 : 0xd32f2f)
+            this.setEmbedColor((this.body.current_state === "UP") ? 0x4caf50 : 0xd32f2f)
             this.addEmbed(embed)
         }
     }

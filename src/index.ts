@@ -106,12 +106,10 @@ app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async (req, res) => {
     }
 })
 
-// Keep these two at the end
 app.use((req, res, next) => {
     res.status(404).send("Not Found")
 })
 
-// listen for requests :)
 const server = app.listen(process.env.PORT || 8080, () => {
     winston.debug('Your app is listening on port ' + server.address().port)
 })

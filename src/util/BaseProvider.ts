@@ -1,6 +1,7 @@
 import { Request } from "express"
 import { DiscordPayload } from "../model/DiscordPayload"
 import { Embed } from "../model/Embed"
+import { EmbedFooter } from "../model/EmbedFooter";
 
 const camel = require('camelcase')
 
@@ -25,6 +26,8 @@ class BaseProvider {
     protected payload: DiscordPayload
     protected req: Request
     protected body: any
+    // all embeds will use this color
+    protected embedColor: number
 
     constructor() {
         this.payload = new DiscordPayload()
@@ -50,7 +53,19 @@ class BaseProvider {
     }
 
     protected addEmbed(embed: Embed): void {
-        this.payload.addEmbed(embed)
+        // add the footer to all embeds added
+        embed.footer = new EmbedFooter("Powered by Skyhook")
+        if (this.embedColor !== null) {
+            embed.color = this.embedColor
+        }
+        if (this.payload.embeds === null) {
+            this.payload.embeds = []
+        }
+        this.payload.embeds.push(embed)
+    }
+
+    protected setEmbedColor(color: number) {
+        this.embedColor = color
     }
 
     protected getType(): string {

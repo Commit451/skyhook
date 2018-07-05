@@ -1,3 +1,6 @@
+/**
+ * https://discordapp.com/developers/docs/resources/channel#embed-object-embed-footer-structure
+ */
 class EmbedFooter {
     public text: string
     // tslint:disable-next-line:variable-name
