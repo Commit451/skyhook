@@ -19,7 +19,7 @@
     "winston": "^3.0.0"
   },
   "engines": {
-    "node": "8.10.x"
+    "node": "10.5.x"
   },
   "repository": {
     "url": "https://github.com/Commit451/skyhook"
