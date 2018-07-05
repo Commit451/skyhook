@@ -27,13 +27,14 @@ class BitBucket extends BaseProvider {
         return str.join(' ')
     }
 
+    private baseLink: string = 'https://bitbucket.org/'
+
     constructor() {
         super()
-        this.payload.setEmbedColor(0x205081)
-        this.baseLink = 'https://bitbucket.org/'
+        this.setEmbedColor(0x205081)
     }
 
-    public async getType() {
+    public getType(): string {
         return this.req.get('X-Event-Key')
     }
 

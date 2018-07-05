@@ -1,130 +1,131 @@
-// patreon.js
-// https://www.patreon.com/platform/documentation/webhooks
-// ========
-const BaseProvider = require('../util/BaseProvider');
+import { Embed } from "../model/Embed"
+import { EmbedAuthor } from "../model/EmbedAuthor"
+import { EmbedField } from "../model/EmbedField"
+import { BaseProvider } from "../util/BaseProvider"
 
-// HTML Regular Expressions
-const boldRegex = /<strong>(.*?)<\/strong>/;
-const italicRegex = /<em>(.*?)<\/em>/;
-const underlineRegex = /<u>(.*?)<\/u>/;
-const anchorRegex = /<a.*?href="(.*?)".*?>(.*?)<\/a>/;
-const ulRegex = /<ul>(.*?)<\/ul>/;
-const liRegex = /<li>(.*?)<\/li>/;
-const imageRegex = /<img.*src="(.*?)">/;
-
+/**
+ * https://www.patreon.com/platform/documentation/webhooks
+ */
 class Patreon extends BaseProvider {
 
-    static getName() {
-        return 'Patreon';
+    public static getName() {
+        return 'Patreon'
     }
 
-    static _formatHTML(html, baseLink) {
-        const newLineRegex = /<br>/g;
-        //Match lists
-        while (ulRegex.test(html)) {
-            let match = ulRegex.exec(html);
-            html = html.replace(ulRegex, match[1]);
-            let str = match[1];
-            while (liRegex.test(str)) {
-                let match2 = liRegex.exec(match[1]);
-                str = str.replace(match2[0], '');
-                html = html.replace(liRegex, '\uFEFF\u00A0\u00A0\u00A0\u00A0\u2022 ' + match2[1] + '\n');
+    // HTML Regular Expressions
+    private static boldRegex = /<strong>(.*?)<\/strong>/
+    private static italicRegex = /<em>(.*?)<\/em>/
+    private static underlineRegex = /<u>(.*?)<\/u>/
+    private static anchorRegex = /<a.*?href="(.*?)".*?>(.*?)<\/a>/
+    private static ulRegex = /<ul>(.*?)<\/ul>/
+    private static liRegex = /<li>(.*?)<\/li>/
+    private static imageRegex = /<img.*src="(.*?)">/
+
+    private static _formatHTML(html, baseLink) {
+        const newLineRegex = /<br>/g
+        // Match lists
+        while (this.ulRegex.test(html)) {
+            const match = this.ulRegex.exec(html)
+            html = html.replace(this.ulRegex, match[1])
+            let str = match[1]
+            while (this.liRegex.test(str)) {
+                const match2 = this.liRegex.exec(match[1])
+                str = str.replace(match2[0], '')
+                html = html.replace(this.liRegex, '\uFEFF\u00A0\u00A0\u00A0\u00A0\u2022 ' + match2[1] + '\n')
             }
         }
-        //Match bold
-        while (boldRegex.test(html)) {
-            let match = boldRegex.exec(html);
-            html = html.replace(boldRegex, '**' + match[1] + '**');
+        // Match bold
+        while (this.boldRegex.test(html)) {
+            const match = this.boldRegex.exec(html)
+            html = html.replace(this.boldRegex, '**' + match[1] + '**')
         }
-        //Match Italic
-        while (italicRegex.test(html)) {
-            let match = italicRegex.exec(html);
-            html = html.replace(italicRegex, '_' + match[1] + '_');
+        // Match Italic
+        while (this.italicRegex.test(html)) {
+            const match = this.italicRegex.exec(html)
+            html = html.replace(this.italicRegex, '_' + match[1] + '_')
         }
-        //Replace Underlined
-        while (underlineRegex.test(html)) {
-            let match = underlineRegex.exec(html);
-            html = html.replace(underlineRegex, '__' + match[1] + '__');
+        // Replace Underlined
+        while (this.underlineRegex.test(html)) {
+            const match = this.underlineRegex.exec(html)
+            html = html.replace(this.underlineRegex, '__' + match[1] + '__')
         }
-        //Replace Anchors
-        while (anchorRegex.test(html)) {
-            let match = anchorRegex.exec(html);
-            let url = match[1].startsWith('#') ? baseLink + match[1] : match[1];
-            html = html.replace(anchorRegex, '[' + match[2] + '](' + url + ')');
+        // Replace Anchors
+        while (this.anchorRegex.test(html)) {
+            const match = this.anchorRegex.exec(html)
+            const url = match[1].startsWith('#') ? baseLink + match[1] : match[1]
+            html = html.replace(this.anchorRegex, '[' + match[2] + '](' + url + ')')
         }
-        //Replace Images
-        while (imageRegex.test(html)) {
-            let match = imageRegex.exec(html);
-            html = html.replace(imageRegex, '[View Image..](' + match[1] + ')');
+        // Replace Images
+        while (this.imageRegex.test(html)) {
+            const match = this.imageRegex.exec(html)
+            html = html.replace(this.imageRegex, '[View Image..](' + match[1] + ')')
         }
-        //Replace all br tags
-        html = html.replace(newLineRegex, '\n');
-        return html;
+        // Replace all br tags
+        html = html.replace(newLineRegex, '\n')
+        return html
     }
 
     constructor() {
-        super();
-        this.payload.setEmbedColor(0xF96854);
+        super()
+        this.setEmbedColor(0xF96854)
     }
 
-    async getType() {
-        return this.req.get('X-Patreon-Event');
+    protected getType(): string {
+        return this.req.get('X-Patreon-Event')
     }
 
-    _createUpdateCommon(type) {
-        let embed = {};
-        const creator_id = this.body.data.relationships.creator && this.body.data.relationships.creator.data && this.body.data.relationships.creator.data.id;
-        const patron_id = this.body.data.relationships.patron && this.body.data.relationships.patron.data && this.body.data.relationships.patron.data.id;
-        const reward_id = this.body.data.relationships.reward && this.body.data.relationships.reward.data && this.body.data.relationships.reward.data.id;
+    private _createUpdateCommon(type) {
+        const embed = new Embed()
+        const createorId = this.body.data.relationships.creator && this.body.data.relationships.creator.data && this.body.data.relationships.creator.data.id
+        const patreonId = this.body.data.relationships.patron && this.body.data.relationships.patron.data && this.body.data.relationships.patron.data.id
+        const rewardId = this.body.data.relationships.reward && this.body.data.relationships.reward.data && this.body.data.relationships.reward.data.id
 
-        const incl = this.body.included;
-        let reward = null;
-        for (let i = 0; i < incl.length; ++i) {
-            const attr = incl[i];
-            if (attr.id === creator_id) {
+        const incl = this.body.included
+        let reward = null
+        incl.forEach((attr: any) => {
+            if (attr.id === createorId) {
                 if (type === 'delete') {
-                    embed.title = 'Canceled $' + (this.body.data.attributes.amount_cents / 100).toFixed(2) + ' pledge to ' + attr.attributes.full_name;
+                    embed.title = 'Canceled $' + (this.body.data.attributes.amount_cents / 100).toFixed(2) + ' pledge to ' + attr.attributes.full_name
                 } else {
-                    embed.title = 'Pledged $' + (this.body.data.attributes.amount_cents / 100).toFixed(2) + ' to ' + attr.attributes.full_name;
+                    embed.title = 'Pledged $' + (this.body.data.attributes.amount_cents / 100).toFixed(2) + ' to ' + attr.attributes.full_name
                 }
-                embed.url = attr.attributes.url;
-            } else if (attr.id === patron_id) {
-                embed.author = {
-                    name: attr.attributes.full_name,
-                    icon_url: attr.attributes.thumb_url,
-                    url: attr.attributes.url
-                };
-            } else if (attr.id === reward_id) {
-                reward = attr;
+                embed.url = attr.attributes.url
+            } else if (attr.id === patreonId) {
+                const author = new EmbedAuthor()
+                author.name = attr.attributes.full_name
+                author.iconUrl = attr.attributes.thumb_url
+                author.url = attr.attributes.url
+                embed.author = author
+            } else if (attr.id === rewardId) {
+                reward = attr
             }
-        }
+        })
         if (reward != null) {
-            embed.description = '---';
-            const field = {
-                name: 'Unlocked \'' + reward.attributes.title + '\'',
-                value: '[$' + (reward.attributes.amount_cents / 100).toFixed(2) + '+ per month](https://www.patreon.com' + reward.attributes.url + ')\n' + Patreon._formatHTML(reward.attributes.description, embed.url),
-                inline: false
-            };
+            const field = new EmbedField()
+            field.name = 'Unlocked \'' + reward.attributes.title + '\''
+            field.value = '[$' + (reward.attributes.amount_cents / 100).toFixed(2) + '+ per month](https://www.patreon.com' + reward.attributes.url + ')\n' + Patreon._formatHTML(reward.attributes.description, embed.url)
+            field.inline = false
+            embed.description = '---'
             if (type === 'delete') {
-                field.name = 'Lost \'' + reward.attributes.title + '\'';
+                field.name = 'Lost \'' + reward.attributes.title + '\''
             }
-            embed.fields = [field];
+            embed.fields = [field]
         }
-        this.payload.addEmbed(embed);
+        this.addEmbed(embed)
     }
 
-    async pledgesCreate() {
-        this._createUpdateCommon('create');
+    private async pledgesCreate() {
+        this._createUpdateCommon('create')
     }
 
-    async pledgesUpdate() {
-        this._createUpdateCommon('update');
+    private async pledgesUpdate() {
+        this._createUpdateCommon('update')
     }
 
-    async pledgesDelete() {
-        this._createUpdateCommon('delete');
+    private async pledgesDelete() {
+        this._createUpdateCommon('delete')
     }
 
 }
 
-module.exports = Patreon;
+export { Patreon }
