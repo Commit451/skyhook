@@ -1,3 +1,5 @@
+import { Embed } from "../model/Embed"
+import { EmbedAuthor } from "../model/EmbedAuthor"
 import { BaseProvider } from "../util/BaseProvider"
 
 /**
@@ -11,13 +13,13 @@ class Heroku extends BaseProvider {
 
     public async parseData() {
         this.payload.setEmbedColor(0xC9C3E6)
-        this.payload.addEmbed({
-            title: "Deployed App " + this.body.app,
-            url: this.body.url,
-            author: {
-                name: this.body.user,
-            },
-        })
+        const embed = new Embed()
+        embed.title = "Deployed App " + this.body.app
+        embed.url = this.body.url
+        const author = new EmbedAuthor()
+        author.name = this.body.user
+        embed.author = author
+        this.payload.addEmbed(embed)
     }
 }
 

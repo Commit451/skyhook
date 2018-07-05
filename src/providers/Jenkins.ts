@@ -1,3 +1,4 @@
+import { Embed } from "../model/Embed"
 import { BaseProvider } from "../util/BaseProvider"
 
 /**
@@ -17,24 +18,19 @@ class Jenkins extends BaseProvider {
     public async parseData() {
         this.payload.setEmbedColor(0xF0D6B7)
         const phase = this.body.build.phase
-
+        const embed = new Embed()
+        embed.title = "Project " + this.body.name
+        embed.url = this.body.build.full_url
         switch (phase) {
             case "STARTED":
-                this.payload.addEmbed({
-                    title: "Project " + this.body.name,
-                    url: this.body.build.full_url,
-                    description: "Started build #" + this.body.build.number,
-                })
+                embed.description = "Started build #" + this.body.build.number
                 break
             case "COMPLETED":
             case "FINALIZED":
-                this.payload.addEmbed({
-                    title: "Project " + this.body.name,
-                    url: this.body.build.full_url,
-                    description: Jenkins.capitalize(phase) + " build #" + this.body.build.number + " with status: " + this.body.build.status,
-                })
+                embed.description = Jenkins.capitalize(phase) + " build #" + this.body.build.number + " with status: " + this.body.build.status
                 break
         }
+        this.payload.addEmbed(embed)
     }
 }
 

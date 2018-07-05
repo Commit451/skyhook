@@ -12,11 +12,6 @@ class VSTS extends BaseProvider {
     constructor() {
         super()
         this.payload.setEmbedColor(0x68217a)
-        this.thumbnail = {
-            url: 'http://jeroenniesen.com/wp-content/uploads/2016/11/visual_studio_2012_logo.png',
-            height: 150,
-            width: 150,
-        }
         this.fields = []
     }
 
@@ -44,11 +39,8 @@ class VSTS extends BaseProvider {
 
     // CHECK IN
     public async tfvcCheckin() {
-        this.user = {
-            name: this.body.resource.checkedInBy.displayName,
-            icon_url: this.body.resource.checkedInBy.imageUrl,
-        }
-        this.fields.push({
+        const name = this.body.resource.checkedInBy.displayName
+        this.payload.getData().fields.push({
             name: "Check in from " + this.user.name,
             value: "([`" + this.body.resource.changesetId + "`](" +
                 this.body.resource.url + ")) " + this.body.resource.comment,

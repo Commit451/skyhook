@@ -1,3 +1,5 @@
+import { Embed } from "../model/Embed"
+import { EmbedField } from "../model/EmbedField"
 import { BaseProvider } from "../util/BaseProvider"
 
 /**
@@ -10,20 +12,19 @@ class Bintray extends BaseProvider {
     }
 
     public async parseData() {
-        this.payload.setEmbedColor('0x43a047')
-        const embed = {
-            timestamp: this.body.released,
-            title: this.body.package + ' v' + this.body.version + ' Released',
-        }
-        const fields: any[] = []
+        this.payload.setEmbedColor(0x43a047)
+        const embed = new Embed()
+        embed.timestamp = this.body.released
+        embed.title = this.body.package + ' v' + this.body.version + ' Released'
+        const fields: EmbedField[] = []
         if (this.body.release_notes != null && this.body.release_notes) {
-            const field = {
-                inline: false,
-                name: 'Release Notes',
-                value: MarkdownUtil._formatMarkdown(this.body.release_notes),
-            }
+            const field = new EmbedField()
+            field.inline = false
+            field.name = "Release Notes"
+            field.value = MarkdownUtil._formatMarkdown(this.body.release_notes)
             fields.push(field)
         }
+        embed.fields = fields
         this.payload.addEmbed(embed)
     }
 }

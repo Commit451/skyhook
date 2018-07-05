@@ -1,3 +1,4 @@
+import { Embed } from "../model/Embed"
 import { BaseProvider } from "../util/BaseProvider"
 
 /**
@@ -11,14 +12,11 @@ class AppVeyor extends BaseProvider {
 
     public async parseData() {
         this.payload.setEmbedColor(0xFFFFFF)
-        this.payload.addEmbed({
-            author: {
-                name: this.body.eventData.projectName,
-            },
-            description: "**Status**: " + this.body.eventData.status,
-            title: "Build #" + this.body.eventData.buildNumber,
-            url: this.body.eventData.buildUrl,
-        })
+        const embed = new Embed()
+        embed.description = "**Status**: " + this.body.eventData.status
+        embed.title = "Build #" + this.body.eventData.buildNumber
+        embed.url = this.body.eventData.buildUrl
+        this.payload.addEmbed(embed)
     }
 }
 

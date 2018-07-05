@@ -1,20 +1,22 @@
+import { Embed } from "../model/Embed"
 import { BaseProvider } from "../util/BaseProvider"
 
 /**
  * https://www.pingdom.com/resources/webhooks
  */
 class Pingdom extends BaseProvider {
+
     public static getName() {
         return "Pingdom"
     }
 
     public async parseData() {
         if (this.body.current_state !== this.body.previous_state) {
+            const embed = new Embed()
+            embed.title = "State changed"
+            embed.description = "State change from " + this.body.previous_state + " to " + this.body.current_state
             this.payload.setEmbedColor((this.body.current_state === "UP") ? 0x4caf50 : 0xd32f2f)
-            this.payload.addEmbed({
-                title: "State changed",
-                description: "State change from " + this.body.previous_state + " to " + this.body.current_state,
-            })
+            this.addEmbed(embed)
         }
     }
 }
