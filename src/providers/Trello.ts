@@ -45,7 +45,7 @@ class Trello extends BaseProvider {
     }
 
     private embed: Embed
-    
+
     constructor() {
         super()
         this.embed = new Embed()
@@ -116,7 +116,7 @@ class Trello extends BaseProvider {
         const memberCreator = this.req.body.action.memberCreator;
         return {
             name: memberCreator.fullName,
-            icon_url: this.avatarurl + memberCreator.avatarHash + '/170.png',
+            icon_url: Trello.baseAvatarUrl + memberCreator.avatarHash + '/170.png',
             url: this.baseLink + memberCreator.username
         };
     }
@@ -164,7 +164,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async addLabelToCard() {
+    public async addLabelToCard() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Added Label to "' + this.action.data.card.name + '"';
         embed.url = this._resolveFullCardURL(this.action.data.card);
@@ -172,7 +172,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async addMemberToCard() {
+    public async addMemberToCard() {
         let embed = this._preparePayload();
         if (this.action.memberCreator.id === thos.action.member.id) {
             embed.title = '[' + this.action.data.board.name + '] Joined "' + this.action.data.card.name + '"';
@@ -185,7 +185,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async addMemberToBoard() {
+    public async addMemberToBoard() {
         let embed = this._preparePayload();
         if (this.action.memberCreator.id === this.action.member.id) {
             embed.title = 'Joined Board "' + this.action.data.board.name + '"';
@@ -198,7 +198,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async addMemberToOrganization() {
+    public async addMemberToOrganization() {
         let embed = this._preparePayload();
         if (this.action.memberCreator.id === this.action.member.id) {
             embed.title = 'Joined Organization "' + this.action.data.organization.name + '"';
@@ -211,7 +211,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async addToOrganizationBoard() {
+    public async addToOrganizationBoard() {
         let embed = this._preparePayload();
         embed.title = 'Created Board in "' + this.action.data.organization.name + '"';
         embed.description = '[`' + this.action.data.board.name + '`](' + this._resolveFullBoardURL(this.action.data.board) + ') has been created.';
@@ -227,7 +227,7 @@ class Trello extends BaseProvider {
         this.payload.addEmbed(embed);
     }
 
-    async convertToCardFromCheckItem() {
+    public async convertToCardFromCheckItem() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Converted Check Item to Card';
         embed.url = this._resolveFullCardURL(this.action.data.card);
