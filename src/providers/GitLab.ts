@@ -1,3 +1,6 @@
+import { Embed } from "../model/Embed"
+import { EmbedAuthor } from "../model/EmbedAuthor"
+import { EmbedField } from "../model/EmbedField"
 import { BaseProvider } from "../util/BaseProvider"
 
 /**
@@ -16,12 +19,17 @@ class GitLab extends BaseProvider {
         return url
     }
 
+    private embed: Embed
+
     constructor() {
         super()
-        this.payload.setEmbedColor(0xFCA326)
+        this.setEmbedColor(0xFCA326)
+        this.embed = new Embed()
+        this.embed.url = this.body.object_attributes.url
+        this.embed.author = this.authorFromBody()
     }
 
-    public async getType() {
+    public getType(): string {
         return this.body.object_kind
     }
 
@@ -37,27 +45,19 @@ class GitLab extends BaseProvider {
             commits: this.body.commits,
         }
 
-        const commits = []
-        for (let i = 0; (i < project.commits.length && i < 4); i++) {
-            const commit = project.commits[i]
+        const fields: EmbedField[] = []
+        project.commits.forEach((commit: any) => {
             const message = (commit.message.length > 256) ? commit.message.substring(0, 255) + "\u2026" : commit.message
-
-            commits.push({
-                name: "Commit from " + commit.author.name,
-                value: "(" + "[`" + commit.id.substring(0, 7) + "`](" + commit.url + ")" + ") " + (message == null ? "" : message.replace(/\n/g, " ").replace(/\r/g, " ")),
-                inline: false,
-            })
-        }
-
-        this.payload.addEmbed({
-            title: "[" + project.name + ":" + project.branch + "] " + project.commits.length + " commit" + ((project.commits.length > 1) ? "s" : ""),
-            url: project.url,
-            author: {
-                name: this.body.user_name,
-                icon_url: GitLab._formatAvatarURL(this.body.user_avatar),
-            },
-            fields: commits,
+            const field = new EmbedField()
+            field.name = "Commit from " + commit.author.name
+            field.value = "(" + "[`" + commit.id.substring(0, 7) + "`](" + commit.url + ")" + ") " + (message == null ? "" : message.replace(/\n/g, " ").replace(/\r/g, " "))
+            field.inline = false
+            fields.push(field)
         })
+
+        this.embed.title = "[" + project.name + ":" + project.branch + "] " + project.commits.length + " commit" + ((project.commits.length > 1) ? "s" : "")
+        this.embed.fields = fields
+        this.addEmbed(this.embed)
     }
 
     public async tagPush() {
@@ -72,27 +72,14 @@ class GitLab extends BaseProvider {
             commits: this.body.commits,
         }
 
+        this.embed.url = project.url + '/tags/' + tag
+        this.embed.description = (typeof this.body.message !== 'undefined') ? ((this.body.message.length > 1024) ? this.body.message.substring(0, 1023) + "\u2026" : this.body.message) : ''
         if (this.body.after !== '0000000000000000000000000000000000000000') {
-            this.payload.addEmbed({
-                title: "Pushed tag \"" + tag + "\" to " + project.name,
-                url: project.url + '/tags/' + tag,
-                author: {
-                    name: this.body.user_name,
-                    icon_url: GitLab._formatAvatarURL(this.body.user_avatar),
-                },
-                description: (typeof this.body.message !== 'undefined') ? ((this.body.message.length > 1024) ? this.body.message.substring(0, 1023) + "\u2026" : this.body.message) : '',
-            })
+            this.embed.title = `Pushed tag "${tag}" to ${project.name}`
         } else {
-            this.payload.addEmbed({
-                title: "Deleted tag \"" + tag + "\" on " + project.name,
-                url: project.url + '/tags/' + tag,
-                author: {
-                    name: this.body.user_name,
-                    icon_url: GitLab._formatAvatarURL(this.body.user_avatar),
-                },
-                description: (typeof this.body.message !== 'undefined') ? ((this.body.message.length > 1024) ? this.body.message.substring(0, 1023) + "\u2026" : this.body.message) : '',
-            })
+            this.embed.title = `Deleted tag "${tag}" to ${project.name}`
         }
+        this.addEmbed(this.embed)
     }
 
     public async issue() {
@@ -103,24 +90,16 @@ class GitLab extends BaseProvider {
             update: "Updated",
         }
 
-        this.payload.addEmbed({
-            title: actions[this.body.object_attributes.action] + " issue #" + this.body.object_attributes.iid + " on " + this.body.project.name,
-            url: this.body.object_attributes.url,
-            author: {
-                name: this.body.user.name,
-                icon_url: GitLab._formatAvatarURL(this.body.user.avatar_url),
-            },
-            fields: [
-                {
-                    name: this.body.object_attributes.title,
-                    value: (this.body.object_attributes.description !== null && this.body.object_attributes.description.length > 1024) ? this.body.object_attributes.description.substring(0, 1023) + "\u2026" : this.body.object_attributes.description,
-                },
-            ],
-        })
+        this.embed.title = actions[this.body.object_attributes.action] + " issue #" + this.body.object_attributes.iid + " on " + this.body.project.name
+        const field = new EmbedField()
+        field.name = this.body.object_attributes.title
+        field.value = (this.body.object_attributes.description !== null && this.body.object_attributes.description.length > 1024) ? this.body.object_attributes.description.substring(0, 1023) + "\u2026" : this.body.object_attributes.description
+        this.embed.fields = [ field ]
+        this.addEmbed(this.embed)
     }
 
     public async note() {
-        let type = null
+        let type: string = null
         switch (this.body.object_attributes.noteable_type) {
             case "Commit":
                 type = "commit (" + this.body.commit.id.substring(0, 7) + ")"
@@ -135,16 +114,9 @@ class GitLab extends BaseProvider {
                 type = "snippet #" + this.body.snippet.id
                 break
         }
-
-        this.payload.addEmbed({
-            title: "Wrote a comment on " + type + " on " + this.body.project.name,
-            url: this.body.object_attributes.url,
-            author: {
-                name: this.body.user.name,
-                icon_url: GitLab._formatAvatarURL(this.body.user.avatar_url),
-            },
-            description: (this.body.object_attributes.note.length > 2048) ? this.body.object_attributes.note.substring(0, 2047) + "\u2026" : this.body.object_attributes.note,
-        })
+        this.embed.title = "Wrote a comment on " + type + " on " + this.body.project.name
+        this.embed.description = (this.body.object_attributes.note.length > 2048) ? this.body.object_attributes.note.substring(0, 2047) + "\u2026" : this.body.object_attributes.note
+        this.addEmbed(this.embed)
     }
 
     public async mergeRequest() {
@@ -155,21 +127,12 @@ class GitLab extends BaseProvider {
             update: "Updated",
             merge: "Merged",
         }
-
-        this.payload.addEmbed({
-            title: actions[this.body.object_attributes.action] + " merge request #" + this.body.object_attributes.iid + " on " + this.body.project.name,
-            url: this.body.object_attributes.url,
-            author: {
-                name: this.body.user.name,
-                icon_url: GitLab._formatAvatarURL(this.body.user.avatar_url),
-            },
-            fields: [
-                {
-                    name: this.body.object_attributes.title,
-                    value: (this.body.object_attributes.description.length > 1024) ? this.body.object_attributes.description.substring(0, 1023) + "\u2026" : this.body.object_attributes.description,
-                },
-            ],
-        })
+        const field = new EmbedField()
+        field.name = this.body.object_attributes.title
+        field.value = (this.body.object_attributes.description.length > 1024) ? this.body.object_attributes.description.substring(0, 1023) + "\u2026" : this.body.object_attributes.description
+        this.embed.title = actions[this.body.object_attributes.action] + " merge request #" + this.body.object_attributes.iid + " on " + this.body.project.name
+        this.embed.fields = [ field ]
+        this.addEmbed(this.embed)
     }
 
     public async wikiPage() {
@@ -179,39 +142,29 @@ class GitLab extends BaseProvider {
             update: "Updated",
         }
 
-        this.payload.addEmbed({
-            title: actions[this.body.object_attributes.action] + " wiki page " + this.body.object_attributes.title + " on " + this.body.project.name,
-            url: this.body.object_attributes.url,
-            author: {
-                name: this.body.user.name,
-                icon_url: GitLab._formatAvatarURL(this.body.user.avatar_url),
-            },
-            description: (typeof this.body.object_attributes.message !== 'undefined') ? (this.body.object_attributes.message.length > 2048) ? this.body.object_attributes.message.substring(0, 2047) + "\u2026" : this.body.object_attributes.message : '',
-        })
+        this.embed.title = actions[this.body.object_attributes.action] + " wiki page " + this.body.object_attributes.title + " on " + this.body.project.name
+        this.embed.description = (typeof this.body.object_attributes.message !== 'undefined') ? (this.body.object_attributes.message.length > 2048) ? this.body.object_attributes.message.substring(0, 2047) + "\u2026" : this.body.object_attributes.message : ''
+        this.addEmbed(this.embed)
     }
 
     public async pipeline() {
-        this.payload.addEmbed({
-            title: "Pipeline #" + this.body.object_attributes.id + " on " + this.body.project.name,
-            url: this.body.project.web_url + "/pipelines/" + this.body.object_attributes.id,
-            author: {
-                name: this.body.user.name,
-                icon_url: GitLab._formatAvatarURL(this.body.user.avatar_url),
-            },
-            description: "**Status**: " + this.body.object_attributes.status,
-        })
+        this.embed.title = "Pipeline #" + this.body.object_attributes.id + " on " + this.body.project.name
+        this.embed.url = this.body.project.web_url + "/pipelines/" + this.body.object_attributes.id
+        this.embed.description = "**Status**: " + this.body.object_attributes.status
+        this.addEmbed(this.embed)
     }
 
     public async build() {
-        this.payload.addEmbed({
-            title: "Build #" + this.body.build_id + " on " + this.body.repository.name,
-            url: this.body.repository.homepage + "/builds/" + this.body.build_id,
-            author: {
-                name: this.body.user.name,
-                icon_url: GitLab._formatAvatarURL(this.body.user.avatar_url),
-            },
-            description: "**Status**: " + this.body.build_status,
-        })
+        this.embed.title = "Build #" + this.body.build_id + " on " + this.body.repository.name
+        this.embed.description = "**Status**: " + this.body.build_status
+        this.addEmbed(this.embed)
+    }
+
+    private authorFromBody(): EmbedAuthor {
+        const author = new EmbedAuthor()
+        author.name = this.body.user.name
+        author.iconUrl = GitLab._formatAvatarURL(this.body.user.avatar_url)
+        return author
     }
 }
 

@@ -1,12 +1,30 @@
-// trello.js
-// https://developers.trello.com/apis/webhooks
-// ========
-const BaseProvider = require('../util/BaseProvider')
-const MarkdownUtil = require('../util/MarkdownUtil')
+import { BaseProvider } from "../util/BaseProvider"
+import { Embed } from "../model/Embed";
+
 const rpn = require('request-promise-native')
 const urlMod = require('url')
 
+/**
+ * https://developers.trello.com/apis/webhooks
+ */
 class Trello extends BaseProvider {
+
+    private static baseLink = 'https://trello.com/'
+    private static baseAvatarUrl = 'https://trello-avatars.s3.amazonaws.com/'
+    private static defTrelloColors = {
+        blue: 0x0079bf,
+        yellow: 0xd9b51c,
+        orange: 0xd29034,
+        green: 0x519839,
+        red: 0xb04632,
+        purple: 0x89609e,
+        pink: 0xcd5a91,
+        lime: 0x4bbf6b,
+        sky: 0x00aecc,
+        grey: 0x838c91,
+        trello: 0x026aa7,
+        nocolor: 0xb6bbbf
+    }
 
     public static getName() {
         return 'Trello'
@@ -17,7 +35,7 @@ class Trello extends BaseProvider {
     private static _addMemberThumbnail(avatarHash, embed) {
         if (avatarHash != null && avatarHash !== 'null') {
             embed.thumbnail = {
-                url: this.avatarurl + avatarHash + '/170.png'
+                url: this.baseAvatarUrl + avatarHash + '/170.png'
             }
         }
     }
@@ -26,59 +44,46 @@ class Trello extends BaseProvider {
         return (str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str);
     }
 
+    private embed: Embed
+    
     constructor() {
         super()
-        this.baseLink = 'https://trello.com/'
-        this.avatarurl = 'https://trello-avatars.s3.amazonaws.com/'
-        this.defTrelloColors = {
-            blue: 0x0079bf,
-            yellow: 0xd9b51c,
-            orange: 0xd29034,
-            green: 0x519839,
-            red: 0xb04632,
-            purple: 0x89609e,
-            pink: 0xcd5a91,
-            lime: 0x4bbf6b,
-            sky: 0x00aecc,
-            grey: 0x838c91,
-            trello: 0x026aa7,
-            nocolor: 0xb6bbbf
-        };
+        this.embed = new Embed()
     }
 
-    async getType() {
+    public getType(): string {
         return this.req.body.action.type
     }
 
-    _resolveFullCardURL(card) {
-        return this.baseLink + 'c/' + card.shortLink + '/' + card.idShort + '-' + card.name.replace(/\s/g, '-').toLowerCase();
+    private _resolveFullCardURL(card) {
+        return Trello.baseLink + 'c/' + card.shortLink + '/' + card.idShort + '-' + card.name.replace(/\s/g, '-').toLowerCase();
     }
 
-    _resolveFullBoardURL(board) {
-        return this.baseLink + 'b/' + board.shortLink + '/' + board.name.replace(/\s/g, '-').toLowerCase();
+    private _resolveFullBoardURL(board) {
+        return Trello.baseLink + 'b/' + board.shortLink + '/' + board.name.replace(/\s/g, '-').toLowerCase();
     }
 
-    _resolveFullCommentURL(card, commentID) {
+    private _resolveFullCommentURL(card, commentID) {
         return this._resolveFullCardURL(card) + '#comment-' + commentID;
     }
 
-    _resolveCardURL(id) {
-        return this.baseLink + 'c/' + id;
+    private _resolveCardURL(id) {
+        return Trello.baseLink + 'c/' + id;
     }
 
-    _resolveBoardURL(id) {
-        return this.baseLink + 'b/' + id;
+    private _resolveBoardURL(id) {
+        return Trello.baseLink + 'b/' + id;
     }
 
-    _resolveCommentURL(cardID, commentID) {
+    private _resolveCommentURL(cardID, commentID) {
         return this._resolveCardURL(cardID) + '#comment-' + commentID;
     }
 
-    _resolveGenericURL(id) {
-        return this.baseLink + id;
+    private _resolveGenericURL(id) {
+        return Trello.baseLink + id;
     }
 
-    _formatAttachment(attachment, embed) {
+    private _formatAttachment(attachment, embed) {
         if (attachment.previewUrl != null) {
             embed.image = {url: attachment.previewUrl};
         }
@@ -96,7 +101,7 @@ class Trello extends BaseProvider {
         }
     }
 
-    _formatLabel(text, value, embed) {
+    private _formatLabel(text, value, embed) {
         if (value && this.defTrelloColors[value] != null) {
             this.payload.setEmbedColor(this.defTrelloColors[value]);
         } else {
@@ -107,7 +112,7 @@ class Trello extends BaseProvider {
         }
     }
 
-    _resolveUser() {
+    private _resolveUser() {
         const memberCreator = this.req.body.action.memberCreator;
         return {
             name: memberCreator.fullName,
@@ -116,7 +121,7 @@ class Trello extends BaseProvider {
         };
     }
 
-    _preparePayload() {
+    private _preparePayload() {
         this.action = this.req.body.action;
         this.model = this.req.body.model;
 
@@ -138,7 +143,7 @@ class Trello extends BaseProvider {
 
     // Webhook Type Responses
 
-    async addAttachmentToCard() {
+    public async addAttachmentToCard() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Added Attachment to "' + this.action.data.card.name + '"';
         embed.url = this._resolveFullCardURL(this.action.data.card);
@@ -147,11 +152,11 @@ class Trello extends BaseProvider {
     }
 
     // How to Trigger?
-    async addBoardsPinnedToMember() {
+    public async addBoardsPinnedToMember() {
 
     }
 
-    async addChecklistToCard() {
+    public async addChecklistToCard() {
         let embed = this._preparePayload();
         embed.title = '[' + this.action.data.board.name + '] Added Checklist to "' + this.action.data.card.name + '"';
         embed.url = this._resolveFullCardURL(this.action.data.card);
@@ -910,4 +915,4 @@ class Trello extends BaseProvider {
     }
 }
 
-module.exports = Trello;
+module.exports = Trello

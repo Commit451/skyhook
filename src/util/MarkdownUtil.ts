@@ -1,3 +1,6 @@
+import { Embed } from "../model/Embed"
+import { EmbedImage } from "../model/EmbedImage"
+
 // Regular Expressions
 const mdUL1 = /^={3,}$/
 const mdUL2 = /^-{3,}$/
@@ -75,10 +78,12 @@ class MarkdownUtil {
         return str
     }
 
-    public static _formatMarkdownImage(str: string, embed: any): string {
+    public static _formatMarkdownImage(str: string, embed: Embed): string {
         if (imageRegex.test(str)) {
             const match = imageRegex.exec(str)
-            embed.image = {url: match[1]}
+            const image = new EmbedImage()
+            image.url = match[1]
+            embed.image = image
             str = str.replace(imageRegex, '')
         }
         return str
@@ -99,7 +104,7 @@ class MarkdownUtil {
         return lines.join('\n')
     }
 
-    public static _formatMarkdown(str: string, embed: any): string {
+    public static _formatMarkdown(str: string, embed: Embed): string {
         str = MarkdownUtil._formatMarkdownBullets(str)
         str = MarkdownUtil._formatMarkdownBold(str)
         str = MarkdownUtil._formatMarkdownItalic(str)

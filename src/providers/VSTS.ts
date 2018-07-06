@@ -1,3 +1,6 @@
+import { Embed } from "../model/Embed"
+import { EmbedAuthor } from "../model/EmbedAuthor"
+import { EmbedField } from "../model/EmbedField"
 import { BaseProvider } from "../util/BaseProvider"
 
 /**
@@ -9,87 +12,80 @@ class VSTS extends BaseProvider {
         return 'VSTS'
     }
 
+    private embed: Embed
+
     constructor() {
         super()
         this.setEmbedColor(0x68217a)
+        this.embed = new Embed()
     }
 
-    public async getType() {
+    public getType(): string {
         return this.body.eventType
     }
 
     // PUSH
     public async gitPush() {
-        this.user = {
-            name: this.body.resource.pushedBy.displayName,
-            icon_url: this.body.resource.pushedBy.imageUrl
-        }
-        for (let i = 0; i < this.body.resource.commits.length; i++) {
-            const commit = this.body.resource.commits[i]
-            this.fields.push({
-                name: "Commit from " + this.body.resource.pushedBy.displayName,
-                value: "([`" + commit.commitId.substring(0, 7) + "`](" +
-                    this.body.resource.repository.remoteUrl + "/commit/" + commit.commitId + ")) " + commit.comment,
-                inline: false,
-            })
-        }
+        const author = new EmbedAuthor()
+        author.name = this.body.resource.pushedBy.displayName
+        author.iconUrl = this.body.resource.pushedBy.imageUrl
+        const fields: EmbedField[] = []
+        this.body.resource.commits.forEach((commit: any) => {
+            const field = new EmbedField()
+            field.name = "Commit from " + this.body.resource.pushedBy.displayName
+            field.value = "([`" + commit.commitId.substring(0, 7) + "`](" + this.body.resource.repository.remoteUrl + "/commit/" + commit.commitId + ")) " + commit.comment
+            field.inline = false
+            fields.push(field)
+        })
+        this.embed.fields = fields
+        this.embed.author = author
         this.addMinimalMessage()
     }
 
     // CHECK IN
     public async tfvcCheckin() {
         const name = this.body.resource.checkedInBy.displayName
-        this.payload.getData().fields.push({
-            name: "Check in from " + this.user.name,
-            value: "([`" + this.body.resource.changesetId + "`](" +
-                this.body.resource.url + ")) " + this.body.resource.comment,
-            inline: false,
-        })
+        const field = new EmbedField()
+        field.name = "Check in from " + name
+        field.value = "([`" + this.body.resource.changesetId + "`](" + this.body.resource.url + ")) " + this.body.resource.comment
+        field.inline = false
+        this.embed.fields = [field]
         this.addMinimalMessage()
     }
 
     // PULL REQUEST
     public async gitPullrequestCreated() {
-        this.user = {
-            name: this.body.resource.createdBy.displayName,
-            icon_url: this.body.resource.createdBy.imageUrl,
-        }
-        this.fields.push({
-            name: "Pull Request from " + this.body.resource.createdBy.displayName,
-            value: "([`" + this.body.resource.title + "`](" +
-                this.body.resource.repository.remoteUrl + ")) " + this.body.resource.description,
-            inline: false,
-        })
+        const author = this.extractCreatedByAuthor()
+        this.embed.author = author
+        const field = new EmbedField()
+        field.name = "Pull Request from " + this.body.resource.createdBy.displayName
+        field.value = "([`" + this.body.resource.title + "`](" + this.body.resource.repository.remoteUrl + ")) " + this.body.resource.description
+        field.inline = false
+        this.embed.fields = [field]
         this.addMinimalMessage()
     }
 
     // PULL REQUEST MERGE COMMIT
     public async gitPullrequestMerged() {
-        this.user = {
-            name: this.body.resource.createdBy.displayName,
-            icon_url: this.body.resource.createdBy.imageUrl,
-        }
-        this.fields.push({
-            name: "Pull Request Merge Commit from " + this.body.resource.createdBy.displayName,
-            value: "([`" + this.body.resource.title + "`](" +
-                this.body.resource.repository.remoteUrl + ")) " + this.body.resource.description,
-            inline: false,
-        })
+        const author = this.extractCreatedByAuthor()
+        this.embed.author = author
+        const field = new EmbedField()
+        field.name = "Pull Request Merge Commit from " + this.body.resource.createdBy.displayName
+        field.value = "([`" + this.body.resource.title + "`](" + this.body.resource.repository.remoteUrl + ")) " + this.body.resource.description
+        field.inline = false
+        this.embed.fields = [field]
         this.addMinimalMessage()
     }
 
     // PULL REQUEST UPDATED
     public async gitPullrequestUpdated() {
-        this.user = {
-            name: this.body.resource.createdBy.displayName,
-            icon_url: this.body.resource.createdBy.imageUrl,
-        }
-        this.fields.push({
-            name: "Pull Request Updated by " + this.body.resource.createdBy.displayName,
-            value: "([`" + this.body.resource.title + "`](" +
-                this.body.resource.repository.remoteUrl + ")) " + this.body.resource.description,
-            inline: false,
-        })
+        const author = this.extractCreatedByAuthor()
+        this.embed.author = author
+        const field = new EmbedField()
+        field.name = "Pull Request Updated by " + this.body.resource.createdBy.displayName
+        field.value = "([`" + this.body.resource.title + "`](" + this.body.resource.repository.remoteUrl + ")) " + this.body.resource.description
+        field.inline = false
+        this.embed.fields = [field]
         this.addMinimalMessage()
     }
 
@@ -155,12 +151,15 @@ class VSTS extends BaseProvider {
 
     // Because carpal tunnel...
     private addMinimalMessage() {
-        this.payload.addEmbed({
-            title: this.body.message.markdown,
-            author: this.user,
-            thumbnail: this.thumbnail,
-            fields: this.fields,
-        })
+        this.embed.title = this.body.message.markdown
+        this.addEmbed(this.embed)
+    }
+
+    private extractCreatedByAuthor(): EmbedAuthor {
+        const author = new EmbedAuthor()
+        author.name = this.body.resource.createdBy.displayName
+        author.iconUrl = this.body.resource.createdBy.imageUrl
+        return author
     }
 }
 
