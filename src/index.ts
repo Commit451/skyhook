@@ -12,7 +12,7 @@ import winston from 'winston'
 winston.loggers.add('logger', {
     format: winston.format.combine(
         winston.format.colorize(),
-        winston.format.printf(info => `[${moment().format('YYYY-MM-DD hh:mm:ss').trim()}] [${info.level}]: ${info.message}`)
+        winston.format.printf((info) => `[${moment().format('YYYY-MM-DD hh:mm:ss').trim()}] [${info.level}]: ${info.message}`)
     ),
     level: process.env.PRODUCTION ? 'info' : 'debug',
     transports: [
@@ -42,7 +42,7 @@ const providers: any = {
     travis: require('./providers/travisci'),
     trello: require('./providers/trello'),
     unity: require('./providers/unity'),
-    vsts: require('./providers/vsts'),
+    vsts: require('./providers/vsts')
 }
 
 app.use(bodyParser.json())
@@ -98,7 +98,7 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
             res.sendStatus(500)
             // Note sure of a better way to log errors in winston.
             logger.error('Error during parse: ' + error.stack)
-            //console.log('Error during parse:', error)
+            // console.log('Error during parse:', error)
         }
     } else {
         logger.error(`Unknown provider ${provider}`)
@@ -108,7 +108,7 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
     if (discordPayload !== null) {
         const jsonString = JSON.stringify(discordPayload)
 
-        if(test){
+        if (test) {
 
             res.setHeader('Content-Type', 'application/json')
             res.send(jsonString)
@@ -118,7 +118,7 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
             axios({
                 data: jsonString,
                 method: 'post',
-                url: discordEndpoint,
+                url: discordEndpoint
             }).then(() => {
                 res.sendStatus(200)
             }).catch((err: any) => {

@@ -1,6 +1,6 @@
-import { Embed } from "../model/Embed"
-import { EmbedField } from "../model/EmbedField"
-import { BaseProvider } from "../util/BaseProvider"
+import { Embed } from '../model/Embed'
+import { EmbedField } from '../model/EmbedField'
+import { BaseProvider } from '../util/BaseProvider'
 import { MarkdownUtil } from '../util/MarkdownUtil'
 
 /**
@@ -21,7 +21,7 @@ class Bintray extends BaseProvider {
         if (this.body.release_notes != null && this.body.release_notes) {
             const field = new EmbedField()
             field.inline = false
-            field.name = "Release Notes"
+            field.name = 'Release Notes'
             field.value = MarkdownUtil._formatMarkdown(this.body.release_notes, embed)
             fields.push(field)
         }

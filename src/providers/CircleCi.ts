@@ -1,5 +1,5 @@
-import { Embed } from "../model/Embed"
-import { BaseProvider } from "../util/BaseProvider"
+import { Embed } from '../model/Embed'
+import { BaseProvider } from '../util/BaseProvider'
 
 /**
  * https://circleci.com/docs/1.0/configuration/#notify

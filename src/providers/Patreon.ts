@@ -1,7 +1,7 @@
-import { Embed } from "../model/Embed"
-import { EmbedAuthor } from "../model/EmbedAuthor"
-import { EmbedField } from "../model/EmbedField"
-import { BaseProvider } from "../util/BaseProvider"
+import { Embed } from '../model/Embed'
+import { EmbedAuthor } from '../model/EmbedAuthor'
+import { EmbedField } from '../model/EmbedField'
+import { BaseProvider } from '../util/BaseProvider'
 
 /**
  * https://www.patreon.com/platform/documentation/webhooks

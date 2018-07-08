@@ -1,5 +1,5 @@
-import { Embed } from "../model/Embed"
-import { EmbedImage } from "../model/EmbedImage"
+import { Embed } from '../model/Embed'
+import { EmbedImage } from '../model/EmbedImage'
 
 // Regular Expressions
 const mdUL1 = /^={3,}$/

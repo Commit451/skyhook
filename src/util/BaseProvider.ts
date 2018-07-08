@@ -1,9 +1,9 @@
+import camel from 'camelcase'
 import { Request } from 'express'
+import winston from 'winston'
 import { DiscordPayload } from '../model/DiscordPayload'
 import { Embed } from '../model/Embed'
 import { EmbedFooter } from '../model/EmbedFooter'
-import winston from 'winston'
-import camel from 'camelcase'
 
 /**
  * Base provider, which all other providers will subclass. You can then
@@ -19,8 +19,9 @@ class BaseProvider {
     }
 
     public static formatType(type: string): string {
-        if(type == null)
+        if (type == null) {
             return null
+        }
         type = type.replace(/:/, '_') // needed because of BitBucket
         return camel(type)
     }
@@ -48,10 +49,9 @@ class BaseProvider {
         }
         type = BaseProvider.formatType(type)
 
-        const methodToCall: any = this[type]
-        if (typeof methodToCall !== 'undefined') {
+        if (typeof this[type] !== 'undefined') {
             this.logger.info(`Calling ${type}() in ${this.constructor.name} provider.`)
-            await methodToCall()
+            await this[type]()
         }
 
         return this.payload
@@ -61,10 +61,10 @@ class BaseProvider {
         // TODO check to see if too many fields
         // add the footer to all embeds added
         embed.footer = new EmbedFooter('Powered by Skyhook')
-        if (this.embedColor !== null) {
+        if (this.embedColor != null) {
             embed.color = this.embedColor
         }
-        if (this.payload.embeds === null) {
+        if (this.payload.embeds == null) {
             this.payload.embeds = []
         }
         this.payload.embeds.push(embed)

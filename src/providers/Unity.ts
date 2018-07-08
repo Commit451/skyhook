@@ -1,5 +1,5 @@
-import { Embed } from "../model/Embed"
-import { BaseProvider } from "../util/BaseProvider"
+import { Embed } from '../model/Embed'
+import { BaseProvider } from '../util/BaseProvider'
 
 /**
  * https://build-api.cloud.unity3d.com/docs/1.0.0/index.html#operation-webhooks-intro
@@ -19,32 +19,34 @@ class Unity extends BaseProvider {
             share = this.body.links.share_url
         }
         const type = this.body.buildStatus
-        let content = "No download available."
-        let download = ""
+        let content = 'No download available.'
+        let download = ''
+        this.payload.username = projectName + 'Buildserver', 'https://developer.cloud.unity3d.com/images/icon-default.png'
         switch (type) {
-            case "success":
+            case 'success':
                 if (share) {
                     download = share.href
-                    content = "[`Download it here`](" + download + ")"
+                    content = '[`Download it here`](' + download + ')'
                 }
-                content = "**New build**\n" + content
+                content = '**New build**\n' + content
                 break
-            case "queued":
-                content = "**In build queue**\nIt will be update to version  #" + projectVersion + "\n"
+            case 'queued':
+                content = '**In build queue**\nIt will be update to version  #' + projectVersion + '\n'
                 break
-            case "started":
-                content = "**Build is started**\nBuilding version  #" + projectVersion + "\n"
+            case 'started':
+                content = '**Build is started**\nBuilding version  #' + projectVersion + '\n'
                 break
-            case "failed":
-                content = "**Build failed**\n" + "Latest version is still  #" + (projectVersion - 1) + "\n"
+            case 'failed':
+                content = '**Build failed**\n' + 'Latest version is still  #' + (projectVersion - 1) + '\n'
                 break
 
         }
         const embed = new Embed()
-        embed.title = "[" + projectName + "] " + " version #" + projectVersion
+        embed.title = '[' + projectName + '] ' + ' version #' + projectVersion
         embed.url = download
         embed.description = content
         this.addEmbed(embed)
     }
 }
+
 module.exports = Unity

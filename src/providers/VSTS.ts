@@ -1,7 +1,7 @@
-import { Embed } from "../model/Embed"
-import { EmbedAuthor } from "../model/EmbedAuthor"
-import { EmbedField } from "../model/EmbedField"
-import { BaseProvider } from "../util/BaseProvider"
+import { Embed } from '../model/Embed'
+import { EmbedAuthor } from '../model/EmbedAuthor'
+import { EmbedField } from '../model/EmbedField'
+import { BaseProvider } from '../util/BaseProvider'
 
 /**
  * https://docs.microsoft.com/en-us/vsts/service-hooks/create-subscription
@@ -32,8 +32,8 @@ class VSTS extends BaseProvider {
         const fields: EmbedField[] = []
         this.body.resource.commits.forEach((commit: any) => {
             const field = new EmbedField()
-            field.name = "Commit from " + this.body.resource.pushedBy.displayName
-            field.value = "([`" + commit.commitId.substring(0, 7) + "`](" + this.body.resource.repository.remoteUrl + "/commit/" + commit.commitId + ")) " + commit.comment
+            field.name = 'Commit from ' + this.body.resource.pushedBy.displayName
+            field.value = '([`' + commit.commitId.substring(0, 7) + '`](' + this.body.resource.repository.remoteUrl + '/commit/' + commit.commitId + ')) ' + commit.comment
             field.inline = false
             fields.push(field)
         })
@@ -46,8 +46,8 @@ class VSTS extends BaseProvider {
     public async tfvcCheckin() {
         const name = this.body.resource.checkedInBy.displayName
         const field = new EmbedField()
-        field.name = "Check in from " + name
-        field.value = "([`" + this.body.resource.changesetId + "`](" + this.body.resource.url + ")) " + this.body.resource.comment
+        field.name = 'Check in from ' + name
+        field.value = '([`' + this.body.resource.changesetId + '`](' + this.body.resource.url + ')) ' + this.body.resource.comment
         field.inline = false
         this.embed.fields = [field]
         this.addMinimalMessage()
@@ -58,8 +58,8 @@ class VSTS extends BaseProvider {
         const author = this.extractCreatedByAuthor()
         this.embed.author = author
         const field = new EmbedField()
-        field.name = "Pull Request from " + this.body.resource.createdBy.displayName
-        field.value = "([`" + this.body.resource.title + "`](" + this.body.resource.repository.remoteUrl + ")) " + this.body.resource.description
+        field.name = 'Pull Request from ' + this.body.resource.createdBy.displayName
+        field.value = '([`' + this.body.resource.title + '`](' + this.body.resource.repository.remoteUrl + ')) ' + this.body.resource.description
         field.inline = false
         this.embed.fields = [field]
         this.addMinimalMessage()
@@ -70,8 +70,8 @@ class VSTS extends BaseProvider {
         const author = this.extractCreatedByAuthor()
         this.embed.author = author
         const field = new EmbedField()
-        field.name = "Pull Request Merge Commit from " + this.body.resource.createdBy.displayName
-        field.value = "([`" + this.body.resource.title + "`](" + this.body.resource.repository.remoteUrl + ")) " + this.body.resource.description
+        field.name = 'Pull Request Merge Commit from ' + this.body.resource.createdBy.displayName
+        field.value = '([`' + this.body.resource.title + '`](' + this.body.resource.repository.remoteUrl + ')) ' + this.body.resource.description
         field.inline = false
         this.embed.fields = [field]
         this.addMinimalMessage()
@@ -82,8 +82,8 @@ class VSTS extends BaseProvider {
         const author = this.extractCreatedByAuthor()
         this.embed.author = author
         const field = new EmbedField()
-        field.name = "Pull Request Updated by " + this.body.resource.createdBy.displayName
-        field.value = "([`" + this.body.resource.title + "`](" + this.body.resource.repository.remoteUrl + ")) " + this.body.resource.description
+        field.name = 'Pull Request Updated by ' + this.body.resource.createdBy.displayName
+        field.value = '([`' + this.body.resource.title + '`](' + this.body.resource.repository.remoteUrl + ')) ' + this.body.resource.description
         field.inline = false
         this.embed.fields = [field]
         this.addMinimalMessage()

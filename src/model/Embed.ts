@@ -1,7 +1,7 @@
-import { EmbedAuthor } from "./EmbedAuthor"
-import { EmbedField } from "./EmbedField"
-import { EmbedFooter } from "./EmbedFooter"
-import { EmbedImage } from "./EmbedImage"
+import { EmbedAuthor } from './EmbedAuthor'
+import { EmbedField } from './EmbedField'
+import { EmbedFooter } from './EmbedFooter'
+import { EmbedImage } from './EmbedImage'
 
 /**
  * https://discordapp.com/developers/docs/resources/channel#embed-object-embed-structure
