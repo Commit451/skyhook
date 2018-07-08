@@ -3,8 +3,7 @@ import { DiscordPayload } from '../model/DiscordPayload'
 import { Embed } from '../model/Embed'
 import { EmbedFooter } from '../model/EmbedFooter'
 import winston from 'winston'
-
-const camel = require('camelcase')
+import camel from 'camelcase'
 
 /**
  * Base provider, which all other providers will subclass. You can then
@@ -73,10 +72,6 @@ class BaseProvider {
 
     protected setEmbedColor(color: number) {
         this.embedColor = color
-    }
-
-    protected getType(): string {
-        return null
     }
 }
 

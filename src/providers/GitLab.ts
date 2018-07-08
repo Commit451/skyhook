@@ -25,8 +25,6 @@ class GitLab extends BaseProvider {
         super()
         this.setEmbedColor(0xFCA326)
         this.embed = new Embed()
-        this.embed.url = this.body.object_attributes.url
-        this.embed.author = this.authorFromBody()
     }
 
     public getType(): string {
@@ -56,6 +54,8 @@ class GitLab extends BaseProvider {
         })
 
         this.embed.title = "[" + project.name + ":" + project.branch + "] " + project.commits.length + " commit" + ((project.commits.length > 1) ? "s" : "")
+        this.embed.url = project.url
+        this.embed.author = this.authorFromBody()
         this.embed.fields = fields
         this.addEmbed(this.embed)
     }
@@ -73,6 +73,7 @@ class GitLab extends BaseProvider {
         }
 
         this.embed.url = project.url + '/tags/' + tag
+        this.embed.author = this.authorFromBody()
         this.embed.description = (typeof this.body.message !== 'undefined') ? ((this.body.message.length > 1024) ? this.body.message.substring(0, 1023) + "\u2026" : this.body.message) : ''
         if (this.body.after !== '0000000000000000000000000000000000000000') {
             this.embed.title = `Pushed tag "${tag}" to ${project.name}`
@@ -91,6 +92,8 @@ class GitLab extends BaseProvider {
         }
 
         this.embed.title = actions[this.body.object_attributes.action] + " issue #" + this.body.object_attributes.iid + " on " + this.body.project.name
+        this.embed.url = this.body.object_attributes.url
+        this.embed.author = this.authorFromBody()
         const field = new EmbedField()
         field.name = this.body.object_attributes.title
         field.value = (this.body.object_attributes.description !== null && this.body.object_attributes.description.length > 1024) ? this.body.object_attributes.description.substring(0, 1023) + "\u2026" : this.body.object_attributes.description
@@ -115,6 +118,8 @@ class GitLab extends BaseProvider {
                 break
         }
         this.embed.title = "Wrote a comment on " + type + " on " + this.body.project.name
+        this.embed.url = this.body.object_attributes.url
+        this.embed.author = this.authorFromBody()
         this.embed.description = (this.body.object_attributes.note.length > 2048) ? this.body.object_attributes.note.substring(0, 2047) + "\u2026" : this.body.object_attributes.note
         this.addEmbed(this.embed)
     }
@@ -131,6 +136,8 @@ class GitLab extends BaseProvider {
         field.name = this.body.object_attributes.title
         field.value = (this.body.object_attributes.description.length > 1024) ? this.body.object_attributes.description.substring(0, 1023) + "\u2026" : this.body.object_attributes.description
         this.embed.title = actions[this.body.object_attributes.action] + " merge request #" + this.body.object_attributes.iid + " on " + this.body.project.name
+        this.embed.url = this.body.object_attributes.url
+        this.embed.author = this.authorFromBody()
         this.embed.fields = [ field ]
         this.addEmbed(this.embed)
     }
@@ -143,6 +150,8 @@ class GitLab extends BaseProvider {
         }
 
         this.embed.title = actions[this.body.object_attributes.action] + " wiki page " + this.body.object_attributes.title + " on " + this.body.project.name
+        this.embed.url = this.body.object_attributes.url
+        this.embed.author = this.authorFromBody()
         this.embed.description = (typeof this.body.object_attributes.message !== 'undefined') ? (this.body.object_attributes.message.length > 2048) ? this.body.object_attributes.message.substring(0, 2047) + "\u2026" : this.body.object_attributes.message : ''
         this.addEmbed(this.embed)
     }
@@ -150,12 +159,15 @@ class GitLab extends BaseProvider {
     public async pipeline() {
         this.embed.title = "Pipeline #" + this.body.object_attributes.id + " on " + this.body.project.name
         this.embed.url = this.body.project.web_url + "/pipelines/" + this.body.object_attributes.id
+        this.embed.author = this.authorFromBody()
         this.embed.description = "**Status**: " + this.body.object_attributes.status
         this.addEmbed(this.embed)
     }
 
     public async build() {
         this.embed.title = "Build #" + this.body.build_id + " on " + this.body.repository.name
+        this.embed.url = this.body.repository.homepage + "/builds/" + this.body.build_id
+        this.embed.author = this.authorFromBody()
         this.embed.description = "**Status**: " + this.body.build_status
         this.addEmbed(this.embed)
     }

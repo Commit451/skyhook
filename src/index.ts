@@ -79,6 +79,7 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
     const webhookID = req.params.webhookID
     const webhookSecret = req.params.webhookSecret
     const provider = req.params.from
+    const test = req.get('test')
     if (!webhookID || !webhookSecret || !provider) {
         res.sendStatus(400)
         return
@@ -107,16 +108,25 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
     if (discordPayload !== null) {
         const jsonString = JSON.stringify(discordPayload)
 
-        axios({
-            data: jsonString,
-            method: 'post',
-            url: discordEndpoint,
-        }).then(() => {
-            res.sendStatus(200)
-        }).catch((err: any) => {
-            logger.error(error)
-            res.sendStatus(400)
-        })
+        if(test){
+
+            res.setHeader('Content-Type', 'application/json')
+            res.send(jsonString)
+
+        } else {
+
+            axios({
+                data: jsonString,
+                method: 'post',
+                url: discordEndpoint,
+            }).then(() => {
+                res.sendStatus(200)
+            }).catch((err: any) => {
+                logger.error(error)
+                res.sendStatus(400)
+            })
+
+        }
     }
 })
 
