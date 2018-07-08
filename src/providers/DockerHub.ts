@@ -17,4 +17,4 @@ class DockerHub extends BaseProvider {
         this.addEmbed(embed)
     }
 }
-export { DockerHub }
+module.exports = DockerHub

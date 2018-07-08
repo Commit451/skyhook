@@ -34,4 +34,4 @@ class Codacy extends BaseProvider {
     }
 }
 
-export { Codacy }
+module.exports = Codacy

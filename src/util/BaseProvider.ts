@@ -19,6 +19,8 @@ class BaseProvider {
     }
 
     public static formatType(type: string): string {
+        if(type == null)
+            return null
         type = type.replace(/:/, '_') // needed because of BitBucket
         return camel(type)
     }
@@ -43,7 +45,7 @@ class BaseProvider {
         }
         type = BaseProvider.formatType(type)
 
-        const methodToCall: any = this[type]()
+        const methodToCall: any = this[type]
         if (typeof methodToCall !== 'undefined') {
             console.log('[' + (new Date()).toUTCString() + '] Calling ' + type + '() in ' + this.constructor.name + ' provider.')
             await methodToCall()

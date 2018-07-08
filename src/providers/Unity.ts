@@ -47,4 +47,4 @@ class Unity extends BaseProvider {
         this.addEmbed(embed)
     }
 }
-export { Unity }
+module.exports = Unity

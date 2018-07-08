@@ -23,4 +23,4 @@ class Heroku extends BaseProvider {
     }
 }
 
-export { Heroku }
+module.exports = Heroku

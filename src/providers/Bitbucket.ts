@@ -308,4 +308,4 @@ class BitBucket extends BaseProvider {
         return this.baseLink + this.body.repository.full_name + '/issues/' + this.body.issue.id
     }
 }
-export { BitBucket }
+module.exports = BitBucket

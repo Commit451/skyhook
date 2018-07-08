@@ -19,7 +19,7 @@ const providers: any = {
     jenkins: require('./providers/jenkins'),
     patreon: require('./providers/patreon'),
     pingdom: require('./providers/pingdom'),
-    travis: require('./providers/travis'),
+    travis: require('./providers/travisci'),
     trello: require('./providers/trello'),
     unity: require('./providers/unity'),
     vsts: require('./providers/vsts'),
@@ -122,3 +122,5 @@ function getListOfProviderNamesSorted(): string[] {
     sortedProviders.sort()
     return sortedProviders
 }
+
+module.exports = server

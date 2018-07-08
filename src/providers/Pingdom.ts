@@ -21,4 +21,4 @@ class Pingdom extends BaseProvider {
     }
 }
 
-export { Pingdom }
+module.exports = Pingdom

@@ -163,4 +163,4 @@ class VSTS extends BaseProvider {
     }
 }
 
-export { VSTS }
+module.exports = VSTS

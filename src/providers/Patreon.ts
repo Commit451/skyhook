@@ -128,4 +128,4 @@ class Patreon extends BaseProvider {
 
 }
 
-export { Patreon }
+module.exports = Patreon

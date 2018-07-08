@@ -7,7 +7,7 @@
     "tsc": "tsc",
     "build": "npm run clean && npm run tsc",
     "start": "npm run build && node dist/index.js",
-    "test": "mocha",
+    "test": "mocha -r ts-node/register test/*.js",
     "lint": "tslint --project ."
   },
   "devDependencies": {
