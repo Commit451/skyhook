@@ -28,21 +28,21 @@ logger.debug('Winston setup successfully.')
 
 const app = express()
 const providers: any = {
-    appveyor: require('./providers/appveyor.ts'),
-    bintray: require('./providers/bintray.ts'),
-    bitbucket: require('./providers/bitbucket.ts'),
-    circleci: require('./providers/circleci.ts'),
-    codacy: require('./providers/codacy.ts'),
-    dockerhub: require('./providers/dockerhub.ts'),
-    gitlab: require('./providers/gitlab.ts'),
-    heroku: require('./providers/heroku.ts'),
-    jenkins: require('./providers/jenkins.ts'),
-    patreon: require('./providers/patreon.ts'),
-    pingdom: require('./providers/pingdom.ts'),
-    travis: require('./providers/travisci.ts'),
-    trello: require('./providers/trello.ts'),
-    unity: require('./providers/unity.ts'),
-    vsts: require('./providers/vsts.ts')
+    appveyor: require('./providers/Appveyor'),
+    bintray: require('./providers/Bintray'),
+    bitbucket: require('./providers/Bitbucket'),
+    circleci: require('./providers/CircleCi'),
+    codacy: require('./providers/Codacy'),
+    dockerhub: require('./providers/DockerHub'),
+    gitlab: require('./providers/GitLab'),
+    heroku: require('./providers/Heroku'),
+    jenkins: require('./providers/Jenkins'),
+    patreon: require('./providers/Patreon'),
+    pingdom: require('./providers/Pingdom'),
+    travis: require('./providers/TravisCi'),
+    trello: require('./providers/Trello'),
+    unity: require('./providers/Unity'),
+    vsts: require('./providers/VSTS')
 }
 
 app.use(bodyParser.json())
