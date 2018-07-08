@@ -6,13 +6,13 @@ Skyhook happily accepts pull requests for new providers and features. To make th
 
 While writing your changes, please follow the code style maintained throughout the project. Skyhook does not follow a specific standard of javascript code, therefore you should browse some of the existing code to get a feel of the style. Here are some things to keep in mind.
 
-* > Always use `let` instead of `var`
+* Always use `let` instead of `var`
 
-* > End statements with semicolons (`;`)
+* End statements with semicolons (`;`)
 
 These are the two main style standards that the project maintains. Please put in an effort to keep the code style uniform throughout the entire project.
 
-### Where to Work on Changes
+### Working on Changes
 
 All of your changes should be made on a [fork](https://help.github.com/articles/fork-a-repo/) of the main project.
 
@@ -20,7 +20,7 @@ Once you are satisfied with your changes, you may submit a [pull request](https:
 
 > Note that to add more commits to your pull request, you only need to push commits to the branch of your fork from which you based the pull request.
 
-### Starting and Testing the skyhook Locally
+### Local Testing
 
 In order to test the features you've implemented, it's a good idea to setup and run skyhook locally.
 
@@ -28,9 +28,11 @@ Ensure you have the latest version of Node.js installed and have cloned the repo
 
 In order to accept data from the webhook providers, you should forward the port which skyhook will bind to. By default, this is set to `8080`, however if another port is more convienient for you, you may change this in the code. **Be mindful not to submit this change in a pull request.**
 
+> If you are unable to forward a port you may use [ngrok](https://ngrok.com/).
+
 Once the port is forwarded, you should be able to start the server and have it open for requests. You can validate this by going to `{your-public-ip}:8080`. If the skyhook webpage loads, then the port is forwarded correctly.
 
-From here you should be able to [setup](https://github.com/Commit451/skyhook#setup) webooks through your local copy of skyhook. **Note that when setting up your webhooks you MUST replace `skyhook.glitch.me` with `{your-public-ip}:8080`.** Your IP will never have https protocol, so ensure you are using basic http.
+From here you should be able to [setup](https://github.com/Commit451/skyhook#setup) webooks through your local copy of skyhook. **Note that when setting up your webhooks you MUST replace `skyhook.glitch.me` with `{your-public-ip}:8080`.**
 
 If your changes work, the provider's webhooks should be parsed and forwarded to discord.
 

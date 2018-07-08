@@ -1,10 +1,30 @@
 require('dotenv').config()
 
 import axios from 'axios'
-import express from "express"
+import express from 'express'
+import moment from 'moment'
 
-const bodyParser = require('body-parser')
-const winston = require('winston')
+import bodyParser from 'body-parser'
+import winston from 'winston'
+
+// Set up a logger.
+// @ts-ignore Method exists, will be added to ts def in next release.
+winston.loggers.add('logger', {
+    format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.printf(info => `[${moment().format('YYYY-MM-DD hh:mm:ss').trim()}] [${info.level}]: ${info.message}`)
+    ),
+    level: process.env.PRODUCTION ? 'info' : 'debug',
+    transports: [
+        new winston.transports.Console()
+    ]
+})
+
+// @ts-ignore Method exists, will be added to ts def in next release.
+const logger = winston.loggers.get('logger')
+logger.debug('Winston setup successfully.')
+
+// Setup app.
 
 const app = express()
 const providers: any = {
@@ -25,19 +45,12 @@ const providers: any = {
     vsts: require('./providers/vsts'),
 }
 
-if (process.env.PRODUCTION) {
-    winston.level = 'error'
-} else {
-    winston.level = 'debug'
-    winston.debug("Setting winston log level to debug")
-}
-
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static('public'))
 app.set('view engine', 'ejs')
 
-app.get("/", (req, res) => {
+app.get('/', (req, res) => {
     // response.sendFile(__dirname + '/views/index.ejs');
     const templProviders: any[] = []
     providers.array.forEach((provider: any) => {
@@ -48,11 +61,11 @@ app.get("/", (req, res) => {
     res.render('index', { providers: templProviders })
 })
 
-app.get("/providers", (req, res) => {
+app.get('/providers', (req, res) => {
     res.status(200).send(getListOfProviderNamesSorted())
 })
 
-app.get("/api/webhooks/:webhookID/:webhookSecret/:from", (req, res) => {
+app.get('/api/webhooks/:webhookID/:webhookSecret/:from', (req, res) => {
     // Return 200 if the provider is valid to show this url is ready.
     const provider: any = req.params.from
     if (provider === null || providers[provider] === null) {
@@ -62,7 +75,7 @@ app.get("/api/webhooks/:webhookID/:webhookSecret/:from", (req, res) => {
     }
 })
 
-app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async (req, res) => {
+app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
     const webhookID = req.params.webhookID
     const webhookSecret = req.params.webhookSecret
     const provider = req.params.from
@@ -70,7 +83,7 @@ app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async (req, res) => {
         res.sendStatus(400)
         return
     }
-    const discordEndpoint = "https://discordapp.com/api/webhooks/" + webhookID + "/" + webhookSecret
+    const discordEndpoint = 'https://discordapp.com/api/webhooks/' + webhookID + '/' + webhookSecret
 
     // https://discordapp.com/developers/docs/resources/webhook#execute-webhook
     let discordPayload = null
@@ -81,12 +94,13 @@ app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async (req, res) => {
         try {
             discordPayload = await instance.parse(req)
         } catch (error) {
-            console.log('Error during parse:', error)
             res.sendStatus(500)
-            // Winston doesn't log errors?? winston.error(error)
+            // Note sure of a better way to log errors in winston.
+            logger.error('Error during parse: ' + error.stack)
+            //console.log('Error during parse:', error)
         }
     } else {
-        winston.error(`Unknown provider ${provider}`)
+        logger.error(`Unknown provider ${provider}`)
         res.sendStatus(400)
     }
 
@@ -100,18 +114,36 @@ app.post("/api/webhooks/:webhookID/:webhookSecret/:from", async (req, res) => {
         }).then(() => {
             res.sendStatus(200)
         }).catch((err: any) => {
-            winston.error(error)
+            logger.error(error)
             res.sendStatus(400)
         })
     }
 })
 
 app.use((req, res, next) => {
-    res.status(404).send("Not Found")
+    res.status(404).send('Not Found')
 })
 
-const server = app.listen(process.env.PORT || 8080, () => {
-    winston.debug('Your app is listening on port ' + server.address().port)
+function normalizePort(val) {
+    const port = parseInt(val, 10)
+
+    if (isNaN(port)) {
+        // named pipe
+        return val
+    }
+
+    if (port >= 0) {
+        // port number
+        return port
+    }
+
+    return false
+}
+
+const port = normalizePort(process.env.PORT || 8080)
+
+const server = app.listen(port, () => {
+    logger.debug(`Your app is listening on port ${port}`)
 })
 
 function getListOfProviderNamesSorted(): string[] {

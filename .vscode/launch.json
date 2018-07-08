@@ -10,12 +10,13 @@
             "name": "DEBUG",
             "outFiles": ["${workspaceRoot}/dist/**/*.js"],
             "preLaunchTask": "compile",
-            "program": "${workspaceRoot}/src/server.ts",
+            "program": "${workspaceRoot}/src/index.ts",
             "request": "launch",
             "runtimeArgs": [
                 "--nolazy"
             ],
             "runtimeExecutable": null,
+            "outputCapture": "std",
             "sourceMaps": true,
             "stopOnEntry": false,
             "type": "node"

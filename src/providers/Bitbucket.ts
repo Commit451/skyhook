@@ -59,14 +59,15 @@ class BitBucket extends BaseProvider {
             project.commits = change.commits
 
             const fields: EmbedField[] = []
-            project.commits.forEach((commit) => {
+            for (let j = project.commits.length-1; j >= 0; j--) {
+                const commit = project.commits[j]
                 const message = (commit.message.length > 256) ? commit.message.substring(0, 255) + "\u2026" : commit.message
                 const author = (typeof commit.author.user !== "undefined") ? commit.author.user.display_name : "Unknown"
                 const field = new EmbedField()
                 field.name = "Commit from " + author
                 field.value = "(" + "[`" + commit.hash.substring(0, 7) + "`](" + commit.links.html.href + ")" + ") " + message.replace(/\n/g, " ").replace(/\r/g, " ")
                 fields.push(field)
-            })
+            }
 
             const embed = new Embed()
             embed.title = "[" + project.name + ":" + project.branch + "] " + project.commits.length + " commit" + ((project.commits.length > 1) ? "s" : "")

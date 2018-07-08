@@ -13,8 +13,8 @@
   "devDependencies": {
     "@types/chai": "^4.1.4",
     "@types/express": "^4.16.0",
-    "@types/mocha": "^5.2.3",
-    "@types/node": "^8.0.53",
+    "@types/mocha": "^5.2.4",
+    "@types/node": "^10.5.2",
     "chai": "^4.1.2",
     "chai-http": "^4.0.0",
     "mocha": "^5.2.0",
@@ -26,17 +26,18 @@
   "dependencies": {
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
-    "camelcase": "^4.1.0",
+    "camelcase": "^5.0.0",
     "dotenv": "^6.0.0",
     "ejs": "^2.5.7",
     "express": "^4.16.3",
+    "moment": "^2.22.2",
     "request": "^2.87.0",
     "request-promise-native": "^1.0.5",
-    "winston": "^2.4.0"
+    "winston": "^3.0.0"
   },
   "engines": {
-    "node": "8.11.3",
-    "npm": "5.6.0"
+    "node": "10.5.x",
+    "npm": "6.1.x"
   },
   "repository": {
     "url": "https://github.com/Commit451/skyhook"

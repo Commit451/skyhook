@@ -1,7 +1,8 @@
-import { Request } from "express"
-import { DiscordPayload } from "../model/DiscordPayload"
-import { Embed } from "../model/Embed"
-import { EmbedFooter } from "../model/EmbedFooter";
+import { Request } from 'express'
+import { DiscordPayload } from '../model/DiscordPayload'
+import { Embed } from '../model/Embed'
+import { EmbedFooter } from '../model/EmbedFooter'
+import winston from 'winston'
 
 const camel = require('camelcase')
 
@@ -26,6 +27,7 @@ class BaseProvider {
     }
 
     protected payload: DiscordPayload
+    protected logger: winston.Logger
     protected req: Request
     protected body: any
     // all embeds will use this color
@@ -33,6 +35,8 @@ class BaseProvider {
 
     constructor() {
         this.payload = new DiscordPayload()
+        // @ts-ignore Method exists, will be added to ts def in next release.
+        this.logger = winston.loggers.get('logger')
     }
 
     public async parse(req: Request): Promise<DiscordPayload> {
@@ -47,7 +51,7 @@ class BaseProvider {
 
         const methodToCall: any = this[type]
         if (typeof methodToCall !== 'undefined') {
-            console.log('[' + (new Date()).toUTCString() + '] Calling ' + type + '() in ' + this.constructor.name + ' provider.')
+            this.logger.info(`Calling ${type}() in ${this.constructor.name} provider.`)
             await methodToCall()
         }
 
@@ -57,7 +61,7 @@ class BaseProvider {
     protected addEmbed(embed: Embed): void {
         // TODO check to see if too many fields
         // add the footer to all embeds added
-        embed.footer = new EmbedFooter("Powered by Skyhook")
+        embed.footer = new EmbedFooter('Powered by Skyhook')
         if (this.embedColor !== null) {
             embed.color = this.embedColor
         }
