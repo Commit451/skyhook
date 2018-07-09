@@ -6,7 +6,7 @@ import { BaseProvider } from '../util/BaseProvider'
  */
 class Unity extends BaseProvider {
 
-    public static getName() {
+    public getName() {
         return 'Unity Cloud'
     }
 
@@ -21,7 +21,7 @@ class Unity extends BaseProvider {
         const type = this.body.buildStatus
         let content = 'No download available.'
         let download = ''
-        this.payload.username = projectName + 'Buildserver', 'https://developer.cloud.unity3d.com/images/icon-default.png'
+        this.payload.username = projectName + ' Buildserver'
         switch (type) {
             case 'success':
                 if (share) {

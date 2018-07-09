@@ -8,7 +8,7 @@ import { MarkdownUtil } from '../util/MarkdownUtil'
  */
 class Bintray extends BaseProvider {
 
-    public static getName() {
+    public getName() {
         return 'Bintray'
     }
 

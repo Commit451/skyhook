@@ -11,13 +11,6 @@ import { EmbedFooter } from '../model/EmbedFooter'
  */
 class BaseProvider {
 
-    /**
-     * Override this and provide the name of the provider
-     */
-    public static getName(): string {
-        return null
-    }
-
     public static formatType(type: string): string {
         if (type == null) {
             return null
@@ -37,6 +30,20 @@ class BaseProvider {
         this.payload = new DiscordPayload()
         // @ts-ignore Method exists, will be added to ts def in next release.
         this.logger = winston.loggers.get('logger')
+    }
+
+    /**
+     * Override this and provide the name of the provider
+     */
+    public getName(): string {
+        return null
+    }
+
+    /**
+     * Right now, the path is always just the same as the name, all lower case. Override if that is not the case
+     */
+    public getPath(): string {
+        return this.getName().toLowerCase()
     }
 
     public async parse(req: Request): Promise<DiscordPayload> {

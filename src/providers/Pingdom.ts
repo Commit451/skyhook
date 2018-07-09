@@ -6,7 +6,7 @@ import { BaseProvider } from '../util/BaseProvider'
  */
 class Pingdom extends BaseProvider {
 
-    public static getName() {
+    public getName() {
         return 'Pingdom'
     }
 

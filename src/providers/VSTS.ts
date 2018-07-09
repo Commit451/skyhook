@@ -8,16 +8,16 @@ import { BaseProvider } from '../util/BaseProvider'
  */
 class VSTS extends BaseProvider {
 
-    public static getName() {
-        return 'VSTS'
-    }
-
     private embed: Embed
 
     constructor() {
         super()
         this.setEmbedColor(0x68217a)
         this.embed = new Embed()
+    }
+
+    public getName() {
+        return 'VSTS'
     }
 
     public getType(): string {

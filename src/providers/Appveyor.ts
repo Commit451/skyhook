@@ -6,7 +6,7 @@ import { BaseProvider } from '../util/BaseProvider'
  */
 class AppVeyor extends BaseProvider {
 
-    public static getName() {
+    public getName() {
         return 'AppVeyor'
     }
 

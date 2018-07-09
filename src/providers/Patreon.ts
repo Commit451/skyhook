@@ -8,10 +8,6 @@ import { BaseProvider } from '../util/BaseProvider'
  */
 class Patreon extends BaseProvider {
 
-    public static getName() {
-        return 'Patreon'
-    }
-
     // HTML Regular Expressions
     private static boldRegex = /<strong>(.*?)<\/strong>/
     private static italicRegex = /<em>(.*?)<\/em>/
@@ -70,7 +66,11 @@ class Patreon extends BaseProvider {
         this.setEmbedColor(0xF96854)
     }
 
-    protected getType(): string {
+    public getName() {
+        return 'Patreon'
+    }
+
+    public getType(): string {
         return this.req.get('X-Patreon-Event')
     }
 

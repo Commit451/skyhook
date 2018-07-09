@@ -8,10 +8,6 @@ import { BaseProvider } from '../util/BaseProvider'
  */
 class GitLab extends BaseProvider {
 
-    public static getName() {
-        return 'GitLab'
-    }
-
     private static _formatAvatarURL(url): string {
         if (!/^https?:\/\/|^\/\//i.test(url)) {
             return 'https://gitlab.com' + url
@@ -25,6 +21,10 @@ class GitLab extends BaseProvider {
         super()
         this.setEmbedColor(0xFCA326)
         this.embed = new Embed()
+    }
+
+    public getName() {
+        return 'GitLab'
     }
 
     public getType(): string {

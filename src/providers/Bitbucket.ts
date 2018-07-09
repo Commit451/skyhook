@@ -9,7 +9,7 @@ import { MarkdownUtil } from '../util/MarkdownUtil'
  */
 class BitBucket extends BaseProvider {
 
-    public static getName() {
+    public getName() {
         return 'BitBucket'
     }
 

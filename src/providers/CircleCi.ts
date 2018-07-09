@@ -6,7 +6,7 @@ import { BaseProvider } from '../util/BaseProvider'
  */
 class CircleCi extends BaseProvider {
 
-    public static getName(): string {
+    public getName(): string {
         return 'CircleCi'
     }
 

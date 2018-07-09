@@ -7,7 +7,7 @@ import { BaseProvider } from '../util/BaseProvider'
  */
 class Heroku extends BaseProvider {
 
-    public static getName() {
+    public getName() {
         return 'Heroku'
     }
 

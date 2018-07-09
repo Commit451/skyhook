@@ -27,23 +27,53 @@ logger.debug('Winston setup successfully.')
 // Setup app.
 
 const app = express()
-const providers: any = {
-    appveyor: require('./providers/Appveyor'),
-    bintray: require('./providers/Bintray'),
-    bitbucket: require('./providers/Bitbucket'),
-    circleci: require('./providers/CircleCi'),
-    codacy: require('./providers/Codacy'),
-    dockerhub: require('./providers/DockerHub'),
-    gitlab: require('./providers/GitLab'),
-    heroku: require('./providers/Heroku'),
-    jenkins: require('./providers/Jenkins'),
-    patreon: require('./providers/Patreon'),
-    pingdom: require('./providers/Pingdom'),
-    travis: require('./providers/TravisCi'),
-    trello: require('./providers/Trello'),
-    unity: require('./providers/Unity'),
-    vsts: require('./providers/VSTS')
-}
+
+const appveyor = require('./providers/Appveyor')
+const bintray = require('./providers/Bintray')
+const bitbucket = require('./providers/Bitbucket')
+const circleci = require('./providers/CircleCi')
+const codacy = require('./providers/Codacy')
+const dockerhub = require('./providers/DockerHub')
+const gitlab = require('./providers/GitLab')
+const heroku = require('./providers/Heroku')
+const jenkins = require('./providers/Jenkins')
+const patreon = require('./providers/Patreon')
+const pingdom = require('./providers/Pingdom')
+const travis = require('./providers/Travis')
+const trello = require('./providers/Trello')
+const unity = require('./providers/Unity')
+const vsts = require('./providers/VSTS')
+
+/**
+ * Array of the classes
+ */
+const providers: any[] = [
+    appveyor,
+    bintray,
+    bitbucket,
+    circleci,
+    codacy,
+    dockerhub,
+    gitlab,
+    heroku,
+    jenkins,
+    patreon,
+    pingdom,
+    travis,
+    trello,
+    unity,
+    vsts
+]
+
+const providersMap = new Map<string, any>()
+const providerNames: string[] = []
+providers.forEach((Provider) => {
+    const instance = new Provider()
+    providersMap.set(instance.getPath(), Provider)
+    console.log(`Adding provider name ${instance.getName()}`)
+    providerNames.push(instance.getName())
+})
+providerNames.sort()
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -51,18 +81,11 @@ app.use(express.static('public'))
 app.set('view engine', 'ejs')
 
 app.get('/', (req, res) => {
-    // response.sendFile(__dirname + '/views/index.ejs');
-    const templProviders: any[] = []
-    providers.array.forEach((provider: any) => {
-        templProviders.push([provider, provider.getName()])
-    })
-    templProviders.sort()
-
-    res.render('index', { providers: templProviders })
+    res.render('index', { providers: providerNames })
 })
 
 app.get('/providers', (req, res) => {
-    res.status(200).send(getListOfProviderNamesSorted())
+    res.status(200).send(providerNames)
 })
 
 app.get('/api/webhooks/:webhookID/:webhookSecret/:from', (req, res) => {
@@ -78,9 +101,9 @@ app.get('/api/webhooks/:webhookID/:webhookSecret/:from', (req, res) => {
 app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
     const webhookID = req.params.webhookID
     const webhookSecret = req.params.webhookSecret
-    const provider = req.params.from
+    const providerName = req.params.from
     const test = req.get('test')
-    if (!webhookID || !webhookSecret || !provider) {
+    if (!webhookID || !webhookSecret || !providerName) {
         res.sendStatus(400)
         return
     }
@@ -90,8 +113,9 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
     let discordPayload = null
     const error = false
 
-    if (typeof providers[provider] !== 'undefined') {
-        const instance = new providers[provider]()
+    const Provider = providersMap.get(providerName)
+    if (Provider !== null && typeof Provider !== 'undefined') {
+        const instance = new Provider()
         try {
             discordPayload = await instance.parse(req)
         } catch (error) {
@@ -101,7 +125,7 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
             // console.log('Error during parse:', error)
         }
     } else {
-        logger.error(`Unknown provider ${provider}`)
+        logger.error(`Unknown provider ${providerName}`)
         res.sendStatus(400)
     }
 
@@ -109,12 +133,9 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
         const jsonString = JSON.stringify(discordPayload)
 
         if (test) {
-
             res.setHeader('Content-Type', 'application/json')
             res.send(jsonString)
-
         } else {
-
             axios({
                 data: jsonString,
                 method: 'post',
@@ -135,16 +156,16 @@ app.use((req, res, next) => {
 })
 
 function normalizePort(val) {
-    const port = parseInt(val, 10)
+    const normalizedPort = parseInt(val, 10)
 
-    if (isNaN(port)) {
+    if (isNaN(normalizedPort)) {
         // named pipe
         return val
     }
 
-    if (port >= 0) {
+    if (normalizedPort >= 0) {
         // port number
-        return port
+        return normalizedPort
     }
 
     return false
@@ -155,14 +176,5 @@ const port = normalizePort(process.env.PORT || 8080)
 const server = app.listen(port, () => {
     logger.debug(`Your app is listening on port ${port}`)
 })
-
-function getListOfProviderNamesSorted(): string[] {
-    const sortedProviders: string[] = []
-    providers.forEach((provider: any) => {
-        sortedProviders.push(provider.getName())
-    })
-    sortedProviders.sort()
-    return sortedProviders
-}
 
 module.exports = server

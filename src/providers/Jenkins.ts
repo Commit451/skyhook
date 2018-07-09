@@ -6,13 +6,13 @@ import { BaseProvider } from '../util/BaseProvider'
  */
 class Jenkins extends BaseProvider {
 
-    public static getName() {
-        return 'Jenkins-CI'
-    }
-
     private static capitalize(str: string) {
         const tmp = str.toLowerCase()
         return tmp.charAt(0).toUpperCase() + tmp.slice(1)
+    }
+
+    public getName() {
+        return 'Jenkins-CI'
     }
 
     public async parseData() {

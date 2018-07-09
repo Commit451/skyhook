@@ -5,9 +5,9 @@ import { BaseProvider } from '../util/BaseProvider'
 /**
  * https://docs.travis-ci.com/user/notifications/#Configuring-webhook-notifications
  */
-class TravisCi extends BaseProvider {
+class Travis extends BaseProvider {
 
-    public static getName() {
+    public getName() {
         return 'Travis'
     }
 
@@ -24,4 +24,4 @@ class TravisCi extends BaseProvider {
     }
 }
 
-module.exports = TravisCi
+module.exports = Travis

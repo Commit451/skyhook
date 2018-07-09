@@ -7,7 +7,7 @@ import { BaseProvider } from '../util/BaseProvider'
  */
 class Codacy extends BaseProvider {
 
-    public static getName(): string {
+    public getName(): string {
         return 'Codacy'
     }
 

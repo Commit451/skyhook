@@ -29,10 +29,6 @@ class Trello extends BaseProvider {
         nocolor: 0xb6bbbf
     }
 
-    public static getName() {
-        return 'Trello'
-    }
-
     // Utility Functions
 
     private static _addMemberThumbnail(avatarHash, embed) {
@@ -54,6 +50,10 @@ class Trello extends BaseProvider {
     constructor() {
         super()
         this.embed = new Embed()
+    }
+
+    public getName() {
+        return 'Trello'
     }
 
     public getType(): string {

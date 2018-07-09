@@ -5,7 +5,7 @@ import { BaseProvider } from '../util/BaseProvider'
  * https://docs.docker.com/docker-hub/webhooks/
  */
 class DockerHub extends BaseProvider {
-    public static getName() {
+    public getName() {
         return 'DockerHub'
     }
 
