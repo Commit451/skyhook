@@ -15,6 +15,10 @@ class Jenkins extends BaseProvider {
         return 'Jenkins-CI'
     }
 
+    public getPath() {
+        return 'jenkins'
+    }
+
     public async parseData() {
         this.setEmbedColor(0xF0D6B7)
         const phase = this.body.build.phase
