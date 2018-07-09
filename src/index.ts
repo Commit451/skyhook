@@ -1,13 +1,13 @@
 require('dotenv').config()
 
 import axios from 'axios'
+import bodyParser from 'body-parser'
 import express from 'express'
 import moment from 'moment'
-
-import bodyParser from 'body-parser'
 import winston from 'winston'
+import { DiscordPayload } from './model/DiscordPayload'
+import { BaseProvider } from './util/BaseProvider';
 
-// Set up a logger.
 // @ts-ignore Method exists, will be added to ts def in next release.
 winston.loggers.add('logger', {
     format: winston.format.combine(
@@ -23,8 +23,6 @@ winston.loggers.add('logger', {
 // @ts-ignore Method exists, will be added to ts def in next release.
 const logger = winston.loggers.get('logger')
 logger.debug('Winston setup successfully.')
-
-// Setup app.
 
 const app = express()
 
@@ -110,12 +108,12 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
     const discordEndpoint = 'https://discordapp.com/api/webhooks/' + webhookID + '/' + webhookSecret
 
     // https://discordapp.com/developers/docs/resources/webhook#execute-webhook
-    let discordPayload = null
+    let discordPayload: DiscordPayload = null
     const error = false
 
     const Provider = providersMap.get(providerName)
     if (Provider !== null && typeof Provider !== 'undefined') {
-        const instance = new Provider()
+        const instance: BaseProvider = new Provider()
         try {
             discordPayload = await instance.parse(req)
         } catch (error) {

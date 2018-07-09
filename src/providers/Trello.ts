@@ -60,94 +60,6 @@ class Trello extends BaseProvider {
         return this.req.body.action.type
     }
 
-    private _resolveFullCardURL(card) {
-        return Trello.baseLink + 'c/' + card.shortLink + '/' + card.idShort + '-' + card.name.replace(/\s/g, '-').toLowerCase()
-    }
-
-    private _resolveFullBoardURL(board) {
-        return Trello.baseLink + 'b/' + board.shortLink + '/' + board.name.replace(/\s/g, '-').toLowerCase()
-    }
-
-    private _resolveFullCommentURL(card, commentID) {
-        return this._resolveFullCardURL(card) + '#comment-' + commentID
-    }
-
-    private _resolveCardURL(id) {
-        return Trello.baseLink + 'c/' + id
-    }
-
-    private _resolveBoardURL(id) {
-        return Trello.baseLink + 'b/' + id
-    }
-
-    private _resolveCommentURL(cardID, commentID) {
-        return this._resolveCardURL(cardID) + '#comment-' + commentID
-    }
-
-    private _resolveGenericURL(id) {
-        return Trello.baseLink + id
-    }
-
-    private _formatAttachment(attachment, embed) {
-        if (attachment.previewUrl != null) {
-            embed.image = {url: attachment.previewUrl}
-        }
-        if (attachment.url != null) {
-            if (attachment.name !== attachment.url) {
-                embed.fields = [{
-                    name: attachment.name,
-                    value: attachment.url
-                }]
-            } else {
-                embed.description = attachment.url
-            }
-        } else {
-            embed.description = attachment.name
-        }
-    }
-
-    private _formatLabel(text, value, embed) {
-        if (value && Trello.defTrelloColors[value] != null) {
-            embed.color = Trello.defTrelloColors[value]
-        } else {
-            embed.color = Trello.defTrelloColors.nocolor
-        }
-        if (text) {
-            embed.description = '`' + text + '`'
-        }
-    }
-
-    private _resolveUser() {
-        const memberCreator = this.req.body.action.memberCreator
-        const author = new EmbedAuthor()
-        author.name = memberCreator.fullName
-        author.iconUrl = Trello.baseAvatarUrl + memberCreator.avatarHash + '/170.png'
-        author.url = Trello.baseLink + memberCreator.username
-        return author
-    }
-
-    private _preparePayload() {
-        this.action = this.req.body.action
-        this.model = this.req.body.model
-
-        // Testing code.
-        // console.info(this.body.action.type);
-        // console.info(this.action.data);
-
-        const embed = new Embed()
-
-        // Use the background color of the board if applicable. Otherwise, use the default trello color.
-        if (this.model.prefs != null && this.model.prefs.background != null && Trello.defTrelloColors[this.model.prefs.background] != null) {
-            embed.color = Trello.defTrelloColors[this.model.prefs.background]
-        } else {
-            embed.color = Trello.defTrelloColors.trello
-        }
-
-        embed.author = this._resolveUser()
-
-        return embed
-    }
-
     // Webhook Type Responses
 
     public async addAttachmentToCard() {
@@ -160,7 +72,7 @@ class Trello extends BaseProvider {
 
     // How to Trigger?
     public async addBoardsPinnedToMember() {
-
+        console.log('Not implemented')
     }
 
     public async addChecklistToCard() {
@@ -276,7 +188,7 @@ class Trello extends BaseProvider {
 
     // How to Trigger?
     public async copyCommentCard() {
-
+        console.log('Not implemented')
     }
 
     public async createBoard() {
@@ -288,12 +200,12 @@ class Trello extends BaseProvider {
 
     // Won't Trigger?
     public async createBoardInvitation() {
-
+        console.log('Not implemented')
     }
 
     // How to Trigger?
     public async createBoardPreference() {
-
+        console.log('Not implemented')
     }
 
     public async createCard() {
@@ -314,7 +226,7 @@ class Trello extends BaseProvider {
 
     // How to Trigger?
     public async createChecklist() {
-
+        console.log('Not implemented')
     }
 
     public async createList() {
@@ -335,7 +247,7 @@ class Trello extends BaseProvider {
 
     // Won't Trigger?
     public async createOrganizationInvitation() {
-
+        console.log('Not implemented')
     }
 
     public async deleteAttachmentFromCard() {
@@ -348,7 +260,7 @@ class Trello extends BaseProvider {
 
     // Won't Trigger?
     public async deleteBoardInvitation() {
-
+        console.log('Not implemented')
     }
 
     public async deleteCard() {
@@ -376,7 +288,7 @@ class Trello extends BaseProvider {
 
     // Won't Trigger?
     public async deleteOrganizationInvitation() {
-
+        console.log('Not implemented')
     }
 
     public async disablePlugin() {
@@ -408,12 +320,12 @@ class Trello extends BaseProvider {
 
     // How to Trigger?
     public async disablePowerUp() {
-
+        console.log('Not implemented')
     }
 
     // How to Trigger?
     public async emailCard() {
-
+        console.log('Not implemented')
     }
 
     public async enablePlugin() {
@@ -445,7 +357,7 @@ class Trello extends BaseProvider {
 
     // How to Trigger?
     public async enablePowerUp() {
-
+        console.log('Not implemented')
     }
 
     public async makeAdminOfBoard() {
@@ -496,7 +408,7 @@ class Trello extends BaseProvider {
 
     // How to Trigger?
     public async memberJoinedTrello() {
-
+        console.log('Not implemented')
     }
 
     public async moveCardFromBoard() {
@@ -603,12 +515,12 @@ class Trello extends BaseProvider {
 
     // How to Trigger?
     public async unconfirmedBoardInvitation() {
-
+        console.log('Not implemented')
     }
 
     // How to trigger?
     public async unconfirmedOrganizationInvitation() {
-
+        console.log('Not implemented')
     }
 
     public async updateBoard() {
@@ -843,7 +755,7 @@ class Trello extends BaseProvider {
 
     // How to Trigger?
     public async updateMember() {
-
+        console.log('Not implemented')
     }
 
     public async updateOrganization() {
@@ -919,6 +831,94 @@ class Trello extends BaseProvider {
         }
         embed.url = this._resolveFullCardURL(this.action.data.card)
         this.addEmbed(embed)
+    }
+
+    private _resolveFullCardURL(card) {
+        return Trello.baseLink + 'c/' + card.shortLink + '/' + card.idShort + '-' + card.name.replace(/\s/g, '-').toLowerCase()
+    }
+
+    private _resolveFullBoardURL(board) {
+        return Trello.baseLink + 'b/' + board.shortLink + '/' + board.name.replace(/\s/g, '-').toLowerCase()
+    }
+
+    private _resolveFullCommentURL(card, commentID) {
+        return this._resolveFullCardURL(card) + '#comment-' + commentID
+    }
+
+    private _resolveCardURL(id) {
+        return Trello.baseLink + 'c/' + id
+    }
+
+    private _resolveBoardURL(id) {
+        return Trello.baseLink + 'b/' + id
+    }
+
+    private _resolveCommentURL(cardID, commentID) {
+        return this._resolveCardURL(cardID) + '#comment-' + commentID
+    }
+
+    private _resolveGenericURL(id) {
+        return Trello.baseLink + id
+    }
+
+    private _formatAttachment(attachment, embed) {
+        if (attachment.previewUrl != null) {
+            embed.image = {url: attachment.previewUrl}
+        }
+        if (attachment.url != null) {
+            if (attachment.name !== attachment.url) {
+                embed.fields = [{
+                    name: attachment.name,
+                    value: attachment.url
+                }]
+            } else {
+                embed.description = attachment.url
+            }
+        } else {
+            embed.description = attachment.name
+        }
+    }
+
+    private _formatLabel(text, value, embed) {
+        if (value && Trello.defTrelloColors[value] != null) {
+            embed.color = Trello.defTrelloColors[value]
+        } else {
+            embed.color = Trello.defTrelloColors.nocolor
+        }
+        if (text) {
+            embed.description = '`' + text + '`'
+        }
+    }
+
+    private _resolveUser() {
+        const memberCreator = this.req.body.action.memberCreator
+        const author = new EmbedAuthor()
+        author.name = memberCreator.fullName
+        author.iconUrl = Trello.baseAvatarUrl + memberCreator.avatarHash + '/170.png'
+        author.url = Trello.baseLink + memberCreator.username
+        return author
+    }
+
+    private _preparePayload() {
+        this.action = this.req.body.action
+        this.model = this.req.body.model
+
+        // Testing code.
+        // console.info(this.body.action.type);
+        // console.info(this.action.data);
+
+        const embed = new Embed()
+
+        // Use the background color of the board if applicable. Otherwise, use the default trello color.
+        if (this.model.prefs != null && this.model.prefs.background != null && Trello.defTrelloColors[this.model.prefs.background] != null) {
+            embed.color = Trello.defTrelloColors[this.model.prefs.background]
+        } else {
+            embed.color = Trello.defTrelloColors.trello
+        }
+
+        embed.author = this._resolveUser()
+
+        return embed
     }
 }
 
