@@ -10,6 +10,10 @@ class Unity extends BaseProvider {
         return 'Unity Cloud'
     }
 
+    public getPath() {
+        return 'unity'
+    }
+
     public async parseData() {
         this.setEmbedColor(0x222C37)
         const projectName = this.body.projectName

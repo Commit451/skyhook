@@ -44,17 +44,17 @@
 
         <p>Provider</p>
         <section>
-            <% providers.forEach(function (c, i){ %>
+            <% providers.forEach(function (provider, index) { %>
             <div class="mdc-form-field">
                 <div class="mdc-radio">
-                    <input class="mdc-radio__native-control" type="radio" id="ex2-radio<%= i %>" name="ex2"
-                           value="<%= c[0] %>">
+                    <input class="mdc-radio__native-control" type="radio" id="ex2-radio<%= index %>" name="ex2"
+                           value="<%= provider.path %>">
                     <div class="mdc-radio__background">
                         <div class="mdc-radio__outer-circle"></div>
                         <div class="mdc-radio__inner-circle"></div>
                     </div>
                 </div>
-                <label id="ex2-radio1-labe<%= i %>" for="ex2-radio<%= i %>"><%= c[1] %></label>
+                <label id="ex2-radio1-labe<%= index %>" for="ex2-radio<%= index %>"><%= provider.name %></label>
             </div>
             <% }) %>
         </section>

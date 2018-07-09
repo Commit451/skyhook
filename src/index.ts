@@ -65,11 +65,19 @@ const providers: any[] = [
 
 const providersMap = new Map<string, any>()
 const providerNames: string[] = []
+const providerInstances: BaseProvider[] = []
+const providerInfos: any[] = []
 providers.forEach((Provider) => {
     const instance = new Provider()
+    providerInstances.push(instance)
     providersMap.set(instance.getPath(), Provider)
     console.log(`Adding provider name ${instance.getName()}`)
     providerNames.push(instance.getName())
+    const providerInfo = {
+        name: instance.getName(),
+        path: instance.getPath()
+    }
+    providerInfos.push(providerInfo)
 })
 providerNames.sort()
 
@@ -79,7 +87,7 @@ app.use(express.static('public'))
 app.set('view engine', 'ejs')
 
 app.get('/', (req, res) => {
-    res.render('index', { providers: providerNames })
+    res.render('index', { providers: providerInfos })
 })
 
 app.get('/providers', (req, res) => {
