@@ -1,12 +1,5 @@
-process.env.NODE_ENV = 'test'
-
-import * as chai from 'chai'
-import chaiHttp = require('chai-http')
-
-const server = require('../src/index.ts')
-const should = chai.should()
-
-chai.use(chaiHttp)
+import { assert } from 'chai'
+import { Bintray } from '../src/providers/Bintray'
 
 const json = {
     package: 'TestPackage',
@@ -19,17 +12,10 @@ const json = {
  * Test the /POST route
  */
 describe('/POST bintray', () => {
-    it('release', (done) => {
-        chai.request(server)
-            .post('/api/webhooks/test/test/bintray')
-            .send(json)
-            .end((err, res) => {
-                res.should.have.status(200)
-                console.log(res.body)
-                should.exist(res.body)
-                res.body.should.be.a('object')
-                res.body.should.have.property('embeds')
-                done()
-            })
+    it('release', async () => {
+        const bintray = new Bintray()
+        const res = await bintray.parse(json, null)
+        console.log(res)
+        assert(res !== null)
     })
 })
