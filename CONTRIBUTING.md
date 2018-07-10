@@ -4,13 +4,7 @@ Skyhook happily accepts pull requests for new providers and features. To make th
 
 ### Code Style
 
-While writing your changes, please follow the code style maintained throughout the project. Skyhook does not follow a specific standard of javascript code, therefore you should browse some of the existing code to get a feel of the style. Here are some things to keep in mind.
-
-* Always use `let` instead of `var`
-
-* End statements with semicolons (`;`)
-
-These are the two main style standards that the project maintains. Please put in an effort to keep the code style uniform throughout the entire project.
+We have tslint configured for the project. If you are using VSCode (which you should, because it is awesome) and have the tslint plugin installed, you will be guided through the coding style and changes will be suggested. While writing your changes, please follow the code style maintained throughout the project. You should browse some of the existing code to get a feel of the style.
 
 ### Working on Changes
 
@@ -34,5 +28,5 @@ Once the port is forwarded, you should be able to start the server and have it o
 
 From here you should be able to [setup](https://github.com/Commit451/skyhook#setup) webooks through your local copy of skyhook. **Note that when setting up your webhooks you MUST replace `skyhook.glitch.me` with `{your-public-ip}:8080`.**
 
-If your changes work, the provider's webhooks should be parsed and forwarded to discord.
+If your changes work, the provider's webhooks should be parsed and forwarded to discord. You can also write tests in the `test` directory, using the other tests as an example, to make sure your webhook parsing is working.
 

@@ -40,12 +40,10 @@ Alternatively, a new provider can also be requested by creating an [issue](https
 
 ## Contributing
 
-If you wish to contribute, follow our [contributing guide](https://github.com/Commit451/skyhook/blob/master/docs/Contributing.md).
+If you wish to contribute, follow our [contributing guide](CONTRIBUTING.md).
 
 ### Creating a Provider
 If you want to create a new provider please follow the examples shown at our small [documentation](docs/CreateNewProvider.md).
-
-\ ゜o゜)ノ
 
 ## Testing Locally
 To run server:
@@ -78,3 +76,5 @@ docker rm skyhook
 ## License
 
 skyhook is available under the MIT license. See the LICENSE file for more info.
+
+\ ゜o゜)ノ
