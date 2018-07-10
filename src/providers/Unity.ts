@@ -53,4 +53,4 @@ class Unity extends BaseProvider {
     }
 }
 
-module.exports = Unity
+export { Unity }

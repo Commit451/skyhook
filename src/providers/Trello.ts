@@ -922,4 +922,4 @@ class Trello extends BaseProvider {
     }
 }
 
-module.exports = Trello
+export { Trello }

@@ -30,4 +30,4 @@ class Bintray extends BaseProvider {
     }
 }
 
-module.exports = Bintray
+export { Bintray }

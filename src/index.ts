@@ -6,7 +6,23 @@ import express from 'express'
 import moment from 'moment'
 import winston from 'winston'
 import { DiscordPayload } from './model/DiscordPayload'
-import { BaseProvider } from './util/BaseProvider';
+import { BaseProvider } from './util/BaseProvider'
+
+import { AppVeyor } from './providers/Appveyor'
+import { Bintray } from './providers/Bintray'
+import { BitBucket } from './providers/Bitbucket'
+import { CircleCi } from './providers/CircleCi'
+import { Codacy } from './providers/Codacy'
+import { DockerHub } from './providers/DockerHub'
+import { GitLab } from './providers/GitLab'
+import { Heroku } from './providers/Heroku'
+import { Jenkins } from './providers/Jenkins'
+import { Patreon } from './providers/Patreon'
+import { Pingdom } from './providers/Pingdom'
+import { Travis } from './providers/Travis'
+import { Trello } from './providers/Trello'
+import { Unity } from './providers/Unity'
+import { VSTS } from './providers/VSTS'
 
 // @ts-ignore Method exists, will be added to ts def in next release.
 winston.loggers.add('logger', {
@@ -26,41 +42,25 @@ logger.debug('Winston setup successfully.')
 
 const app = express()
 
-const appveyor = require('./providers/Appveyor')
-const bintray = require('./providers/Bintray')
-const bitbucket = require('./providers/Bitbucket')
-const circleci = require('./providers/CircleCi')
-const codacy = require('./providers/Codacy')
-const dockerhub = require('./providers/DockerHub')
-const gitlab = require('./providers/GitLab')
-const heroku = require('./providers/Heroku')
-const jenkins = require('./providers/Jenkins')
-const patreon = require('./providers/Patreon')
-const pingdom = require('./providers/Pingdom')
-const travis = require('./providers/Travis')
-const trello = require('./providers/Trello')
-const unity = require('./providers/Unity')
-const vsts = require('./providers/VSTS')
-
 /**
  * Array of the classes
  */
 const providers: any[] = [
-    appveyor,
-    bintray,
-    bitbucket,
-    circleci,
-    codacy,
-    dockerhub,
-    gitlab,
-    heroku,
-    jenkins,
-    patreon,
-    pingdom,
-    travis,
-    trello,
-    unity,
-    vsts
+    AppVeyor,
+    Bintray,
+    BitBucket,
+    CircleCi,
+    Codacy,
+    DockerHub,
+    GitLab,
+    Heroku,
+    Jenkins,
+    Patreon,
+    Pingdom,
+    Travis,
+    Trello,
+    Unity,
+    VSTS
 ]
 
 const providersMap = new Map<string, any>()

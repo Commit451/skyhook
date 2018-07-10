@@ -24,4 +24,4 @@ class Travis extends BaseProvider {
     }
 }
 
-module.exports = Travis
+export { Travis }

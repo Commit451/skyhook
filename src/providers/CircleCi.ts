@@ -20,4 +20,4 @@ class CircleCi extends BaseProvider {
         this.addEmbed(embed)
     }
 }
-module.exports = CircleCi
+export { CircleCi }

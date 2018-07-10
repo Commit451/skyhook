@@ -187,4 +187,4 @@ class GitLab extends BaseProvider {
     }
 }
 
-module.exports = GitLab
+export { GitLab }

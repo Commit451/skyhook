@@ -38,4 +38,4 @@ class Jenkins extends BaseProvider {
     }
 }
 
-module.exports = Jenkins
+export { Jenkins }

@@ -20,5 +20,4 @@ class AppVeyor extends BaseProvider {
     }
 }
 
-// export { AppVeyor }
-module.exports = AppVeyor
+export { AppVeyor }
