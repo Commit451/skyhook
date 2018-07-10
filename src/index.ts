@@ -3,8 +3,6 @@ require('dotenv').config()
 import axios from 'axios'
 import bodyParser from 'body-parser'
 import express from 'express'
-import moment from 'moment'
-import winston from 'winston'
 import { BaseProvider } from './model/BaseProvider'
 import { DiscordPayload } from './model/DiscordPayload'
 import { LoggerUtil } from './util/LoggerUtil'

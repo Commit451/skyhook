@@ -1,10 +1,10 @@
+import axios from 'axios'
 import { BaseProvider } from '../model/BaseProvider'
 import { Embed } from '../model/Embed'
 import { EmbedAuthor } from '../model/EmbedAuthor'
 import { EmbedImage } from '../model/EmbedImage'
 import { MarkdownUtil } from '../util/MarkdownUtil'
 
-const rpn = require('request-promise-native')
 const urlMod = require('url')
 
 /**
@@ -294,12 +294,10 @@ class Trello extends BaseProvider {
     public async disablePlugin() {
         const embed = this._preparePayload()
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        const opts = {
-            uri: this.action.data.plugin.url,
-            json: true
-        }
+        const url = this.action.data.plugin.url
         try {
-            const manifest = await rpn(opts)
+            const response = await axios.get(url)
+            const manifest = response.data
             const desc = MarkdownUtil._formatMarkdown(manifest.details, embed)
             embed.title = '[' + this.action.data.board.name + '] Disabled Plugin \u2717'
             embed.fields = [{
@@ -308,7 +306,7 @@ class Trello extends BaseProvider {
                 inline: false
             }]
             const thumbnail = new EmbedImage()
-            thumbnail.url = urlMod.resolve(opts.uri, manifest.icon.url)
+            thumbnail.url = urlMod.resolve(url, manifest.icon.url)
             embed.image = thumbnail
         } catch (err) {
             console.log('[Trello Provider] Error while retrieving plugin manifest.')
@@ -331,12 +329,10 @@ class Trello extends BaseProvider {
     public async enablePlugin() {
         const embed = this._preparePayload()
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        const opts = {
-            uri: this.action.data.plugin.url,
-            json: true
-        }
+        const url = this.action.data.plugin.url
         try {
-            const manifest = await rpn(opts)
+            const response = await axios.get(url)
+            const manifest = response.data
             const desc = MarkdownUtil._formatMarkdown(manifest.details, embed)
             embed.title = '[' + this.action.data.board.name + '] Enabled Plugin \u2713'
             embed.fields = [{
@@ -345,7 +341,7 @@ class Trello extends BaseProvider {
                 inline: false
             }]
             const thumbnail = new EmbedImage()
-            thumbnail.url = urlMod.resolve(opts.uri, manifest.icon.url)
+            thumbnail.url = urlMod.resolve(url, manifest.icon.url)
             embed.image = thumbnail
         } catch (err) {
             console.log('[Trello Provider] Error while retrieving plugin manifest.')
