@@ -1,5 +1,5 @@
-import { assert } from 'chai'
 import { Bintray } from '../src/providers/Bintray'
+import { Tester } from './Tester'
 
 const json = {
     package: 'TestPackage',
@@ -13,9 +13,6 @@ const json = {
  */
 describe('/POST bintray', () => {
     it('release', async () => {
-        const bintray = new Bintray()
-        const res = await bintray.parse(json, null)
-        console.log(res)
-        assert(res !== null)
+        Tester.test(new Bintray(), json, null)
     })
 })
