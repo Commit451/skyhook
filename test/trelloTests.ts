@@ -1,13 +1,7 @@
-process.env.NODE_ENV = 'test';
+import { Trello } from '../src/providers/Trello'
+import { Tester } from './Tester'
 
-const chai = require('chai');
-const chaiHttp = require('chai-http');
-const server = require('../src/index.ts');
-const should = chai.should();
-
-chai.use(chaiHttp);
-
-const commentJSON = {
+const json = {
     model: {
         id: '594474056f0b649912106a39',
         name: 'Example Board',
@@ -110,24 +104,10 @@ const commentJSON = {
             }
         }
     }
-};
+}
 
-/*
-* Test the /POST route
-*/
 describe('/POST trello', () => {
-    it('commentCard', (done) => {
-        chai.request(server)
-            .post('/api/webhooks/test/test/trello')
-            .set('test', 'true')
-            .send(commentJSON)
-            .end((err, res) => {
-                res.should.have.status(200);
-                console.log(res.body);
-                should.exist(res.body)
-                res.body.should.be.a('object');
-                res.body.should.have.property('embeds');
-                done();
-            });
-    });
-});
+    it('commentCard', async () => {
+        Tester.test(new Trello(), json, null)
+    })
+})

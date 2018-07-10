@@ -7,6 +7,7 @@ import moment from 'moment'
 import winston from 'winston'
 import { BaseProvider } from './model/BaseProvider'
 import { DiscordPayload } from './model/DiscordPayload'
+import { LoggerUtil } from './util/LoggerUtil'
 
 import { AppVeyor } from './providers/Appveyor'
 import { Bintray } from './providers/Bintray'
@@ -24,20 +25,9 @@ import { Trello } from './providers/Trello'
 import { Unity } from './providers/Unity'
 import { VSTS } from './providers/VSTS'
 
-// @ts-ignore Method exists, will be added to ts def in next release.
-winston.loggers.add('logger', {
-    format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.printf((info) => `[${moment().format('YYYY-MM-DD hh:mm:ss').trim()}] [${info.level}]: ${info.message}`)
-    ),
-    level: process.env.PRODUCTION ? 'info' : 'debug',
-    transports: [
-        new winston.transports.Console()
-    ]
-})
+LoggerUtil.init()
 
-// @ts-ignore Method exists, will be added to ts def in next release.
-const logger = winston.loggers.get('logger')
+const logger = LoggerUtil.logger()
 logger.debug('Winston setup successfully.')
 
 const app = express()

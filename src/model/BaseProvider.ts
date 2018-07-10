@@ -3,6 +3,7 @@ import winston from 'winston'
 import { DiscordPayload } from '../model/DiscordPayload'
 import { Embed } from '../model/Embed'
 import { EmbedFooter } from '../model/EmbedFooter'
+import { LoggerUtil } from '../util/LoggerUtil';
 
 /**
  * Base provider, which all other providers will subclass. You can then
@@ -27,8 +28,7 @@ class BaseProvider {
 
     constructor() {
         this.payload = new DiscordPayload()
-        // @ts-ignore Method exists, will be added to ts def in next release.
-        this.logger = winston.loggers.get('logger')
+        this.logger = LoggerUtil.logger()
     }
 
     /**

@@ -1,13 +1,7 @@
-process.env.NODE_ENV = 'test';
+import { Patreon } from '../src/providers/Patreon'
+import { Tester } from './Tester'
 
-const chai = require('chai');
-const chaiHttp = require('chai-http');
-const server = require('../src/index.ts');
-const should = chai.should();
-
-chai.use(chaiHttp);
-
-const pledgesUpdateJson = {
+const json = {
     data:
         {
             attributes:
@@ -521,26 +515,13 @@ const pledgesUpdateJson = {
                 type: 'goal'
             }],
     links: {self: 'https://www.patreon.com/api/pledges/1'}
-};
+}
 
-
-/*
- * Test the /POST route
- */
 describe('/POST patreon', () => {
-    it('pledges:update', (done) => {
-        chai.request(server)
-            .post('/api/webhooks/test/test/patreon')
-            .set("X-Patreon-Event", "pledges:update")
-            .set("test", "true")
-            .send(pledgesUpdateJson)
-            .end((err, res) => {
-                res.should.have.status(200);
-                console.log(res.body);
-                should.exist(res.body)
-                res.body.should.be.a('object');
-                res.body.should.have.property('embeds');
-                done();
-            });
-    });
-});
+    it('pledges:update', async () => {
+        const headers = {
+            'x-patreon-event': 'pledges:update'
+        }
+        Tester.test(new Patreon(), json, headers)
+    })
+})
