@@ -1,17 +1,13 @@
+import { BaseProvider } from '../model/BaseProvider'
 import { Embed } from '../model/Embed'
 import { EmbedAuthor } from '../model/EmbedAuthor'
 import { EmbedField } from '../model/EmbedField'
-import { BaseProvider } from '../util/BaseProvider'
 import { MarkdownUtil } from '../util/MarkdownUtil'
 
 /**
  * https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html
  */
 class BitBucket extends BaseProvider {
-
-    public getName() {
-        return 'BitBucket'
-    }
 
     private static _formatLargeString(str, limit = 256) {
         return (str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str)
@@ -40,8 +36,12 @@ class BitBucket extends BaseProvider {
         this.embed = new Embed()
     }
 
+    public getName() {
+        return 'BitBucket'
+    }
+
     public getType(): string {
-        return this.req.get('X-Event-Key')
+        return this.headers['x-event-key']
     }
 
     public async repoPush() {

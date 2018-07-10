@@ -1,5 +1,5 @@
+import { BaseProvider } from '../model/BaseProvider'
 import { Embed } from '../model/Embed'
-import { BaseProvider } from '../util/BaseProvider'
 
 /**
  * https://www.appveyor.com/docs/notifications/#webhook-payload-default

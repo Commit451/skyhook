@@ -5,8 +5,8 @@ import bodyParser from 'body-parser'
 import express from 'express'
 import moment from 'moment'
 import winston from 'winston'
+import { BaseProvider } from './model/BaseProvider'
 import { DiscordPayload } from './model/DiscordPayload'
-import { BaseProvider } from './util/BaseProvider'
 
 import { AppVeyor } from './providers/Appveyor'
 import { Bintray } from './providers/Bintray'
@@ -123,7 +123,10 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
     if (Provider !== null && typeof Provider !== 'undefined') {
         const instance: BaseProvider = new Provider()
         try {
-            discordPayload = await instance.parse(req)
+            // seems dumb, but this is the best way I know how to format these headers in a way we can use them
+            const headersString = JSON.stringify(req.headers)
+            const headersObject = JSON.parse(headersString)
+            discordPayload = await instance.parse(req.body, headersObject)
         } catch (error) {
             res.sendStatus(500)
             // Note sure of a better way to log errors in winston.

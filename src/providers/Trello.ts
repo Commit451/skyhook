@@ -1,7 +1,7 @@
+import { BaseProvider } from '../model/BaseProvider'
 import { Embed } from '../model/Embed'
 import { EmbedAuthor } from '../model/EmbedAuthor'
 import { EmbedImage } from '../model/EmbedImage'
-import { BaseProvider } from '../util/BaseProvider'
 import { MarkdownUtil } from '../util/MarkdownUtil'
 
 const rpn = require('request-promise-native')
@@ -57,7 +57,7 @@ class Trello extends BaseProvider {
     }
 
     public getType(): string {
-        return this.req.body.action.type
+        return this.body.action.type
     }
 
     // Webhook Type Responses
@@ -891,7 +891,7 @@ class Trello extends BaseProvider {
     }
 
     private _resolveUser() {
-        const memberCreator = this.req.body.action.memberCreator
+        const memberCreator = this.body.action.memberCreator
         const author = new EmbedAuthor()
         author.name = memberCreator.fullName
         author.iconUrl = Trello.baseAvatarUrl + memberCreator.avatarHash + '/170.png'
@@ -900,8 +900,8 @@ class Trello extends BaseProvider {
     }
 
     private _preparePayload() {
-        this.action = this.req.body.action
-        this.model = this.req.body.model
+        this.action = this.body.action
+        this.model = this.body.model
 
         // Testing code.
         // console.info(this.body.action.type);

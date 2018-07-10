@@ -1,5 +1,4 @@
 import camel from 'camelcase'
-import { Request } from 'express'
 import winston from 'winston'
 import { DiscordPayload } from '../model/DiscordPayload'
 import { Embed } from '../model/Embed'
@@ -21,7 +20,7 @@ class BaseProvider {
 
     protected payload: DiscordPayload
     protected logger: winston.Logger
-    protected req: Request
+    protected headers: any
     protected body: any
     // all embeds will use this color
     protected embedColor: number
@@ -46,10 +45,9 @@ class BaseProvider {
         return this.getName().toLowerCase()
     }
 
-    public async parse(req: Request): Promise<DiscordPayload> {
-        this.req = req
-        this.body = req.body
-
+    public async parse(body: any, headers: any): Promise<DiscordPayload> {
+        this.body = body
+        this.headers = headers
         let type: string = 'parseData'
         if (typeof this['getType'] !== 'undefined') {
             type = await this['getType']()

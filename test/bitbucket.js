@@ -290,13 +290,13 @@ describe('/POST bitbucket', () => {
                 if(err) {
                     console.log(err)
                 } else {
-                    res.should.have.status(200);
-                    console.log(res.body);
+                    res.should.have.status(200)
+                    console.log(res.body)
                     should.exist(res.body)
-                    res.body.should.be.a('object');
-                    res.body.should.have.property('embeds');
+                    res.body.should.be.a('object')
+                    res.body.should.have.property('embeds')
                 }
                 done()
-            });
-    });
-});
+            })
+    })
+})

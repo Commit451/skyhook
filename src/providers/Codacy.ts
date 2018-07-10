@@ -1,6 +1,6 @@
+import { BaseProvider } from '../model/BaseProvider'
 import { Embed } from '../model/Embed'
 import { EmbedField } from '../model/EmbedField'
-import { BaseProvider } from '../util/BaseProvider'
 
 /**
  * https://support.codacy.com/hc/en-us/articles/207280359-WebHook-Notifications

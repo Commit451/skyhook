@@ -1,5 +1,5 @@
+import { BaseProvider } from '../model/BaseProvider'
 import { Embed } from '../model/Embed'
-import { BaseProvider } from '../util/BaseProvider'
 
 /**
  * https://build-api.cloud.unity3d.com/docs/1.0.0/index.html#operation-webhooks-intro

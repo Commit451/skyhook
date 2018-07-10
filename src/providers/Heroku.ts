@@ -1,6 +1,6 @@
+import { BaseProvider } from '../model/BaseProvider'
 import { Embed } from '../model/Embed'
 import { EmbedAuthor } from '../model/EmbedAuthor'
-import { BaseProvider } from '../util/BaseProvider'
 
 /**
  * https://devcenter.heroku.com/articles/deploy-hooks#http-post-hook

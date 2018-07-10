@@ -1,10 +1,10 @@
+import { BaseProvider } from '../model/BaseProvider'
 import { Embed } from '../model/Embed'
 import { EmbedAuthor } from '../model/EmbedAuthor'
 import { EmbedField } from '../model/EmbedField'
-import { BaseProvider } from '../util/BaseProvider'
 
 /**
- * https://www.patreon.com/platform/documentation/webhooks
+ * https://docs.patreon.com/#webhooks
  */
 class Patreon extends BaseProvider {
 
@@ -71,7 +71,7 @@ class Patreon extends BaseProvider {
     }
 
     public getType(): string {
-        return this.req.get('X-Patreon-Event')
+        return this.headers['x-patreon-event']
     }
 
     private _createUpdateCommon(type) {
