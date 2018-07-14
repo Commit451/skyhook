@@ -165,8 +165,8 @@ class GitLab extends BaseProvider {
     }
 
     public async build() {
-        this.embed.title = 'Build #' + this.body.build_id + ' on ' + this.body.repository.name
-        this.embed.url = this.body.repository.homepage + '/builds/' + this.body.build_id
+        this.embed.title = 'Build #' + this.body.build_id + ' on ' + this.body.project.name
+        this.embed.url = this.body.project.homepage + '/builds/' + this.body.build_id
         this.embed.author = this.authorFromBody()
         this.embed.description = '**Status**: ' + this.body.build_status
         this.addEmbed(this.embed)
