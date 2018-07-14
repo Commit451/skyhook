@@ -53,7 +53,7 @@ class BitBucket extends BaseProvider {
         }
         for (let i = 0; (i < this.body.push.changes.length && i < 4); i++) {
             const change = this.body.push.changes[i]
-            project.branch = (change.old !== null) ? change.old.name : change.new.name
+            project.branch = (change.old != null) ? change.old.name : change.new.name
             project.commits = change.commits
 
             const fields: EmbedField[] = []

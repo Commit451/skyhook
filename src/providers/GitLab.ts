@@ -96,7 +96,7 @@ class GitLab extends BaseProvider {
         this.embed.author = this.authorFromBody()
         const field = new EmbedField()
         field.name = this.body.object_attributes.title
-        field.value = (this.body.object_attributes.description !== null && this.body.object_attributes.description.length > 1024) ? this.body.object_attributes.description.substring(0, 1023) + '\u2026' : this.body.object_attributes.description
+        field.value = (this.body.object_attributes.description != null && this.body.object_attributes.description.length > 1024) ? this.body.object_attributes.description.substring(0, 1023) + '\u2026' : this.body.object_attributes.description
         this.embed.fields = [ field ]
         this.addEmbed(this.embed)
     }

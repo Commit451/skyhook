@@ -19,7 +19,7 @@ class Unity extends BaseProvider {
         const projectName = this.body.projectName
         const projectVersion = this.body.buildNumber
         let share = null
-        if (this.body.links !== null) {
+        if (this.body.links != null) {
             share = this.body.links.share_url
         }
         const type = this.body.buildStatus

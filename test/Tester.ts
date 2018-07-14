@@ -9,7 +9,7 @@ class Tester {
         LoggerUtil.init()
         const res = await provider.parse(json, headers)
         console.log(JSON.stringify(res))
-        assert(res !== null)
+        assert(res != null)
     }
 }
 

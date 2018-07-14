@@ -85,7 +85,7 @@ app.get('/providers', (req, res) => {
 app.get('/api/webhooks/:webhookID/:webhookSecret/:from', (req, res) => {
     // Return 200 if the provider is valid to show this url is ready.
     const provider: any = req.params.from
-    if (provider === null || providers[provider] === null) {
+    if (provider == null || providers[provider] == null) {
         res.sendStatus(400)
     } else {
         res.sendStatus(200)
@@ -108,7 +108,7 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
     const error = false
 
     const Provider = providersMap.get(providerName)
-    if (Provider !== null && typeof Provider !== 'undefined') {
+    if (Provider != null) {
         const instance: BaseProvider = new Provider()
         try {
             // seems dumb, but this is the best way I know how to format these headers in a way we can use them
@@ -126,7 +126,7 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
         res.sendStatus(400)
     }
 
-    if (discordPayload !== null) {
+    if (discordPayload != null) {
         const jsonString = JSON.stringify(discordPayload)
 
         if (test) {
