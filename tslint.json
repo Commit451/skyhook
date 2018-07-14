@@ -16,6 +16,11 @@
         "singleline": "never"
       }
     ],
+    "triple-equals": [
+      true,
+      "allow-null-check",
+      "allow-undefined-check"
+    ],
     "no-console": [
       false
     ],
