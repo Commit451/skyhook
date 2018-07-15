@@ -64,9 +64,9 @@ class Trello extends BaseProvider {
 
     public async addAttachmentToCard() {
         const embed = this._preparePayload()
-        embed.title = '[' + this.action.data.board.name + '] Added Attachment to "' + this.action.data.card.name + '"'
+        embed.title = '[' + this.action.data.board.name + '] ' + this.action.data.card.name
         embed.url = this._resolveFullCardURL(this.action.data.card)
-        this._formatAttachment(this.action.data.attachment, embed)
+        this._formatAttachment(this.action.data.attachment, embed, true)
         this.addEmbed(embed)
     }
 
@@ -252,9 +252,9 @@ class Trello extends BaseProvider {
 
     public async deleteAttachmentFromCard() {
         const embed = this._preparePayload()
-        embed.title = '[' + this.action.data.board.name + '] Removed Attachment from "' + this.action.data.card.name + '"'
+        embed.title = '[' + this.action.data.board.name + '] ' + this.action.data.card.name
         embed.url = this._resolveFullCardURL(this.action.data.card)
-        this._formatAttachment(this.action.data.attachment, embed)
+        this._formatAttachment(this.action.data.attachment, embed, false)
         this.addEmbed(embed)
     }
 
@@ -589,62 +589,89 @@ class Trello extends BaseProvider {
         embed.title = '[' + this.action.data.board.name + '] '
         embed.url = this._resolveFullCardURL(this.action.data.card)
         let field = null
+        let shouldFire = true
         if (this.action.data.old != null) {
             const old = this.action.data.old
             if (old.name != null) {
-                embed.title = embed.title + 'Renamed Card'
-                embed.description = '`' + old.name + '` \uD83E\uDC6A `' + this.action.data.card.name + '`'
+                embed.title = embed.title + old.name
+                field = {
+                    name: 'Card Renamed',
+                    value: `\`${this.action.data.card.name}\``,
+                    inline: false
+                }
             } else if (old.desc != null) {
                 if (!old.desc) {
-                    embed.title = embed.title + 'Added Description to Card "' + this.action.data.card.name + '"'
-                    embed.description = Trello._formatLargeString(MarkdownUtil._formatMarkdown(this.action.data.card.desc, embed))
-                } else if (!this.action.data.card.desc) {
-                    embed.title = embed.title + 'Removed Description from Card "' + this.action.data.card.name + '"'
+                    embed.title = embed.title + this.action.data.card.name
                     field = {
-                        name: 'Old Value',
-                        value: Trello._formatLargeString(MarkdownUtil._formatMarkdown(old.desc, embed)),
+                        name: 'Added Description',
+                        value: Trello._formatLargeString(MarkdownUtil._formatMarkdown(this.action.data.card.desc, embed)),
+                        inline: false
+                    }
+                } else if (!this.action.data.card.desc) {
+                    embed.title = embed.title + this.action.data.card.name
+                    field = {
+                        name: 'Removed Description',
+                        value: `~~${Trello._formatLargeString(MarkdownUtil._formatMarkdown(old.desc, embed))}~~`,
                         inline: false
                     }
                 } else {
-                    embed.title = embed.title + 'Updated Description of Card "' + this.action.data.card.name + '"'
-                    embed.description = Trello._formatLargeString(MarkdownUtil._formatMarkdown(this.action.data.card.desc, embed))
+                    embed.title = embed.title + this.action.data.card.name
+                    field = {
+                        name: 'Updated Description',
+                        value: Trello._formatLargeString(MarkdownUtil._formatMarkdown(this.action.data.card.desc, embed)),
+                        inline: false
+                    }
                 }
             } else if (old.due != null || this.action.data.card.due != null) {
                 if (old.due == null) {
                     const d = new Date(this.action.data.card.due)
-                    embed.title = embed.title + 'Added Due Date to "' + this.action.data.card.name + '" \uD83D\uDDD3'
-                    embed.description = '`' + d.toUTCString() + '`'
+                    embed.title = embed.title + this.action.data.card.name
+                    field = {
+                        name: 'Added Due Date',
+                        value: `\uD83D\uDDD3 ${d.toUTCString()}`,
+                        inline: false
+                    }
                 } else if (this.action.data.card.due == null) {
                     const d = new Date(old.due)
-                    embed.title = embed.title + 'Removed Due Date from "' + this.action.data.card.name + '" \uD83D\uDDD3'
+                    embed.title = embed.title + this.action.data.card.name
                     field = {
-                        name: 'Old Value',
-                        value: '`' + d.toUTCString() + '`',
+                        name: 'Removed Due Date',
+                        value: `\uD83D\uDDD3 ${d.toUTCString()}`,
                         inline: false
                     }
                 } else {
                     const d = new Date(this.action.data.card.due)
-                    const oldD = new Date(old.due)
-                    embed.title = embed.title + 'Changed Due Date of "' + this.action.data.card.name + '" \uD83D\uDDD3'
-                    embed.description = '`' + oldD.toUTCString() + '` \uD83E\uDC6A `' + d.toUTCString() + '`'
+                    embed.title = embed.title + this.action.data.card.name
+                    field = {
+                        name: 'Updated Due Date',
+                        value: `\uD83D\uDDD3 ${d.toUTCString()}`,
+                        inline: false
+                    }
                 }
             } else if (old.closed != null) {
                 if (this.action.data.card.closed) {
-                    embed.title = embed.title + 'Archived Card "' + this.action.data.card.name + '"'
+                    embed.title = embed.title + `Archived "${this.action.data.card.name}"`
                 } else {
-                    embed.title = embed.title + 'Unarchived Card "' + this.action.data.card.name + '"'
+                    embed.title = embed.title + `Unarchived "${this.action.data.card.name}"`
                 }
             } else if (old.idList != null) {
-                embed.title = embed.title + 'Moved Card "' + this.action.data.card.name + '" to Another List'
-                embed.description = '`' + this.action.data.listBefore.name + '` \uD83E\uDC6A `' + this.action.data.listAfter.name + '`'
+                embed.title = embed.title + this.action.data.card.name
+                field = {
+                    name: 'Moved to Another List',
+                    value: `\`${this.action.data.listBefore.name} \uD83E\uDC6A ${this.action.data.listAfter.name}\``,
+                    inline: false
+                }
             } else if (old.pos != null) {
-                embed.title = embed.title + 'Updated Position of Card "' + this.action.data.card.name + '"'
+                shouldFire = false
+                // embed.title = embed.title + 'Updated Position of Card "' + this.action.data.card.name + '"'
             }
         }
         if (field != null) {
             embed.fields = [field]
         }
-        this.addEmbed(embed)
+        if (shouldFire) {
+            this.addEmbed(embed)
+        }
     }
 
     public async updateCheckItem() {
@@ -857,21 +884,22 @@ class Trello extends BaseProvider {
         return Trello.baseLink + id
     }
 
-    private _formatAttachment(attachment, embed) {
+    private _formatAttachment(attachment, embed, added) {
         if (attachment.previewUrl != null) {
-            embed.image = {url: attachment.previewUrl}
+            embed.image = {
+                url: attachment.previewUrl
+            }
         }
         if (attachment.url != null) {
-            if (attachment.name !== attachment.url) {
-                embed.fields = [{
-                    name: attachment.name,
-                    value: attachment.url
-                }]
-            } else {
-                embed.description = attachment.url
-            }
+            embed.fields = [{
+                name: `${added ? 'New' : 'Removed'} Attachment`,
+                value: `[${attachment.name !== attachment.url ? attachment.name : 'Open Original'}](${attachment.url})`
+            }]
         } else {
-            embed.description = attachment.name
+            embed.fields = [{
+                name: `${added ? 'New' : 'Removed'} New Attachment`,
+                value: attachment.name
+            }]
         }
     }
 
