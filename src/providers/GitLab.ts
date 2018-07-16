@@ -130,7 +130,9 @@ class GitLab extends BaseProvider {
             close: 'Closed',
             reopen: 'Reopened',
             update: 'Updated',
-            merge: 'Merged'
+            merge: 'Merged',
+            approved: "Approved",
+            unapproved: "Unapproved"
         }
         const field = new EmbedField()
         field.name = this.body.object_attributes.title
