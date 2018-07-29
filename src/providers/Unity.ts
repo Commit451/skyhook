@@ -19,8 +19,10 @@ class Unity extends BaseProvider {
         const projectName = this.body.projectName
         const projectVersion = this.body.buildNumber
         let share = null
-        if (this.body.links != null) {
-            share = this.body.links.share_url
+        try {
+            share = this.body.links.artifacts[0].files.href
+        } catch (err) {
+            // Artifact not present
         }
         const type = this.body.buildStatus
         let content = 'No download available.'
