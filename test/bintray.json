@@ -1,0 +1,6 @@
+{
+    "package": "TestPackage",
+    "version": "1.2.1",
+    "released": "2017-08-02T20:52:51Z",
+    "release_notes": "**Release 1.2.1**\n* Fixed fatal crashes.\n* Internal optimizations."
+}

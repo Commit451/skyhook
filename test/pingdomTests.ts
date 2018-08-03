@@ -40,6 +40,6 @@ const json = {
 
 describe('/POST pingdom', () => {
     it('check', async () => {
-        Tester.test(new Pingdom(), json, null)
+        await Tester.test(new Pingdom(), 'pingdom.json', null)
     })
 })
