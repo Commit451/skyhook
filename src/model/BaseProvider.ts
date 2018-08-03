@@ -45,7 +45,7 @@ class BaseProvider {
         return this.getName().toLowerCase()
     }
 
-    public async parse(body: any, headers: any): Promise<DiscordPayload> {
+    public async parse(body: any, headers: any = null): Promise<DiscordPayload> {
         this.body = body
         this.headers = headers
         let type: string = 'parseData'

@@ -1,6 +1,9 @@
 import moment from 'moment'
 import winston from 'winston'
 
+/**
+ * Helps with logging things. Basically a Winston helper
+ */
 class LoggerUtil {
 
     public static init() {

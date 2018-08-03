@@ -5,6 +5,7 @@ import bodyParser from 'body-parser'
 import express from 'express'
 import { BaseProvider } from './model/BaseProvider'
 import { DiscordPayload } from './model/DiscordPayload'
+import { ErrorUtil } from './util/ErrorUtil'
 import { LoggerUtil } from './util/LoggerUtil'
 
 import { AppVeyor } from './providers/Appveyor'
@@ -22,6 +23,7 @@ import { Travis } from './providers/Travis'
 import { Trello } from './providers/Trello'
 import { Unity } from './providers/Unity'
 import { VSTS } from './providers/VSTS'
+
 
 LoggerUtil.init()
 
@@ -96,14 +98,12 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
     const webhookID = req.params.webhookID
     const webhookSecret = req.params.webhookSecret
     const providerName = req.params.from
-    const test = req.get('test')
     if (!webhookID || !webhookSecret || !providerName) {
         res.sendStatus(400)
         return
     }
     const discordEndpoint = 'https://discordapp.com/api/webhooks/' + webhookID + '/' + webhookSecret
 
-    // https://discordapp.com/developers/docs/resources/webhook#execute-webhook
     let discordPayload: DiscordPayload = null
     const error = false
 
@@ -117,9 +117,8 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
             discordPayload = await instance.parse(req.body, headersObject)
         } catch (error) {
             res.sendStatus(500)
-            // Note sure of a better way to log errors in winston.
             logger.error('Error during parse: ' + error.stack)
-            // console.log('Error during parse:', error)
+            discordPayload = ErrorUtil.createErrorPayload(providerName, error)
         }
     } else {
         logger.error(`Unknown provider ${providerName}`)
@@ -128,23 +127,16 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
 
     if (discordPayload != null) {
         const jsonString = JSON.stringify(discordPayload)
-
-        if (test) {
-            res.setHeader('Content-Type', 'application/json')
-            res.send(jsonString)
-        } else {
-            axios({
-                data: jsonString,
-                method: 'post',
-                url: discordEndpoint
-            }).then(() => {
-                res.sendStatus(200)
-            }).catch((err: any) => {
-                logger.error(error)
-                res.sendStatus(400)
-            })
-
-        }
+        axios({
+            data: jsonString,
+            method: 'post',
+            url: discordEndpoint
+        }).then(() => {
+            res.sendStatus(200)
+        }).catch((err: any) => {
+            logger.error(error)
+            res.sendStatus(400)
+        })
     }
 })
 
@@ -152,12 +144,18 @@ app.use((req, res, next) => {
     res.status(404).send('Not Found')
 })
 
-function normalizePort(val) {
-    const normalizedPort = parseInt(val, 10)
+const port = normalizePort(process.env.PORT || '8080')
+
+const server = app.listen(port, () => {
+    logger.debug(`Your app is listening on port ${port}`)
+})
+
+function normalizePort(givenPort: string) {
+    const normalizedPort = parseInt(givenPort, 10)
 
     if (isNaN(normalizedPort)) {
         // named pipe
-        return val
+        return givenPort
     }
 
     if (normalizedPort >= 0) {
@@ -167,11 +165,5 @@ function normalizePort(val) {
 
     return false
 }
-
-const port = normalizePort(process.env.PORT || 8080)
-
-const server = app.listen(port, () => {
-    logger.debug(`Your app is listening on port ${port}`)
-})
 
 module.exports = server

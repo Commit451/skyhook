@@ -8,7 +8,8 @@
     "build": "npm run clean && npm run tsc",
     "start": "npm run build && node dist/index.js",
     "test": "mocha -r ts-node/register test/*.ts",
-    "lint": "tslint --project ."
+    "lint": "tslint --project .",
+    "visualTest": "npm run build && node dist/test.js"
   },
   "devDependencies": {
     "@types/chai": "^4.1.4",
