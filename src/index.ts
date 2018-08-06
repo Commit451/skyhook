@@ -24,7 +24,6 @@ import { Trello } from './providers/Trello'
 import { Unity } from './providers/Unity'
 import { VSTS } from './providers/VSTS'
 
-
 LoggerUtil.init()
 
 const logger = LoggerUtil.logger()
@@ -87,7 +86,8 @@ app.get('/providers', (req, res) => {
 app.get('/api/webhooks/:webhookID/:webhookSecret/:from', (req, res) => {
     // Return 200 if the provider is valid to show this url is ready.
     const provider: any = req.params.from
-    if (provider == null || providers[provider] == null) {
+    if (provider == null || providersMap.get(provider) == null) {
+        logger.error(`Unknown provider: ${provider}`)
         res.sendStatus(400)
     } else {
         res.sendStatus(200)
