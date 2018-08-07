@@ -17,6 +17,7 @@ import { DockerHub } from './provider/DockerHub'
 import { GitLab } from './provider/GitLab'
 import { Heroku } from './provider/Heroku'
 import { Jenkins } from './provider/Jenkins'
+import { NewRelic } from './provider/NewRelic'
 import { Patreon } from './provider/Patreon'
 import { Pingdom } from './provider/Pingdom'
 import { Travis } from './provider/Travis'
@@ -44,6 +45,7 @@ const providers: any[] = [
     GitLab,
     Heroku,
     Jenkins,
+    NewRelic,
     Patreon,
     Pingdom,
     Travis,
