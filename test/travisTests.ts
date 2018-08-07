@@ -1,4 +1,4 @@
-import { Travis } from '../src/providers/Travis'
+import { Travis } from '../src/provider/Travis'
 import { Tester } from './Tester'
 
 describe('/POST travis', () => {

@@ -1,4 +1,4 @@
-import { DockerHub } from '../src/providers/DockerHub'
+import { DockerHub } from '../src/provider/DockerHub'
 import { Tester } from './Tester'
 
 describe('/POST dockerhub', () => {

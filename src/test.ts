@@ -5,9 +5,9 @@ require('dotenv').config()
 
 import axios from 'axios'
 import * as fs from 'fs'
-import { BaseProvider } from './model/BaseProvider'
 import { DiscordPayload } from './model/DiscordPayload'
-import { AppVeyor } from './providers/Appveyor'
+import { AppVeyor } from './provider/Appveyor'
+import { BaseProvider } from './provider/BaseProvider'
 import { ErrorUtil } from './util/ErrorUtil'
 
 testPayloadVisual(new AppVeyor(), 'appveyor.json')

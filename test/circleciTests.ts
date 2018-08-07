@@ -1,4 +1,4 @@
-import { CircleCi } from '../src/providers/CircleCi'
+import { CircleCi } from '../src/provider/CircleCi'
 import { Tester } from './Tester'
 
 describe('/POST circleci', () => {

@@ -1,8 +1,8 @@
 import axios from 'axios'
-import { BaseProvider } from '../model/BaseProvider'
 import { Embed } from '../model/Embed'
 import { EmbedAuthor } from '../model/EmbedAuthor'
 import { EmbedImage } from '../model/EmbedImage'
+import { BaseProvider } from '../provider/BaseProvider'
 import { MarkdownUtil } from '../util/MarkdownUtil'
 
 const urlMod = require('url')

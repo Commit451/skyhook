@@ -1,4 +1,4 @@
-import { Bintray } from '../src/providers/Bintray'
+import { Bintray } from '../src/provider/Bintray'
 import { Tester } from './Tester'
 
 /*

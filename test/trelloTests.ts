@@ -1,4 +1,4 @@
-import { Trello } from '../src/providers/Trello'
+import { Trello } from '../src/provider/Trello'
 import { Tester } from './Tester'
 
 describe('/POST trello', () => {

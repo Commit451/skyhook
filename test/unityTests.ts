@@ -1,4 +1,4 @@
-import { Unity } from '../src/providers/Unity'
+import { Unity } from '../src/provider/Unity'
 import { Tester } from './Tester'
 
 describe('/POST unity', () => {

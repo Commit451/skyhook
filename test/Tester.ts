@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 import * as fs from 'fs'
-import { BaseProvider } from '../src/model/BaseProvider'
+import { BaseProvider } from '../src/provider/BaseProvider'
 import { LoggerUtil } from '../src/util/LoggerUtil'
 
 /**

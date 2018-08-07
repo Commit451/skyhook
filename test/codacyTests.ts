@@ -1,4 +1,4 @@
-import { Codacy } from '../src/providers/Codacy'
+import { Codacy } from '../src/provider/Codacy'
 import { Tester } from './Tester'
 
 describe('/POST codacy', () => {

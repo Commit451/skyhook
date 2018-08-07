@@ -1,4 +1,4 @@
-import { GitLab } from '../src/providers/GitLab'
+import { GitLab } from '../src/provider/GitLab'
 import { Tester } from './Tester'
 
 describe('/POST gitlab', () => {

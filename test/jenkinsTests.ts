@@ -1,4 +1,4 @@
-import { Jenkins } from '../src/providers/Jenkins'
+import { Jenkins } from '../src/provider/Jenkins'
 import { Tester } from './Tester'
 
 describe('/POST jenkins', () => {

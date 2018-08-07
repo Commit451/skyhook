@@ -1,4 +1,4 @@
-import { BitBucket } from '../src/providers/Bitbucket'
+import { BitBucket } from '../src/provider/Bitbucket'
 import { Tester } from './Tester'
 
 describe('/POST bitbucket', () => {

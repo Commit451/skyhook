@@ -1,4 +1,4 @@
-import { VSTS } from '../src/providers/VSTS'
+import { VSTS } from '../src/provider/VSTS'
 import { Tester } from './Tester'
 
 describe('/POST vsts', () => {

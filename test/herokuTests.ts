@@ -1,4 +1,4 @@
-import { Heroku } from '../src/providers/Heroku'
+import { Heroku } from '../src/provider/Heroku'
 import { Tester } from './Tester'
 
 describe('/POST heroku', () => {

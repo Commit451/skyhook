@@ -1,4 +1,4 @@
-import { Patreon } from '../src/providers/Patreon'
+import { Patreon } from '../src/provider/Patreon'
 import { Tester } from './Tester'
 
 describe('/POST patreon', () => {

@@ -1,7 +1,7 @@
-import { BaseProvider } from '../model/BaseProvider'
 import { Embed } from '../model/Embed'
 import { EmbedAuthor } from '../model/EmbedAuthor'
 import { EmbedField } from '../model/EmbedField'
+import { BaseProvider } from '../provider/BaseProvider'
 import { MarkdownUtil } from '../util/MarkdownUtil'
 
 /**

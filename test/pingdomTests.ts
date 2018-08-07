@@ -1,4 +1,4 @@
-import { Pingdom } from '../src/providers/Pingdom'
+import { Pingdom } from '../src/provider/Pingdom'
 import { Tester } from './Tester'
 
 const json = {

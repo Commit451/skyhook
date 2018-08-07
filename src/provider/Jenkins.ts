@@ -1,5 +1,5 @@
-import { BaseProvider } from '../model/BaseProvider'
 import { Embed } from '../model/Embed'
+import { BaseProvider } from '../provider/BaseProvider'
 
 /**
  * https://plugins.jenkins.io/notification

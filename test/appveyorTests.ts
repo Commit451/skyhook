@@ -1,4 +1,4 @@
-import { AppVeyor } from '../src/providers/Appveyor'
+import { AppVeyor } from '../src/provider/Appveyor'
 import { Tester } from './Tester'
 
 describe('/POST appveyor', () => {

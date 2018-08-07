@@ -1,6 +1,6 @@
-import { BaseProvider } from '../model/BaseProvider'
 import { Embed } from '../model/Embed'
 import { EmbedAuthor } from '../model/EmbedAuthor'
+import { BaseProvider } from '../provider/BaseProvider'
 
 /**
  * https://docs.travis-ci.com/user/notifications/#Configuring-webhook-notifications

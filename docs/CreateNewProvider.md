@@ -6,7 +6,7 @@
 
 ## Example for providers without multiple methods
 ```ts
-import { BaseProvider } from '../model/BaseProvider'
+import { BaseProvider } from '../provider/BaseProvider'
 
 class NewProvider extends BaseProvider {
     static getName() {
@@ -24,7 +24,7 @@ export { NewProvider }
 
 ## Example for providers with multiple methods
 ```js
-import { BaseProvider } from '../model/BaseProvider'
+import { BaseProvider } from '../provider/BaseProvider'
 
 class NewProvider extends BaseProvider {
     constructor() {
