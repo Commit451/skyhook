@@ -20,11 +20,10 @@ class Jira extends BaseProvider {
         this.setEmbedColor(0x1e45a8)
 
         var issue = this.body.issue;
-        if (issue.assignee === null) {
-            issue.assignee = {displayName: "nobody"};
+        if (issue.fields.assignee === null) {
+            issue.fields.assignee = {displayName: "nobody"};
         }
     
-        console.log(this.body);
         var user = this.body.user;
         var action = this.body.issue_event_type_name.split('_')[1];
         var matches = issue.self.match(/^(https?:\/\/[^\/?#]+)(?:[\/?#]|$)/i);
@@ -32,7 +31,7 @@ class Jira extends BaseProvider {
     
         const embed = new Embed()
         embed.title = `${issue.key} - ${issue.fields.summary}`
-        embed.description = `${user.displayName} ${action} the issue ${embed.title} (${issue.assignee.displayName})`
+        embed.description = `${user.displayName} ${action} the issue ${embed.title} (${issue.fields.assignee.displayName})`
         embed.url = `${domain}/${issue.key}`;
         this.addEmbed(embed)
     }
