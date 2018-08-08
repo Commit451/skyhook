@@ -24,6 +24,7 @@ class Jira extends BaseProvider {
             issue.assignee = {displayName: "nobody"};
         }
     
+        console.log(this.body);
         var user = this.body.user;
         var action = this.body.issue_event_type_name.split('_')[1];
         var matches = issue.self.match(/^(https?:\/\/[^\/?#]+)(?:[\/?#]|$)/i);
