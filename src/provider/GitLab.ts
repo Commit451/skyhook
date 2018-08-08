@@ -3,6 +3,13 @@ import { EmbedAuthor } from '../model/EmbedAuthor'
 import { EmbedField } from '../model/EmbedField'
 import { BaseProvider } from '../provider/BaseProvider'
 
+class Project {
+    public name?: string
+    public url?: string
+    public branch?: string
+    public commits?: any
+}
+
 /**
  * https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/user/project/integrations/webhooks.md
  */
@@ -36,12 +43,7 @@ class GitLab extends BaseProvider {
         branch.shift()
         branch.shift()
 
-        const project = {
-            name: this.body.project.name,
-            url: this.body.project.web_url,
-            branch: branch.join('/'),
-            commits: this.body.commits
-        }
+        const project = this.projectFromBody()
 
         const fields: EmbedField[] = []
         project.commits.forEach((commit: any) => {
@@ -66,11 +68,7 @@ class GitLab extends BaseProvider {
         tmpTag.shift()
         const tag = tmpTag.join('/')
 
-        const project = {
-            name: this.body.project.name,
-            url: this.body.project.web_url,
-            commits: this.body.commits
-        }
+        const project = this.projectFromBody()
 
         this.embed.url = project.url + '/tags/' + tag
         this.embed.author = this.authorFromBodyPush()
@@ -97,7 +95,7 @@ class GitLab extends BaseProvider {
         const field = new EmbedField()
         field.name = this.body.object_attributes.title
         field.value = (this.body.object_attributes.description != null && this.body.object_attributes.description.length > 1024) ? this.body.object_attributes.description.substring(0, 1023) + '\u2026' : this.body.object_attributes.description
-        this.embed.fields = [ field ]
+        this.embed.fields = [field]
         this.addEmbed(this.embed)
     }
 
@@ -131,8 +129,8 @@ class GitLab extends BaseProvider {
             reopen: 'Reopened',
             update: 'Updated',
             merge: 'Merged',
-            approved: "Approved",
-            unapproved: "Unapproved"
+            approved: 'Approved',
+            unapproved: 'Unapproved'
         }
         const field = new EmbedField()
         field.name = this.body.object_attributes.title
@@ -140,7 +138,7 @@ class GitLab extends BaseProvider {
         this.embed.title = actions[this.body.object_attributes.action] + ' merge request #' + this.body.object_attributes.iid + ' on ' + this.body.project.name
         this.embed.url = this.body.object_attributes.url
         this.embed.author = this.authorFromBody()
-        this.embed.fields = [ field ]
+        this.embed.fields = [field]
         this.addEmbed(this.embed)
     }
 
@@ -186,6 +184,22 @@ class GitLab extends BaseProvider {
         author.name = this.body.user_name
         author.iconUrl = GitLab._formatAvatarURL(this.body.user_avatar)
         return author
+    }
+
+    private projectFromBody(): Project {
+        const branch = this.body.ref.split('/')
+        branch.shift()
+        branch.shift()
+
+        const project = new Project()
+        if (this.body.project !== null) {
+            project.name = this.body.project.name
+            project.url = this.body.project.web_url
+            project.branch = branch.join('/')
+            project.commits = this.body.commits
+        }
+
+        return project
     }
 }
 

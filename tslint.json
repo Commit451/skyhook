@@ -38,6 +38,8 @@
     ],
     "no-var-requires": false,
     "object-literal-sort-keys": false,
-    "no-implicit-dependencies": [true, "dev"]
+    "no-implicit-dependencies": [true, "dev"],
+    "interface-name": [true, "never-prefix"],
+    "max-classes-per-file": [false]
   }
 }
