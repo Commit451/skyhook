@@ -32,7 +32,7 @@ class Jira extends BaseProvider {
         const embed = new Embed()
         embed.title = `${issue.key} - ${issue.fields.summary}`
         embed.description = `${user.displayName} ${action} the issue ${embed.title} (${issue.fields.assignee.displayName})`
-        embed.url = `${domain}/${issue.key}`;
+        embed.url = `${domain}/browse/${issue.key}`;
         this.addEmbed(embed)
     }
 }
