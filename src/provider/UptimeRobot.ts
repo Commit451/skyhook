@@ -9,7 +9,11 @@ import { BaseProvider } from '../provider/BaseProvider'
 class UptimeRobot extends BaseProvider {
 
     public getName() {
-        return 'UptimeRobot'
+        return 'Uptime Robot'
+    }
+
+    public getPath() {
+        return 'uptimerobot'
     }
 
     public async parseData() {
