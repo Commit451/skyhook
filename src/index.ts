@@ -23,6 +23,7 @@ import { Pingdom } from './provider/Pingdom'
 import { Travis } from './provider/Travis'
 import { Trello } from './provider/Trello'
 import { Unity } from './provider/Unity'
+import { UptimeRobot } from './provider/UptimeRobot'
 import { VSTS } from './provider/VSTS'
 
 LoggerUtil.init()
@@ -51,6 +52,7 @@ const providers: any[] = [
     Travis,
     Trello,
     Unity,
+    UptimeRobot,
     VSTS
 ]
 
@@ -89,8 +91,9 @@ app.get('/api/webhooks/:webhookID/:webhookSecret/:from', (req, res) => {
     // Return 200 if the provider is valid to show this url is ready.
     const provider: any = req.params.from
     if (provider == null || providersMap.get(provider) == null) {
-        logger.error(`Unknown provider: ${provider}`)
-        res.sendStatus(400)
+        const errorMessage = `Unknown provider ${provider}`
+        logger.error(errorMessage)
+        res.status(400).send(errorMessage)
     } else {
         res.sendStatus(200)
     }
@@ -104,7 +107,7 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
         res.sendStatus(400)
         return
     }
-    const discordEndpoint = 'https://discordapp.com/api/webhooks/' + webhookID + '/' + webhookSecret
+    const discordEndpoint = `https://discordapp.com/api/webhooks/${webhookID}/${webhookSecret}`
 
     let discordPayload: DiscordPayload = null
     const error = false
@@ -113,18 +116,22 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
     if (Provider != null) {
         const instance: BaseProvider = new Provider()
         try {
+            const queryString = JSON.stringify(req.query)
+            const queryObject = JSON.parse(queryString)
+            console.log(queryObject)
             // seems dumb, but this is the best way I know how to format these headers in a way we can use them
             const headersString = JSON.stringify(req.headers)
             const headersObject = JSON.parse(headersString)
-            discordPayload = await instance.parse(req.body, headersObject)
+            discordPayload = await instance.parse(req.body, headersObject, queryObject)
         } catch (error) {
             res.sendStatus(500)
             logger.error('Error during parse: ' + error.stack)
             discordPayload = ErrorUtil.createErrorPayload(providerName, error)
         }
     } else {
-        logger.error(`Unknown provider ${providerName}`)
-        res.sendStatus(400)
+        const errorMessage = `Unknown provider ${providerName}`
+        logger.error(errorMessage)
+        res.status(400).send(errorMessage)
     }
 
     if (discordPayload != null) {

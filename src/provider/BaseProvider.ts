@@ -23,6 +23,7 @@ class BaseProvider {
     protected logger: winston.Logger
     protected headers: any
     protected body: any
+    protected query: any
     // all embeds will use this color
     protected embedColor: number
 
@@ -45,9 +46,10 @@ class BaseProvider {
         return this.getName().toLowerCase()
     }
 
-    public async parse(body: any, headers: any = null): Promise<DiscordPayload> {
+    public async parse(body: any, headers: any = null, query: any = null): Promise<DiscordPayload> {
         this.body = body
         this.headers = headers
+        this.query = query
         let type: string = 'parseData'
         if (typeof this['getType'] !== 'undefined') {
             type = await this['getType']()

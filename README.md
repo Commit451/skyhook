@@ -28,11 +28,13 @@ https://skyhook.glitch.me/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/pr
 - [GitLab](https://gitlab.com/help/user/project/integrations/webhooks) - `/gitlab`
 - [Heroku](https://devcenter.heroku.com/articles/deploy-hooks#http-post-hook) - `/heroku`
 - [Jenkins](https://plugins.jenkins.io/notification) - `/jenkins` (requires the [notification plugin](https://wiki.jenkins.io/display/JENKINS/Notification+Plugin))
+- [NewRelic](https://docs.newrelic.com/docs/alerts/new-relic-alerts/managing-notification-channels/customize-your-webhook-payload) - `/newrelic`
 - [Patreon](https://www.patreon.com/platform/documentation/webhooks) - `/patreon`
 - [Pingdom](https://www.pingdom.com/resources/webhooks) - `/pingdom`
 - [Travis](https://docs.travis-ci.com/user/notifications/#Webhooks-Delivery-Format) - `/travis`
 - [Trello](https://developers.trello.com/apis/webhooks) - `/trello`
 - [Unity Cloud](https://build-api.cloud.unity3d.com/docs/1.0.0/index.html#operation-webhooks-intro) - `/unity`
+- [Uptime Robot](https://blog.uptimerobot.com/web-hook-alert-contacts-new-feature/) - `/uptimerobot`
 - [VSTS](https://docs.microsoft.com/en-us/vsts/service-hooks/events#) - `/vsts`
 
 If you want support for a new provider, just create a pull request and add it!  
