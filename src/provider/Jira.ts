@@ -1,6 +1,9 @@
 import { Embed } from '../model/Embed'
 import { BaseProvider } from '../provider/BaseProvider'
 
+/**
+ * https://developer.atlassian.com/server/jira/platform/webhooks/
+ */
 class Jira extends BaseProvider {
 
     private static capitalize(str: string) {
@@ -20,13 +23,13 @@ class Jira extends BaseProvider {
         this.setEmbedColor(0x1e45a8)
 
         const issue = this.body.issue
-        if (issue.fields.assignee === null) {
+        if (issue.fields.assignee == null) {
             issue.fields.assignee = {displayName: 'nobody'}
         }
 
         // extract variable from Jira
         const user = this.body.user
-        const action = this.body.issue_event_type_name.split('_')[1]
+        const action = this.body.webhookEvent.split('_')[1]
         const matches = issue.self.match(/^(https?:\/\/[^\/?#]+)(?:[\/?#]|$)/i)
         const domain = matches && matches[1]
 
