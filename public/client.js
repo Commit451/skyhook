@@ -25,7 +25,7 @@ window.mdc.autoInit();
             const startSpacialPart = (discordHookUrl.indexOf(":") + 3);// + :// 3 chars:)
 
             discordHookUrl = discordHookUrl.replace(discordHookUrl.substring(startSpacialPart, endSpacialPart), "");
-            discordHookUrl = discordHookUrl.replace("discordapp.com", "hook.iapp.co.th");
+            discordHookUrl = discordHookUrl.replace("discordapp.com", "skyhook.glitch.me");
 
             const provider = $('input[name=ex2]:checked').val();
             discordHookUrl = discordHookUrl + "/" + provider;
