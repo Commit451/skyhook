@@ -1,3 +1,4 @@
+import { expect } from 'chai'
 import { Bintray } from '../src/provider/Bintray'
 import { Tester } from './Tester'
 
@@ -6,6 +7,8 @@ import { Tester } from './Tester'
  */
 describe('/POST bintray', () => {
     it('release', async () => {
-        await Tester.test(new Bintray(), 'bintray.json', null)
+        const res = await Tester.test(new Bintray(), 'bintray.json', null)
+        expect(res).to.not.be.an('error')
+        expect(res).to.not.be.a('DiscordPayload')
     })
 })

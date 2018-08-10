@@ -1,3 +1,4 @@
+import { expect } from 'chai'
 import { UptimeRobot } from '../src/provider/UptimeRobot'
 import { Tester } from './Tester'
 
@@ -8,6 +9,8 @@ describe('/POST uptimerobot', () => {
             monitorURL: 'http://www.example.com',
             alertDetails: 'Connection timeout'
         }
-        Tester.test(new UptimeRobot(), null, null, query)
+        const res = await Tester.test(new UptimeRobot(), null, null, query)
+        expect(res).to.not.be.an('error')
+        expect(res).to.not.be.a('DiscordPayload')
     })
 })
