@@ -304,7 +304,7 @@ class BitBucket extends BaseProvider {
     private extractAuthor(): EmbedAuthor {
         const author = new EmbedAuthor()
         author.name = this.body.actor.display_name
-        if (author.name === 'Anonymous' && this.body.actor.links === undefined) {
+        if (this.body.actor.links === undefined) {
             author.iconUrl = 'http://i0.wp.com/avatar-cdn.atlassian.com/default/96.png'
             author.url = ''
         } else {
