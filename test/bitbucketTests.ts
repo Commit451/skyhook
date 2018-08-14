@@ -7,7 +7,16 @@ describe('/POST bitbucket', () => {
         const headers = {
             'x-event-key': 'repo:push'
         }
-        const res = Tester.test(new BitBucket(), 'bitbucket.json', headers)
+        const res = await Tester.test(new BitBucket(), 'bitbucket.json', headers)
+        expect(res).to.not.be.an('error')
+        expect(res).to.not.be.a('DiscordPayload')
+    })
+
+    it('repo:push should work with anonymous users', async () => {
+        const headers = {
+            'x-event-key': 'repo:push'
+        }
+        const res = await Tester.test(new BitBucket(), 'bitbucket-anonymous.json', headers)
         expect(res).to.not.be.an('error')
         expect(res).to.not.be.a('DiscordPayload')
     })
