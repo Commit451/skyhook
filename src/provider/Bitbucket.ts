@@ -51,28 +51,32 @@ class BitBucket extends BaseProvider {
             branch: null,
             commits: null
         }
-        for (let i = 0; (i < this.body.push.changes.length && i < 4); i++) {
-            const change = this.body.push.changes[i]
-            project.branch = (change.old != null) ? change.old.name : change.new.name
-            project.commits = change.commits
+        if (this.body.push !== null && this.body.push.changes !== null) {
+            for (let i = 0; (i < this.body.push.changes.length && i < 4); i++) {
+                const change = this.body.push.changes[i]
+                project.branch = (change.old != null) ? change.old.name : change.new.name
+                project.commits = change.commits
 
-            const fields: EmbedField[] = []
-            for (let j = project.commits.length - 1; j >= 0; j--) {
-                const commit = project.commits[j]
-                const message = (commit.message.length > 256) ? commit.message.substring(0, 255) + '\u2026' : commit.message
-                const author = (typeof commit.author.user !== 'undefined') ? commit.author.user.display_name : 'Unknown'
-                const field = new EmbedField()
-                field.name = 'Commit from ' + author
-                field.value = '(' + '[`' + commit.hash.substring(0, 7) + '`](' + commit.links.html.href + ')' + ') ' + message.replace(/\n/g, ' ').replace(/\r/g, ' ')
-                fields.push(field)
+                const fields: EmbedField[] = []
+                if (project.commits !== null) {
+                    for (let j = project.commits.length - 1; j >= 0; j--) {
+                        const commit = project.commits[j]
+                        const message = (commit.message.length > 256) ? commit.message.substring(0, 255) + '\u2026' : commit.message
+                        const author = (typeof commit.author.user !== 'undefined') ? commit.author.user.display_name : 'Unknown'
+                        const field = new EmbedField()
+                        field.name = 'Commit from ' + author
+                        field.value = '(' + '[`' + commit.hash.substring(0, 7) + '`](' + commit.links.html.href + ')' + ') ' + message.replace(/\n/g, ' ').replace(/\r/g, ' ')
+                        fields.push(field)
+                    }
+                }
+
+                const embed = new Embed()
+                embed.title = '[' + project.name + ':' + project.branch + '] ' + project.commits.length + ' commit' + ((project.commits.length > 1) ? 's' : '')
+                embed.url = project.url
+                embed.author = this.extractAuthor()
+                embed.fields = fields
+                this.addEmbed(embed)
             }
-
-            const embed = new Embed()
-            embed.title = '[' + project.name + ':' + project.branch + '] ' + project.commits.length + ' commit' + ((project.commits.length > 1) ? 's' : '')
-            embed.url = project.url
-            embed.author = this.extractAuthor()
-            embed.fields = fields
-            this.addEmbed(embed)
         }
     }
 
