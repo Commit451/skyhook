@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { Embed } from '../model/Embed'
 import { EmbedAuthor } from '../model/EmbedAuthor'
 import { EmbedField } from '../model/EmbedField'
@@ -52,14 +51,14 @@ class BitBucket extends BaseProvider {
             branch: null,
             commits: null
         }
-        if (!_.isNil(this.body.push) && !_.isNil(this.body.push.changes)) {
+        if (this.body.push != null && this.body.push.changes != null) {
             for (let i = 0; (i < this.body.push.changes.length && i < 4); i++) {
                 const change = this.body.push.changes[i]
                 project.branch = (change.old != null) ? change.old.name : change.new.name
                 project.commits = change.commits
 
                 const fields: EmbedField[] = []
-                if (!_.isNil(project.commits)) {
+                if (project.commits != null) {
                     for (let j = project.commits.length - 1; j >= 0; j--) {
                         const commit = project.commits[j]
                         const message = (commit.message.length > 256) ? commit.message.substring(0, 255) + '\u2026' : commit.message
