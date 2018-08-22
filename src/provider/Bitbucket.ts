@@ -57,8 +57,11 @@ class BitBucket extends BaseProvider {
                 project.branch = (change.old != null) ? change.old.name : change.new.name
                 project.commits = change.commits
 
-                const fields: EmbedField[] = []
+                const embed = new Embed()
                 if (project.commits != null) {
+                    const fields: EmbedField[] = []
+                    embed.title = '[' + project.name + ':' + project.branch + '] ' + project.commits.length + ' commit' + ((project.commits.length > 1) ? 's' : '')
+                    embed.url = project.url
                     for (let j = project.commits.length - 1; j >= 0; j--) {
                         const commit = project.commits[j]
                         const message = (commit.message.length > 256) ? commit.message.substring(0, 255) + '\u2026' : commit.message
@@ -68,13 +71,15 @@ class BitBucket extends BaseProvider {
                         field.value = '(' + '[`' + commit.hash.substring(0, 7) + '`](' + commit.links.html.href + ')' + ') ' + message.replace(/\n/g, ' ').replace(/\r/g, ' ')
                         fields.push(field)
                     }
+                    embed.fields = fields
+                } else {
+                    if (change.new != null && change.new.type === 'tag') {
+                        embed.title = '[' + this.body.repository.full_name + '] New tag created: ' + change.new.name
+                        embed.url = change.new.links.html.href
+                    }
                 }
 
-                const embed = new Embed()
-                embed.title = '[' + project.name + ':' + project.branch + '] ' + project.commits.length + ' commit' + ((project.commits.length > 1) ? 's' : '')
-                embed.url = project.url
                 embed.author = this.extractAuthor()
-                embed.fields = fields
                 this.addEmbed(embed)
             }
         }

@@ -1,0 +1,176 @@
+{
+  "push": {
+    "changes": [
+      {
+        "forced": false,
+        "old": null,
+        "links": {
+          "commits": {
+            "href": "https://api.bitbucket.org/2.0/repositories/SECURE_TEAM_NAME/SECURE_REPO_NAME/commits?include=SECURE_HASH"
+          }
+        },
+        "truncated": false,
+        "created": true,
+        "closed": false,
+        "new": {
+          "name": "version/10.64.3",
+          "links": {
+            "commits": {
+              "href": "https://api.bitbucket.org/2.0/repositories/SECURE_TEAM_NAME/SECURE_REPO_NAME/commits/version/10.64.3"
+            },
+            "self": {
+              "href": "https://api.bitbucket.org/2.0/repositories/SECURE_TEAM_NAME/SECURE_REPO_NAME/refs/tags/version/10.64.3"
+            },
+            "html": {
+              "href": "https://bitbucket.org/SECURE_TEAM_NAME/SECURE_REPO_NAME/commits/tag/version/10.64.3"
+            }
+          },
+          "tagger": null,
+          "date": null,
+          "message": null,
+          "type": "tag",
+          "target": {
+            "hash": "SECURE_HASH",
+            "links": {
+              "self": {
+                "href": "https://api.bitbucket.org/2.0/repositories/SECURE_TEAM_NAME/SECURE_REPO_NAME/commit/SECURE_HASH"
+              },
+              "html": {
+                "href": "https://bitbucket.org/SECURE_TEAM_NAME/SECURE_REPO_NAME/commits/SECURE_HASH"
+              }
+            },
+            "author": {
+              "raw": "SECURE_USER_DATA <SECURE_EMAIL>",
+              "type": "author",
+              "user": {
+                "username": "SECURE_USER_NAME",
+                "display_name": "SECURE_USER_DATA",
+                "account_id": "5a8569af9d25142e30bd1805",
+                "links": {
+                  "self": {
+                    "href": "https://api.bitbucket.org/2.0/users/SECURE_USER_NAME"
+                  },
+                  "html": {
+                    "href": "https://bitbucket.org/SECURE_USER_NAME/"
+                  },
+                  "avatar": {
+                    "href": "https://bitbucket.org/account/SECURE_USER_NAME/avatar/"
+                  }
+                },
+                "type": "user",
+                "uuid": "{56744df4-d552-4b48-b207-b57f9215b2a3}"
+              }
+            },
+            "summary": {
+              "raw": "Merged in release/10.64.3 (pull request #138)\n\nUpdate version - Hotfix 10.64.3\n\nApproved-by: SECURE_USER_NAME <SECURE_EMAIL>\n",
+              "markup": "markdown",
+              "html": "<p>Merged in release/10.64.3 (pull request #138)</p>\n<p>Update version - Hotfix 10.64.3</p>\n<p>Approved-by: SECURE_USER_NAME <a href=\"&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#112;&#97;&#119;&#101;&#108;&#46;&#116;&#114;&#101;&#108;&#97;&#64;&#112;&#99;&#103;&#97;&#99;&#97;&#100;&#101;&#109;&#105;&#97;&#46;&#112;&#108;\">&#112;&#97;&#119;&#101;&#108;&#46;&#116;&#114;&#101;&#108;&#97;&#64;&#112;&#99;&#103;&#97;&#99;&#97;&#100;&#101;&#109;&#105;&#97;&#46;&#112;&#108;</a></p>",
+              "type": "rendered"
+            },
+            "parents": [
+              {
+                "type": "commit",
+                "hash": "99a1d08545d4dd63a846b0afb698784dcc470cb8",
+                "links": {
+                  "self": {
+                    "href": "https://api.bitbucket.org/2.0/repositories/SECURE_TEAM_NAME/SECURE_REPO_NAME/commit/99a1d08545d4dd63a846b0afb698784dcc470cb8"
+                  },
+                  "html": {
+                    "href": "https://bitbucket.org/SECURE_TEAM_NAME/SECURE_REPO_NAME/commits/99a1d08545d4dd63a846b0afb698784dcc470cb8"
+                  }
+                }
+              },
+              {
+                "type": "commit",
+                "hash": "b6fc53d01caabe5a74e8fc87f0666bec2a336ba0",
+                "links": {
+                  "self": {
+                    "href": "https://api.bitbucket.org/2.0/repositories/SECURE_TEAM_NAME/SECURE_REPO_NAME/commit/b6fc53d01caabe5a74e8fc87f0666bec2a336ba0"
+                  },
+                  "html": {
+                    "href": "https://bitbucket.org/SECURE_TEAM_NAME/SECURE_REPO_NAME/commits/b6fc53d01caabe5a74e8fc87f0666bec2a336ba0"
+                  }
+                }
+              }
+            ],
+            "date": "2018-08-22T13:22:38+00:00",
+            "message": "Merged in release/10.64.3 (pull request #138)\n\nUpdate version - Hotfix 10.64.3\n\nApproved-by: SECURE_USER_NAME <SECURE_EMAIL>\n",
+            "type": "commit"
+          }
+        }
+      }
+    ]
+  },
+  "repository": {
+    "scm": "git",
+    "website": "",
+    "name": "SECURE_REPO_NAME",
+    "links": {
+      "self": {
+        "href": "https://api.bitbucket.org/2.0/repositories/SECURE_TEAM_NAME/SECURE_REPO_NAME"
+      },
+      "html": {
+        "href": "https://bitbucket.org/SECURE_TEAM_NAME/SECURE_REPO_NAME"
+      },
+      "avatar": {
+        "href": "https://bytebucket.org/ravatar/%7B61675ebc-89c5-4b34-93a1-97117ba6a68b%7D?ts=1498977"
+      }
+    },
+    "project": {
+      "links": {
+        "self": {
+          "href": "https://api.bitbucket.org/2.0/teams/SECURE_TEAM_NAME/projects/SECURE_REPO_NAME"
+        },
+        "html": {
+          "href": "https://bitbucket.org/account/user/SECURE_TEAM_NAME/projects/SECURE_REPO_NAME"
+        },
+        "avatar": {
+          "href": "https://bitbucket.org/account/user/SECURE_TEAM_NAME/projects/SECURE_REPO_NAME/avatar/32"
+        }
+      },
+      "type": "project",
+      "uuid": "{69b595c5-4b81-409f-96af-ebfc96263ccc}",
+      "key": "SECURE_REPO_NAME",
+      "name": "SECURE_REPO_NAME"
+    },
+    "full_name": "SECURE_TEAM_NAME/SECURE_REPO_NAME",
+    "owner": {
+      "username": "SECURE_TEAM_NAME",
+      "type": "team",
+      "display_name": "SECURE_COMPANY_NAME",
+      "uuid": "{9d48c3e9-01c9-4034-b898-754089aa32f0}",
+      "links": {
+        "self": {
+          "href": "https://api.bitbucket.org/2.0/teams/SECURE_TEAM_NAME"
+        },
+        "html": {
+          "href": "https://bitbucket.org/SECURE_TEAM_NAME/"
+        },
+        "avatar": {
+          "href": "https://bitbucket.org/account/SECURE_TEAM_NAME/avatar/"
+        }
+      }
+    },
+    "type": "repository",
+    "is_private": true,
+    "uuid": "{61675ebc-89c5-4b34-93a1-97117ba6a68b}"
+  },
+  "actor": {
+    "username": "SECURE_USER_NAME",
+    "display_name": "SECURE_USER_DATA",
+    "account_id": "5a8569af9d25142e30bd1805",
+    "links": {
+      "self": {
+        "href": "https://api.bitbucket.org/2.0/users/SECURE_USER_NAME"
+      },
+      "html": {
+        "href": "https://bitbucket.org/SECURE_USER_NAME/"
+      },
+      "avatar": {
+        "href": "https://bitbucket.org/account/SECURE_USER_NAME/avatar/"
+      }
+    },
+    "type": "user",
+    "uuid": "{56744df4-d552-4b48-b207-b57f9215b2a3}"
+  }
+}
