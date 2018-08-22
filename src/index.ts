@@ -112,7 +112,6 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
     const discordEndpoint = `https://discordapp.com/api/webhooks/${webhookID}/${webhookSecret}`
 
     let discordPayload: DiscordPayload = null
-    const error = false
 
     const Provider = providersMap.get(providerName)
     if (Provider != null) {
@@ -145,8 +144,8 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
         }).then(() => {
             res.sendStatus(200)
         }).catch((err: any) => {
-            logger.error(error)
-            res.sendStatus(400)
+            logger.error(err)
+            res.status(502).send(err)
         })
     }
 })
