@@ -57,7 +57,7 @@ class BitBucket extends BaseProvider {
                     // Branch Created
                     embed.title = '[' + this.body.repository.full_name + '] New branch created: ' + change.new.name
                     embed.url = change.new.links.html.href
-                } else if (change.new != null && change.new.type === 'tag') {
+                } else if (change.old == null && change.new.type === 'tag') {
                     // Tag Created
                     embed.title = '[' + this.body.repository.full_name + '] New tag created: ' + change.new.name
                     embed.url = change.new.links.html.href
