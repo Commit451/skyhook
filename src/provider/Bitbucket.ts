@@ -45,25 +45,35 @@ class BitBucket extends BaseProvider {
     }
 
     public async repoPush() {
-        const project = {
-            name: this.body.repository.name,
-            url: this.baseLink + this.body.repository.full_name,
-            branch: null,
-            commits: null
-        }
         if (this.body.push != null && this.body.push.changes != null) {
             for (let i = 0; (i < this.body.push.changes.length && i < 4); i++) {
                 const change = this.body.push.changes[i]
-                project.branch = (change.old != null) ? change.old.name : change.new.name
-                project.commits = change.commits
-
                 const embed = new Embed()
-                if (project.commits != null) {
+
+                if (change.new == null && change.old.type === 'branch') {
+                    // Branch Deleted
+                    embed.title = '[' + this.body.repository.full_name + '] Branch deleted: ' + change.old.name
+                } else if (change.old == null && change.new.type === 'branch') {
+                    // Branch Created
+                    embed.title = '[' + this.body.repository.full_name + '] New branch created: ' + change.new.name
+                    embed.url = change.new.links.html.href
+                } else if (change.new != null && change.new.type === 'tag') {
+                    // Tag Created
+                    embed.title = '[' + this.body.repository.full_name + '] New tag created: ' + change.new.name
+                    embed.url = change.new.links.html.href
+                }  else if (change.new == null && change.old.type === 'tag') {
+                    // Tag Deleted
+                    embed.title = '[' + this.body.repository.full_name + '] Tag deleted: ' + change.old.name
+                } else {
+                    // Just some commits.
+                    const branch = change.new.name
+                    const commits = change.commits
+
                     const fields: EmbedField[] = []
-                    embed.title = '[' + project.name + ':' + project.branch + '] ' + project.commits.length + ' commit' + ((project.commits.length > 1) ? 's' : '')
-                    embed.url = project.url
-                    for (let j = project.commits.length - 1; j >= 0; j--) {
-                        const commit = project.commits[j]
+                    embed.title = '[' + this.body.repository.name + ':' + branch + '] ' + commits.length + ' commit' + (commits.length > 1 ? 's' : '')
+                    embed.url = change.links.html.href
+                    for (let j = commits.length - 1; j >= 0; j--) {
+                        const commit = commits[j]
                         const message = (commit.message.length > 256) ? commit.message.substring(0, 255) + '\u2026' : commit.message
                         const author = (typeof commit.author.user !== 'undefined') ? commit.author.user.display_name : 'Unknown'
                         const field = new EmbedField()
@@ -72,11 +82,6 @@ class BitBucket extends BaseProvider {
                         fields.push(field)
                     }
                     embed.fields = fields
-                } else {
-                    if (change.new != null && change.new.type === 'tag') {
-                        embed.title = '[' + this.body.repository.full_name + '] New tag created: ' + change.new.name
-                        embed.url = change.new.links.html.href
-                    }
                 }
 
                 embed.author = this.extractAuthor()
