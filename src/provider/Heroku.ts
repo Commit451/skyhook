@@ -14,7 +14,8 @@ class Heroku extends BaseProvider {
     public async parseData() {
         this.setEmbedColor(0xC9C3E6)
         const embed = new Embed()
-        embed.title = 'Deployed App ' + this.body.app
+        const name = typeof this.body.app === 'object' ? this.body.app.name : this.body.app
+        embed.title = 'Deployed App ' + name
         embed.url = this.body.url
         const author = new EmbedAuthor()
         author.name = this.body.user
