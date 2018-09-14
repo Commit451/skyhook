@@ -194,9 +194,14 @@ class GitLab extends BaseProvider {
         branch.shift()
 
         const project = new Project()
-        if (this.body.project !== null) {
+        if (this.body.project != null) {
             project.name = this.body.project.name
             project.url = this.body.project.web_url
+            project.branch = branch.join('/')
+            project.commits = this.body.commits
+        } else if (this.body.repository != null) {
+            project.name = this.body.repository.name
+            project.url = this.body.repository.homepage
             project.branch = branch.join('/')
             project.commits = this.body.commits
         }
