@@ -18,7 +18,7 @@ class Travis extends BaseProvider {
         embed.url = this.body.build_url
         embed.description = '**Status**: ' + this.body.status_message
         const author = new EmbedAuthor()
-        author.name = this.body.repository.name
+        author.name = this.headers['Travis-Repo-Slug'] || (this.body.repository.owner_name + '/' + this.body.repository.name)
         embed.author = author
         this.addEmbed(embed)
     }
