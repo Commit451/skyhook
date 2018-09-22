@@ -18,17 +18,20 @@ class Codacy extends BaseProvider {
         embed.url = this.body.commit.data.urls.delta
         const fields: EmbedField[] = []
 
-        const fixedIssueField = new EmbedField()
-        fixedIssueField.name = 'Fixed Issues'
-        fixedIssueField.value = this.body.commit.results.fixed_count
-        fixedIssueField.inline = true
-        fields.push(fixedIssueField)
+        // Results undefined with PR.
+        if (this.body.commit.results != null) {
+            const fixedIssueField = new EmbedField()
+            fixedIssueField.name = 'Fixed Issues'
+            fixedIssueField.value = this.body.commit.results.fixed_count || 0
+            fixedIssueField.inline = true
+            fields.push(fixedIssueField)
 
-        const newIssuesField = new EmbedField()
-        newIssuesField.name = 'New Issues'
-        newIssuesField.value = this.body.commit.results.new_count
-        newIssuesField.inline = true
-        fields.push(newIssuesField)
+            const newIssuesField = new EmbedField()
+            newIssuesField.name = 'New Issues'
+            newIssuesField.value = this.body.commit.results.new_count || 0
+            newIssuesField.inline = true
+            fields.push(newIssuesField)
+        }
 
         this.addEmbed(embed)
     }
