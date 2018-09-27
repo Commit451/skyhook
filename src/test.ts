@@ -10,8 +10,9 @@ import { AppVeyor } from './provider/Appveyor'
 import { BaseProvider } from './provider/BaseProvider'
 import { NewRelic } from './provider/NewRelic'
 import { ErrorUtil } from './util/ErrorUtil'
+import { Heroku } from './provider/Heroku'
 
-testPayloadVisual(new NewRelic(), 'newrelic.json')
+testPayloadVisual(new Heroku(), 'heroku.json')
 
 function testPayloadVisual(provider: BaseProvider, jsonFileName: string) {
     const json = fs.readFileSync(`./test/${jsonFileName}`, 'utf-8')
