@@ -32,14 +32,14 @@ class Heroku extends BaseProvider {
 
     private actionAsPastTense(action: string): string {
         switch (action) {
-            case "create":
-                return "created"
-            case "destroy":
-                return "destroyed"
-            case "update":
-                return "updated"
+            case 'create':
+                return 'created'
+            case 'destroy':
+                return 'destroyed'
+            case 'update':
+                return 'updated'
         }
-        return "unknown"
+        return 'unknown'
     }
 
     private typeAsReadable(type: string): string {
