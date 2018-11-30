@@ -23,15 +23,26 @@ class Jira extends BaseProvider {
         this.setEmbedColor(0x1e45a8)
 
         const issue = this.body.issue
+
+        // We don't support anything else at this time.
+        if (issue == null) {
+            return
+        }
+
         if (issue.fields.assignee == null) {
             issue.fields.assignee = {displayName: 'nobody'}
         }
 
         // extract variable from Jira
-        const user = this.body.user
-        const action = this.body.webhookEvent.split('_')[1]
+        let user = this.body.user
+        let action = this.body.webhookEvent.split('_')[1]
         const matches = issue.self.match(/^(https?:\/\/[^\/?#]+)(?:[\/?#]|$)/i)
         const domain = matches && matches[1]
+
+        if (user == null && this.body.comment != null) {
+            user = this.body.comment.updateAuthor
+            action = 'commented on'
+        }
 
         // embed builder
         const embed = new Embed()
