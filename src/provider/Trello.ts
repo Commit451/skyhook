@@ -737,9 +737,9 @@ class Trello extends BaseProvider {
         const embed = this._preparePayload()
         if (this.action.data.old.closed != null) {
             if (this.action.data.list.closed) {
-                embed.title = '[' + this.action.data.board.name + '] Archived List "' + this.action.data.card.name + '"'
+                embed.title = '[' + this.action.data.board.name + '] Archived List "' + this.action.data.list.name + '"'
             } else {
-                embed.title = '[' + this.action.data.board.name + '] Unarchived List "' + this.action.data.card.name + '"'
+                embed.title = '[' + this.action.data.board.name + '] Unarchived List "' + this.action.data.list.name + '"'
             }
         } else {
             embed.title = '[' + this.action.data.board.name + '] Renamed List'
