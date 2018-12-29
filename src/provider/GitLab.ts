@@ -7,7 +7,8 @@ class Project {
     public name?: string
     public url?: string
     public branch?: string
-    public commits?: any
+    public commits?: any[]
+    public totalCommitsCount?: number
 }
 
 /**
@@ -45,20 +46,32 @@ class GitLab extends BaseProvider {
 
         const project = this.projectFromBody()
 
-        const fields: EmbedField[] = []
-        project.commits.forEach((commit: any) => {
-            const message = (commit.message.length > 256) ? commit.message.substring(0, 255) + '\u2026' : commit.message
-            const field = new EmbedField()
-            field.name = 'Commit from ' + commit.author.name
-            field.value = '(' + '[`' + commit.id.substring(0, 7) + '`](' + commit.url + ')' + ') ' + (message == null ? '' : message.replace(/\n/g, ' ').replace(/\r/g, ' '))
-            field.inline = false
-            fields.push(field)
-        })
+        if (project.totalCommitsCount > 0) {
+            const fields: EmbedField[] = []
 
-        this.embed.title = '[' + project.name + ':' + project.branch + '] ' + project.commits.length + ' commit' + ((project.commits.length > 1) ? 's' : '')
-        this.embed.url = project.url
+            for (const commit of project.commits) {
+                const message = (commit.message.length > 256) ? commit.message.substring(0, 255) + '\u2026' : commit.message
+                const field = new EmbedField()
+                field.name = 'Commit from ' + commit.author.name
+                field.value = '(' + '[`' + commit.id.substring(0, 7) + '`](' + commit.url + ')' + ') ' + (message == null ? '' : message.replace(/\n/g, ' ').replace(/\r/g, ' '))
+                field.inline = false
+                fields.push(field)
+            }
+
+            this.embed.title = '[' + project.name + ':' + project.branch + '] ' + project.totalCommitsCount + ' commit' + ((project.totalCommitsCount > 1) ? 's' : '')
+            this.embed.url = project.url + '/tree/' + project.branch
+            this.embed.fields = fields
+        } else {
+            if (this.body.after !== '0000000000000000000000000000000000000000') {
+                this.embed.title = '[' + project.name + ':' + project.branch + '] New branch created: ' + project.branch
+                this.embed.url = project.url + '/tree/' + project.branch
+            } else {
+                this.embed.title = '[' + project.name + ':' + project.branch + '] Branch deleted: ' + project.branch
+                this.embed.url = project.url
+            }
+        }
+
         this.embed.author = this.authorFromBodyPush()
-        this.embed.fields = fields
         this.addEmbed(this.embed)
     }
 
@@ -198,12 +211,14 @@ class GitLab extends BaseProvider {
             project.name = this.body.project.name
             project.url = this.body.project.web_url
             project.branch = branch.join('/')
-            project.commits = this.body.commits
+            project.commits = this.body.commits || []
+            project.totalCommitsCount = this.body.total_commits_count || 0
         } else if (this.body.repository != null) {
             project.name = this.body.repository.name
             project.url = this.body.repository.homepage
             project.branch = branch.join('/')
-            project.commits = this.body.commits
+            project.commits = this.body.commits || []
+            project.totalCommitsCount = this.body.total_commits_count || 0
         }
 
         return project
