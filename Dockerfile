@@ -18,7 +18,6 @@ COPY . /usr/src/app
 
 RUN mkdir dist
 COPY --from=buildenv /app/dist /usr/src/app/dist
-RUN ls dist
 
 EXPOSE 8080
 
