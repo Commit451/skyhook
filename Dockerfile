@@ -17,8 +17,8 @@ RUN npm install && npm cache clean --force
 COPY . /usr/src/app
 
 RUN mkdir dist
-COPY --from=buildenv /app/dist .
-RUN ls
+COPY --from=buildenv /app/dist /usr/src/app/dist
+RUN ls dist
 
 EXPOSE 8080
 
