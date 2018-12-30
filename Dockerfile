@@ -1,6 +1,5 @@
 FROM node:8.9 as buildenv
 
-RUN apk update && apk upgrade
 WORKDIR /app
 COPY . .
 RUN npm install && npm run build
