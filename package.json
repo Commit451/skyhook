@@ -6,7 +6,8 @@
     "clean": "rimraf dist",
     "tsc": "tsc",
     "build": "npm run clean && npm run tsc",
-    "start": "node dist/index.js",
+    "dockerstart": "node dist/index.js",
+    "start": "npm run build && node dist/index.js",
     "test": "mocha -r ts-node/register test/*.ts",
     "lint": "tslint --project .",
     "visualTest": "npm run build && node dist/test.js"
