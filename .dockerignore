@@ -1,9 +1,1 @@
-.dockerignore
-.git/
-.gitignore
-.glitch-assets
-.travis.yml
-Dockerfile
-README.md
-docs/
-images/
+
