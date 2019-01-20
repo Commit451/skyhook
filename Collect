@@ -1,0 +1,232 @@
+Skip to content
+Your account has been flagged.
+Because of that, your profile is hidden from the public. If you believe this is a mistake, contact support to have your account status reviewed.
+
+jenkins appveyor
+Repositories9
+Code18K
+Commits1K
+Issues3K
+Marketplace
+Topics
+Wikis124
+Users
+Language
+
+9 repository results
+Commit451/skyhook
+Parses webhooks and forwards them in the proper format to Discord.
+discord
+webhook
+heroku
+jenkins
+trello
+circleci
+gitlab
+travis-ci
+pingdom
+bitbucket
+unity3d
+appveyor
+patreon
+MIT license
+
+Updated 2 days ago
+
+4 issues need help
+ TypeScript
+ 148
+pvdlg/env-ci
+Get environment variables exposed by CI services
+circleci
+semaphore
+buddy
+jenkins
+environment
+gitlab
+drone
+continuous-integration
+ci
+bamboo
+bitbucket
+vsts
+appveyor
+codeship
+travis
+bitrise
+wercker
+buildkite
+shippable
+cirrus-ci
+MIT license
+
+Updated 7 days ago
+
+ JavaScript
+ 113
+OndraM/ci-detector
+Detect continuous integration server and provide unified access to properties of current build
+php
+travis
+appveyor
+jenkins
+circleci
+continuous-integration
+ci
+codeship
+MIT license
+
+Updated on Nov 12, 2018
+
+ PHP
+ 28
+AnyStatus/Plugins
+A repository of plugins and other extensions for AnyStatus
+jenkins
+appveyor
+batch
+anystatus
+vsts
+monitor
+cpu
+tfs
+devops
+visual-studio
+monitoring
+continuous-integration
+continuous-delivery
+powershell
+network
+sql-query
+uptime
+teamcity
+performance-counters
+downtime
+AGPL-3.0 license
+
+Updated 26 days ago
+
+ C#
+ 12
+rutujar/helloworld_travis_demo
+This is a demo program using continuous integration tools such as Travis,Jenkins,Circle ci and AppVeyor. Many more wi…
+travis
+appveyor
+jenkins
+javascript
+python
+c
+java
+go
+circleci
+r
+scala
+csharp
+cpp
+travis-ci
+code-quality
+codacy
+jenkins-ci
+travis-ci-demo
+travis-ci-github
+circleci-demos
+MIT license
+
+Updated 14 days ago
+
+1 issue needs help
+ C
+ 2
+redaxmedia/chroma-feedback
+Turn your Razer keyboard, mouse or headphone into a extreme feedback device
+appveyor
+circle
+travis
+github
+jenkins
+gitlab
+ci
+notification
+razer
+teamcity
+chroma
+Updated on Dec 16, 2018
+
+ Python
+ 49
+lavabit/libcore.build
+The libcore automated build and test resources.
+c
+bash
+jenkins
+automation
+travis-ci
+continuous-integration
+build-pipelines
+build-automation
+appveyor
+robots
+make
+circle-ci
+coverity-scan
+AGPL-3.0 license
+
+Updated 6 days ago
+
+ 1
+lavabit/magma.build
+The magma daemon automated build and test resources.
+c
+bash
+jenkins
+automation
+travis-ci
+continuous-integration
+build-pipelines
+build-automation
+appveyor
+robots
+make
+circle-ci
+coverity-scan
+AGPL-3.0 license
+
+Updated 6 days ago
+
+go-carrot/envci
+Get environment variables exposed by CI services
+jenkins
+circleci
+environment
+gitlab
+drone
+ci
+bamboo
+appveyor
+codeship
+semaphore
+travis
+teamcity
+wercker
+buildkite
+shippable
+continous-integration
+env-ci
+MIT license
+
+Updated on Jan 10, 2018
+
+ Go
+© 2019 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Help
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+Press h to open a hovercard with more details.
