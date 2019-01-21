@@ -19,9 +19,9 @@ class AppVeyor extends BaseProvider {
         embed.description = '**Status**: ' + this.body.eventData.status
         const author = new EmbedAuthor()
         author.name = this.body.eventData.commitAuthor
-        if (this.body.eventData.repositoryProvider == "gitHub")
+        if (this.body.eventData.repositoryProvider == 'gitHub')
         {
-            author.url = "https://github.com/" + this.body.eventData.repositoryName + "/commit/" + this.body.eventData.commitId
+            author.url = 'https://github.com/' + this.body.eventData.repositoryName + '/commit/' + this.body.eventData.commitId
         }
         embed.author = author
         this.addEmbed(embed)
