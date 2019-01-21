@@ -14,7 +14,7 @@ class AppVeyor extends BaseProvider {
     public async parseData() {
         this.setEmbedColor(0x00B3E0)
         const embed = new Embed()
-        embed.title = 'Build #' + this.body.eventData.buildNumber
+        embed.title = 'Build ' + this.body.eventData.buildVersion
         embed.url = this.body.eventData.buildUrl
         embed.description = '**Status**: ' + this.body.eventData.status
         const author = new EmbedAuthor()
