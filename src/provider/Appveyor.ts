@@ -24,6 +24,13 @@ class AppVeyor extends BaseProvider {
             author.url = 'https://github.com/' + this.body.eventData.repositoryName + '/commit/' + this.body.eventData.commitId
         }
         embed.author = author
+        if (this.body.eventData.jobs[0].artifacts.length != 0)
+        {
+            embed.description += '\n**Artifacts**:'
+            for (let i=0; i < this.body.eventData.jobs[0].artifacts.length; i++){
+                embed.description += '\n- [' + this.body.eventData.jobs[0].artifacts[i].fileName + '](' + this.body.eventData.jobs[0].artifacts[i].permalink + ')'
+            }
+        }
         this.addEmbed(embed)
     }
 }
