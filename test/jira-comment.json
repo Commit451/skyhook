@@ -75,5 +75,5 @@
         "created":"2011-06-07T10:31:26.805-0500",
         "updated":"2011-06-07T10:31:26.805-0500"
     },  
-    "webhookEvent": "jira:issue_updated"
+    "webhookEvent": "comment_created"
 }
