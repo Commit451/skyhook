@@ -8,7 +8,7 @@ import { BaseProvider } from '../provider/BaseProvider'
 class Travis extends BaseProvider {
 
     // States https://github.com/travis-ci/travis-api/blob/master/lib/travis/model/build/states.rb#L25
-    private static status_colors = {
+    private static STATUS_COLORS = {
         passed: 0x39aa56,
         failed: 0xdb4545,
         errored: 0xdb4545,
@@ -22,28 +22,27 @@ class Travis extends BaseProvider {
     public async parseData() {
         this.setEmbedColor(0x39aa56)
         const embed = new Embed()
-        let target_body = this.body
+        let targetBody = this.body
         if (this.body.payload != null && typeof this.body.payload === 'string') {
             // Travis now sends data inside of a string payload property.
             try {
-                target_body = JSON.parse(this.body.payload)
-            }
-            catch (error) {
+                targetBody = JSON.parse(this.body.payload)
+            } catch (error) {
                 this.logger.info('Malformed payload JSON from travis.')
                 this.logger.error(error)
-                target_body = this.body
+                targetBody = this.body
             }
         }
 
-        embed.title = `[${target_body.repository.name}:${target_body.branch}] Build #${target_body.number}: ${target_body.status_message}`
-        embed.url = target_body.build_url
-        embed.description = `[\`${target_body.commit.substring(0, 7)}\`](${target_body.compare_url}) ${target_body.message}`
+        embed.title = `[${targetBody.repository.name}:${targetBody.branch}] Build #${targetBody.number}: ${targetBody.status_message}`
+        embed.url = targetBody.build_url
+        embed.description = `[\`${targetBody.commit.substring(0, 7)}\`](${targetBody.compare_url}) ${targetBody.message}`
 
-        if(target_body.state != null){
-            if(Travis.status_colors[target_body.state] != null) {
-                this.setEmbedColor(Travis.status_colors[target_body.state])
+        if (targetBody.state != null) {
+            if (Travis.STATUS_COLORS[targetBody.state] != null) {
+                this.setEmbedColor(Travis.STATUS_COLORS[targetBody.state])
             } else {
-                this.logger.warn('Unknown Travis build state: ' + target_body.state)
+                this.logger.warn('Unknown Travis build state: ' + targetBody.state)
             }
         }
 

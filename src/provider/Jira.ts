@@ -39,7 +39,7 @@ class Jira extends BaseProvider {
         const domain = matches && matches[1]
 
         // create the embed
-        let embed = new Embed()
+        const embed = new Embed()
         embed.title = `${issue.key} - ${issue.fields.summary}`
         embed.url = `${domain}/browse/${issue.key}`
         if (isIssue) {

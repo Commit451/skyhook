@@ -8,9 +8,9 @@ import * as fs from 'fs'
 import { DiscordPayload } from './model/DiscordPayload'
 import { AppVeyor } from './provider/Appveyor'
 import { BaseProvider } from './provider/BaseProvider'
+import { Heroku } from './provider/Heroku'
 import { NewRelic } from './provider/NewRelic'
 import { ErrorUtil } from './util/ErrorUtil'
-import { Heroku } from './provider/Heroku'
 
 testPayloadVisual(new Heroku(), 'heroku.json')
 
