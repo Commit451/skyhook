@@ -36,7 +36,8 @@ class Travis extends BaseProvider {
 
         embed.title = `[${targetBody.repository.name}:${targetBody.branch}] Build #${targetBody.number}: ${targetBody.status_message}`
         embed.url = targetBody.build_url
-        embed.description = `[\`${targetBody.commit.substring(0, 7)}\`](${targetBody.compare_url}) ${targetBody.message}`
+        const msg = targetBody.message.substring(0, targetBody.message.indexOf('\n'))
+        embed.description = `[\`${targetBody.commit.substring(0, 7)}\`](${targetBody.compare_url}) ${(msg.length > 50) ? msg.substring(0, 47) + '...' : msg}`
 
         if (targetBody.state != null) {
             if (Travis.STATUS_COLORS[targetBody.state] != null) {
