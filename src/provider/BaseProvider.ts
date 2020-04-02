@@ -15,7 +15,7 @@ class BaseProvider {
         if (type == null) {
             return null
         }
-        type = type.replace(/:/, '_') // needed because of BitBucket
+        type = type.replace(/:/g, '_') // needed because of BitBucket
         return camel(type)
     }
 

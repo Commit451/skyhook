@@ -3,6 +3,12 @@ import { EmbedAuthor } from '../model/EmbedAuthor'
 import { EmbedField } from '../model/EmbedField'
 import { BaseProvider } from '../provider/BaseProvider'
 
+enum PatreonAction {
+    CREATE,
+    UPDATE,
+    DELETE
+}
+
 /**
  * https://docs.patreon.com/#webhooks
  */
@@ -74,20 +80,90 @@ class Patreon extends BaseProvider {
         return this.headers['x-patreon-event']
     }
 
-    private _createUpdateCommon(type) {
+    private _handleAPIV2(type: PatreonAction) {
         const embed = new Embed()
-        const createorId = this.body.data.relationships.creator && this.body.data.relationships.creator.data && this.body.data.relationships.creator.data.id
-        const patreonId = this.body.data.relationships.patron && this.body.data.relationships.patron.data && this.body.data.relationships.patron.data.id
-        const rewardId = this.body.data.relationships.reward && this.body.data.relationships.reward.data && this.body.data.relationships.reward.data.id
+        const campaignId = this.body.data.relationships.campaign?.data?.id
+        const patronId = this.body.data.relationships.user?.data?.id
+
+        // TODO Test endpoint may be returning incomplete data.
+        // Does not provide a way to get the reward without keying off of amount_cents.
+        // Keep an eye on data.relationships.currently_entitled_tiers
+        // For now, find closest tier that is below or at the cents value.
+        const reward = (this.body.included as any[])
+        .filter(val => val.type === 'reward' && val.attributes.published && val.attributes.amount_cents <= this.body.data.attributes.pledge_amount_cents)
+        .reduce((a, b) => Math.max(a.attributes.amount_cents, b.attributes.amount_cents))
+
+        for (const entry of this.body.included) {
+            if (entry.type === 'campaign' && entry.id === campaignId) {
+                const dollarAmount = (this.body.data.attributes.pledge_amount_cents / 100).toFixed(2)
+                if (type === PatreonAction.DELETE) {
+                    embed.title = `Canceled $${dollarAmount} Pledge`
+                } else {
+                    embed.title = `Pledged $${dollarAmount}`
+                }
+                embed.url = entry.attributes.url
+            } else if (entry.type === 'user' && entry.id === patronId) {
+                const author = new EmbedAuthor()
+                author.name = entry.attributes.full_name
+                author.iconUrl = entry.attributes.thumb_url
+                author.url = entry.attributes.url
+                embed.author = author
+            }
+        }
+
+        if (reward != null && type !== PatreonAction.DELETE) {
+            const field = new EmbedField()
+            field.name = 'Unlocked Tier'
+            field.value = `[${reward.attributes.title} ($${(reward.attributes.amount_cents / 100).toFixed(2)}+/mo)](https://www.patreon.com${reward.attributes.url})\n${Patreon._formatHTML(reward.attributes.description, embed.url)}`
+            field.inline = false
+            embed.fields = [field]
+        }
+        this.addEmbed(embed)
+
+    }
+
+    private async membersCreate() {
+        this._handleAPIV2(PatreonAction.CREATE)
+    }
+
+    private async membersUpdate() {
+        this._handleAPIV2(PatreonAction.UPDATE)
+    }
+
+    private async membersDelete() {
+        this._handleAPIV2(PatreonAction.DELETE)
+    }
+
+    private async membersPledgeCreate() {
+        this._handleAPIV2(PatreonAction.CREATE)
+    }
+
+    private async membersPledgeUpdate() {
+        this._handleAPIV2(PatreonAction.UPDATE)
+    }
+
+    private async membersPledgeDelete() {
+        this._handleAPIV2(PatreonAction.DELETE)
+    }
+
+    /**
+     * @deprecated Patreon v1 API
+     */
+    private _createUpdateCommon(type: PatreonAction) {
+        const embed = new Embed()
+        const createorId = this.body.data.relationships.campaign?.data?.id
+        const patreonId = this.body.data.relationships.patron?.data?.id
+        const rewardId = this.body.data.relationships.reward?.data?.id
 
         const incl = this.body.included
         let reward = null
         incl.forEach((attr: any) => {
             if (attr.id === createorId) {
-                if (type === 'delete') {
-                    embed.title = 'Canceled $' + (this.body.data.attributes.amount_cents / 100).toFixed(2) + ' pledge to ' + attr.attributes.full_name
+                const dollarAmount = (this.body.data.attributes.amount_cents / 100).toFixed(2)
+                if (type === PatreonAction.DELETE) {
+                    embed.title = `Canceled $${dollarAmount} Pledge`
                 } else {
-                    embed.title = 'Pledged $' + (this.body.data.attributes.amount_cents / 100).toFixed(2) + ' to ' + attr.attributes.full_name
+                    embed.title = `Pledged $${dollarAmount}`
                 }
                 embed.url = attr.attributes.url
             } else if (attr.id === patreonId) {
@@ -100,30 +176,35 @@ class Patreon extends BaseProvider {
                 reward = attr
             }
         })
-        if (reward != null) {
+        if (reward != null && type !== PatreonAction.DELETE) {
             const field = new EmbedField()
-            field.name = 'Unlocked \'' + reward.attributes.title + '\''
-            field.value = '[$' + (reward.attributes.amount_cents / 100).toFixed(2) + '+ per month](https://www.patreon.com' + reward.attributes.url + ')\n' + Patreon._formatHTML(reward.attributes.description, embed.url)
+            field.name = 'Unlocked Tier'
+            field.value = `[${reward.attributes.title} ($${(reward.attributes.amount_cents / 100).toFixed(2)}+/mo)](https://www.patreon.com${reward.attributes.url})\n${Patreon._formatHTML(reward.attributes.description, embed.url)}`
             field.inline = false
-            embed.description = '---'
-            if (type === 'delete') {
-                field.name = 'Lost \'' + reward.attributes.title + '\''
-            }
             embed.fields = [field]
         }
         this.addEmbed(embed)
     }
 
+    /**
+     * @deprecated Patreon v1 API
+     */
     private async pledgesCreate() {
-        this._createUpdateCommon('create')
+        this._createUpdateCommon(PatreonAction.CREATE)
     }
 
+    /**
+     * @deprecated Patreon v1 API
+     */
     private async pledgesUpdate() {
-        this._createUpdateCommon('update')
+        this._createUpdateCommon(PatreonAction.UPDATE)
     }
 
+    /**
+     * @deprecated Patreon v1 API
+     */
     private async pledgesDelete() {
-        this._createUpdateCommon('delete')
+        this._createUpdateCommon(PatreonAction.DELETE)
     }
 
 }
