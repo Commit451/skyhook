@@ -13,32 +13,32 @@
     "visualTest": "npm run build && node dist/test.js"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.4",
-    "@types/express": "^4.17.2",
-    "@types/mocha": "^5.2.7",
-    "@types/node": "^10.17.3",
+    "@types/chai": "^4.2.11",
+    "@types/express": "^4.17.4",
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^12.12.34",
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
-    "mocha": "^5.2.0",
-    "rimraf": "^2.7.1",
-    "ts-node": "^8.4.1",
-    "tslint": "^5.20.0",
-    "typescript": "^3.6.4"
+    "mocha": "^7.1.1",
+    "rimraf": "^3.0.2",
+    "ts-node": "^8.8.1",
+    "tslint": "^6.1.0",
+    "typescript": "^3.8.3"
   },
   "dependencies": {
-    "axios": "^0.18.1",
+    "axios": "^0.19.2",
     "body-parser": "^1.19.0",
     "camelcase": "^5.3.1",
-    "dotenv": "^7.0.0",
-    "ejs": "^2.7.1",
+    "dotenv": "8.2.0",
+    "ejs": "^3.0.2",
     "express": "^4.17.1",
     "gravatar": "^1.8.0",
     "moment": "^2.24.0",
     "winston": "^3.2.1"
   },
   "engines": {
-    "node": "10.14.x",
-    "npm": "6.4.x"
+    "node": "12.16.x",
+    "npm": "6.13.x"
   },
   "repository": {
     "url": "https://github.com/Commit451/skyhook"
