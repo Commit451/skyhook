@@ -85,7 +85,7 @@ class GitLab extends BaseProvider {
 
         this.embed.url = project.url + '/tags/' + tag
         this.embed.author = this.authorFromBodyPush()
-        this.embed.description = (typeof this.body.message !== 'undefined') ? ((this.body.message.length > 1024) ? this.body.message.substring(0, 1023) + '\u2026' : this.body.message) : ''
+        this.embed.description = (this.body.message != null) ? ((this.body.message.length > 1024) ? this.body.message.substring(0, 1023) + '\u2026' : this.body.message) : ''
         if (this.body.after !== '0000000000000000000000000000000000000000') {
             this.embed.title = `Pushed tag "${tag}" to ${project.name}`
         } else {
@@ -165,7 +165,7 @@ class GitLab extends BaseProvider {
         this.embed.title = actions[this.body.object_attributes.action] + ' wiki page ' + this.body.object_attributes.title + ' on ' + this.body.project.name
         this.embed.url = this.body.object_attributes.url
         this.embed.author = this.authorFromBody()
-        this.embed.description = (typeof this.body.object_attributes.message !== 'undefined') ? (this.body.object_attributes.message.length > 2048) ? this.body.object_attributes.message.substring(0, 2047) + '\u2026' : this.body.object_attributes.message : ''
+        this.embed.description = (this.body.object_attributes.message != null) ? (this.body.object_attributes.message.length > 2048) ? this.body.object_attributes.message.substring(0, 2047) + '\u2026' : this.body.object_attributes.message : ''
         this.addEmbed(this.embed)
     }
 
