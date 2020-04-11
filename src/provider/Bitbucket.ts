@@ -317,6 +317,15 @@ class BitBucket extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
+    /**
+     * Bitbucket Server Test Connection
+     */
+    public async diagnosticsPing() {
+        this.embed.title = 'Test Connection'
+        this.embed.description = `Test: ${this.body.test}`
+        this.addEmbed(this.embed)
+    }
+
     private extractAuthor(): EmbedAuthor {
         const author = new EmbedAuthor()
         author.name = this.body.actor.display_name
