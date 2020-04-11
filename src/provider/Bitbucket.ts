@@ -1,7 +1,7 @@
 import { Embed } from '../model/Embed'
 import { EmbedAuthor } from '../model/EmbedAuthor'
 import { EmbedField } from '../model/EmbedField'
-import { BaseProvider } from '../provider/BaseProvider'
+import { BaseProvider } from './BaseProvider'
 import { MarkdownUtil } from '../util/MarkdownUtil'
 
 /**
@@ -27,7 +27,9 @@ class BitBucket extends BaseProvider {
         return strArray.join(' ')
     }
 
-    private baseLink: string = 'https://bitbucket.org/'
+    // Check to see if there a env variable named SERVER. If there isn't, use the standard
+    // Bitbucket Cloud, if there is then we are using Bitbucket Server.
+    private baseLink: string = this.extractBitbucketUrl()
     private embed: Embed
 
     constructor() {
@@ -341,6 +343,14 @@ class BitBucket extends BaseProvider {
 
     private extractIssueUrl(): string {
         return this.baseLink + this.body.repository.full_name + '/issues/' + this.body.issue.id
+    }
+
+    private extractBitbucketUrl(): string {
+        if (process.env.SERVER === null) {
+            return 'https://bitbucket.org/'
+        } else {
+            return process.env.SERVER
+        }
     }
 }
 
