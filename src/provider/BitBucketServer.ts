@@ -6,7 +6,7 @@ import { MarkdownUtil } from '../util/MarkdownUtil'
 
 class BitBucketServer extends BaseProvider {
     private embed: Embed
-    private baseLink: string
+    private baseLink: string = this.extractBitbucketUrl()
 
     private static _formatLargeString(str, limit = 256) {
         return (str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str)
@@ -51,8 +51,53 @@ class BitBucketServer extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
+    public async prOpened() {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.body.pullRequest.toRef.repository.name}] Pull request opened: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
+        this.embed.description = this.body.pullRequest.description
+        this.embed.url = this.extractPullRequestUrl()
+        this.embed.fields = this.extractPullRequestFields()
+        this.addEmbed(this.embed)
+    }
+
+    public async prDeleted() {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.body.pullRequest.toRef.repository.name}] Deleted pull request: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
+        this.addEmbed(this.embed)
+    }
+
     private extractBitbucketUrl(): string {
         return process.env.SERVER
+    }
+
+    private extractAuthor(): EmbedAuthor {
+        const author = new EmbedAuthor()
+        author.name = this.body.actor.displayName
+        author.iconUrl = 'https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/44_Bitbucket_logo_logos-512.png'
+        return author
+    }
+
+    private extractPullRequestUrl() {
+        return this.baseLink + '/projects/' + this.body.pullRequest.fromRef.repository.project.key + '/repos/'
+            + this.body.pullRequest.fromRef.repository.slug + '/pull-requests/' + this.body.pullRequest.id + '/overview'
+    }
+
+    private extractPullRequestFields(): EmbedField[] {
+        const fieldArray = new Array<EmbedField>()
+
+        const toFromRefField = new EmbedField()
+        toFromRefField.name = this.body.pullRequest.title
+        toFromRefField.value = `**Destination branch:** ${this.body.pullRequest.toRef.displayId} \n **State:** ${this.body.pullRequest.state}`
+        fieldArray.push(toFromRefField)
+
+        this.body.pullRequest.reviewers.forEach((reviewer) => {
+            const reviewerField = new EmbedField()
+            reviewerField.name = 'Reviewer'
+            reviewerField.value = reviewer.user.displayName
+            fieldArray.push(reviewerField)
+        })
+
+        return fieldArray
     }
 }
 
