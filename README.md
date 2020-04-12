@@ -42,8 +42,10 @@ https://skyhook.glitch.me/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/pr
 If you want support for a new provider, just create a pull request and add it!  
 Alternatively, a new provider can also be requested by creating an [issue](https://github.com/Commit451/skyhook/issues).
 
-## Contributing
+## Outage
+If the service is down, please check https://status.glitch.com/ before creating an issue.
 
+## Contributing
 If you wish to contribute, follow our [contributing guide](CONTRIBUTING.md).
 
 ### Creating a Provider
@@ -78,7 +80,6 @@ docker rm skyhook
 ```
 
 ## License
-
 skyhook is available under the MIT license. See the LICENSE file for more info.
 
 \ ゜o゜)ノ

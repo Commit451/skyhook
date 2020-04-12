@@ -42,7 +42,7 @@ class BitBucketServer extends BaseProvider {
         const field = new EmbedField()
         this.embed.title = 'Test Connection'
         this.embed.description = `You have successfully configured Skyhook with your BitBucket Server instance.`
-        field.name =  'Test'
+        field.name = 'Test'
         field.value = this.body.test
         this.embed.fields = [field]
 
@@ -61,7 +61,7 @@ class BitBucketServer extends BaseProvider {
     public async repoModified() {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.body.old.name}] Repository has been updated`
-        this.embed.url =  this.extractBaseLink() + '/projects/' + this.body.new.project.key + '/repos/' + this.body.new.slug + '/browse'
+        this.embed.url = this.extractBaseLink() + '/projects/' + this.body.new.project.key + '/repos/' + this.body.new.slug + '/browse'
         this.addEmbed(this.embed)
     }
 
