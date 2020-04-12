@@ -74,142 +74,109 @@ class BitBucketServer extends BaseProvider {
     }
 
     public async repoCommentAdded() {
-        this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.extractRepoRepositoryName()}] New comment on commit ${this.body.commit.slice(0, 10)}`
-        this.embed.description = this.body.comment.text
-        this.embed.url = this.extractCommitCommentUrl()
+        this.formatCommitCommentPayload('New comment no commit')
         this.addEmbed(this.embed)
     }
 
     public async repoCommentEdited() {
-        this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.extractRepoRepositoryName()}] Comment edited on commit ${this.body.commit.slice(0, 10)}`
-        this.embed.description = this.body.comment.text
-        this.embed.url = this.extractCommitCommentUrl()
+        this.formatCommitCommentPayload('Comment edited on commit')
         this.addEmbed(this.embed)
     }
 
     public async repoCommentDeleted() {
-        this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.extractRepoRepositoryName()}] Comment deleted on commit ${this.body.commit.slice(0, 10)}`
-        this.embed.description = this.body.comment.text
-        this.embed.url = this.extractCommitCommentUrl()
+        this.formatCommitCommentPayload('Comment deleted on commit')
         this.addEmbed(this.embed)
     }
 
     public async prOpened() {
-        this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Pull request opened: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
-        this.embed.description = this.body.pullRequest.description
-        this.embed.url = this.extractPullRequestUrl()
-        this.embed.fields = this.extractPullRequestFields()
+        this.formatPrPayload('Pull request opened')
         this.addEmbed(this.embed)
     }
 
     public async prFromRefUpdated() {
-        this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Pull request updated: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
-        this.embed.description = this.body.pullRequest.description
-        this.embed.url = this.extractPullRequestUrl()
-        this.embed.fields = this.extractPullRequestFields()
+        this.formatPrPayload('Pull request updated')
         this.addEmbed(this.embed)
     }
 
     public async prModified() {
-        this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Pull request modified: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
-        this.embed.description = this.body.pullRequest.description
-        this.embed.url = this.extractPullRequestUrl()
-        this.embed.fields = this.extractPullRequestFields()
+        this.formatPrPayload('Pull request modified')
         this.addEmbed(this.embed)
     }
 
     public async prReviewerUpdated() {
-        this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.extractPullRequestRepositoryName()}] New reviewers for pull request: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
-        this.embed.description = this.body.pullRequest.description
-        this.embed.url = this.extractPullRequestUrl()
-        this.embed.fields = this.extractPullRequestFields()
+        this.formatPrPayload('New reviewers for pull request')
         this.addEmbed(this.embed)
     }
 
     public async prReviewerApproved() {
-        this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Pull request approved: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
-        this.embed.description = this.body.pullRequest.description
-        this.embed.url = this.extractPullRequestUrl()
-        this.embed.fields = this.extractPullRequestFields()
+        this.formatPrPayload('Pull request approved')
         this.addEmbed(this.embed)
     }
 
     public async prReviewerUnapproved() {
-        this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Removed approval for pull request: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
-        this.embed.description = this.body.pullRequest.description
-        this.embed.url = this.extractPullRequestUrl()
-        this.embed.fields = this.extractPullRequestFields()
+        this.formatPrPayload(('Removed approval for pull request'))
         this.addEmbed(this.embed)
     }
 
     public async prReviewerNeedsWork() {
-        this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Pull request needs work: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
-        this.embed.description = this.body.pullRequest.description
-        this.embed.url = this.extractPullRequestUrl()
-        this.embed.fields = this.extractPullRequestFields()
+        this.formatPrPayload('Pull request needs work')
         this.addEmbed(this.embed)
     }
 
     public async pullrequestFulfilled() {
-        this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Pull request merged: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
-        this.embed.url = this.extractPullRequestUrl()
-        this.embed.description = this.body.pullRequest.description
-        this.embed.fields = this.extractPullRequestFields()
+        this.formatPrPayload('Pull request merged')
         this.addEmbed(this.embed)
     }
 
     public async prDeclined() {
-        this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Pull request declined: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
-        this.embed.url = this.extractPullRequestUrl()
-        this.embed.description = this.body.pullRequest.description
-        this.embed.fields = this.extractPullRequestFields()
+        this.formatPrPayload('Pull request declined')
         this.addEmbed(this.embed)
     }
 
     public async prDeleted() {
-        this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Deleted pull request: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
+        this.formatPrPayload('Deleted pull request')
         this.addEmbed(this.embed)
     }
 
     public async prCommentAdded() {
-        this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.extractPullRequestRepositoryName()}] New comment on pull request: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
-        this.embed.description = this.body.comment.text
-        this.embed.url = this.extractPullRequestUrl()
+        this.formatCommentPayload('New comment on pull request')
         this.addEmbed(this.embed)
     }
 
     public async prCommentEdited() {
-        this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Updated comment on pull request: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
-        this.embed.description = this.body.comment.text
-        this.embed.url = this.extractPullRequestUrl()
+        this.formatCommentPayload('Updated comment on pull request')
         this.addEmbed(this.embed)
     }
 
     public async prCommentDeleted() {
-        this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Deleted comment on pull request: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
-        this.embed.description = this.body.comment.text
-        this.embed.url = this.extractPullRequestUrl()
+        this.formatCommentPayload('Deleted comment on pull request')
         this.addEmbed(this.embed)
     }
 
     public async mirrorRepoSynchronized() {
         this.embed.title = `[${this.extractRepoRepositoryName()}] Mirror Synchronized`
+    }
+
+    private formatPrPayload(title: string) {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.extractPullRequestRepositoryName()}] ${title}: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
+        this.embed.description = this.body.pullRequest.description
+        this.embed.url = this.extractPullRequestUrl()
+        this.embed.fields = this.extractPullRequestFields()
+    }
+
+    private formatCommentPayload(title: string) {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.extractPullRequestRepositoryName()}] ${title}: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
+        this.embed.description = this.body.comment.text
+        this.embed.url = this.extractPullRequestUrl()
+    }
+
+    private formatCommitCommentPayload(title: string) {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.extractRepoRepositoryName()}] New comment on commit ${this.body.commit.slice(0, 10)}`
+        this.embed.description = this.body.comment.text
+        this.embed.url = this.extractCommitCommentUrl()
     }
 
     private extractAuthor(): EmbedAuthor {
