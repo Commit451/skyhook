@@ -12,9 +12,7 @@ describe('/POST bitbucketserver', () => {
         expect(res).to.not.be.an('error')
         expect(res).to.not.be.a('DiscordPayload')
     })
-})
 
-describe('/POST bitbucketserver', () => {
     it('repo:refs_changed 18 fields or less', async() => {
         const headers = {
             'x-event-key': 'repo:refs_changed'
