@@ -2,8 +2,6 @@ import { Embed } from '../model/Embed'
 import { EmbedAuthor } from '../model/EmbedAuthor'
 import { EmbedField } from '../model/EmbedField'
 import { BaseProvider } from './BaseProvider'
-import { MarkdownUtil } from '../util/MarkdownUtil'
-import moment from 'moment'
 
 class BitBucketServer extends BaseProvider {
     private embed: Embed
