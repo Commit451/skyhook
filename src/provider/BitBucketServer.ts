@@ -199,12 +199,12 @@ class BitBucketServer extends BaseProvider {
         toFromRefField.value = `**Source branch:** ${this.body.pullRequest.fromRef.displayId} \n **Destination branch:** ${this.body.pullRequest.toRef.displayId} \n **State:** ${this.body.pullRequest.state}`
         fieldArray.push(toFromRefField)
 
-        this.body.pullRequest.reviewers.forEach((reviewer) => {
+        for (let i = 0; i < Math.min(this.body.pullRequest.reviewers.length, 18); i++) {
             const reviewerField = new EmbedField()
             reviewerField.name = 'Reviewer'
-            reviewerField.value = reviewer.user.displayName
+            reviewerField.value = this.body.pullRequest.reviewers[i].user.displayName
             fieldArray.push(reviewerField)
-        })
+        }
 
         return fieldArray
     }
@@ -223,12 +223,20 @@ class BitBucketServer extends BaseProvider {
 
     private extractRepoChangesField(): EmbedField[] {
         const fieldArray = new Array<EmbedField>()
-        this.body.changes.forEach((change) => {
+
+        for (let i = 0; i < Math.min(this.body.changes.length, 18); i++) {
             const changesEmbed = new EmbedField()
             changesEmbed.name = 'Change'
-            changesEmbed.value = `**Branch:** ${change.ref.displayId} \n **Old Hash:** ${change.fromHash.slice(0, 10)} \n **New Hash:** ${change.toHash.slice(0, 10)} \n **Type:** ${change.type}`
+            changesEmbed.value = `**Branch:** ${this.body.changes[i].ref.displayId} \n **Old Hash:** ${this.body.changes[i].fromHash.slice(0, 10)} \n **New Hash:** ${this.body.changes[i].toHash.slice(0, 10)} \n **Type:** ${this.body.changes[i].type}`
             fieldArray.push(changesEmbed)
-        })
+        }
+
+        // this.body.changes.forEach((change) => {
+        //     const changesEmbed = new EmbedField()
+        //     changesEmbed.name = 'Change'
+        //     changesEmbed.value = `**Branch:** ${change.ref.displayId} \n **Old Hash:** ${change.fromHash.slice(0, 10)} \n **New Hash:** ${change.toHash.slice(0, 10)} \n **Type:** ${change.type}`
+        //     fieldArray.push(changesEmbed)
+        // })
 
         return fieldArray
     }
