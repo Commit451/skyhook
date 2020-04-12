@@ -61,6 +61,78 @@ class BitBucketServer extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
+    public async prFromRefUpdated() {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Pull request updated: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
+        this.embed.description = this.body.pullRequest.description
+        this.embed.url = this.extractPullRequestUrl()
+        this.embed.fields = this.extractPullRequestFields()
+        this.addEmbed(this.embed)
+    }
+
+    public async prModified() {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Pull request modified: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
+        this.embed.description = this.body.pullRequest.description
+        this.embed.url = this.extractPullRequestUrl()
+        this.embed.fields = this.extractPullRequestFields()
+        this.addEmbed(this.embed)
+    }
+
+    public async prReviewerUpdated() {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.extractPullRequestRepositoryName()}] New reviewers for pull request: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
+        this.embed.description = this.body.pullRequest.description
+        this.embed.url = this.extractPullRequestUrl()
+        this.embed.fields = this.extractPullRequestFields()
+        this.addEmbed(this.embed)
+    }
+
+    public async prReviewerApproved() {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Pull request approved: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
+        this.embed.description = this.body.pullRequest.description
+        this.embed.url = this.extractPullRequestUrl()
+        this.embed.fields = this.extractPullRequestFields()
+        this.addEmbed(this.embed)
+    }
+
+    public async prReviewerUnapproved() {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Removed approval for pull request: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
+        this.embed.description = this.body.pullRequest.description
+        this.embed.url = this.extractPullRequestUrl()
+        this.embed.fields = this.extractPullRequestFields()
+        this.addEmbed(this.embed)
+    }
+
+    public async prReviewerNeedsWork() {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Pull request needs work: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
+        this.embed.description = this.body.pullRequest.description
+        this.embed.url = this.extractPullRequestUrl()
+        this.embed.fields = this.extractPullRequestFields()
+        this.addEmbed(this.embed)
+    }
+
+    public async pullrequestFulfilled() {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Pull request merged: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
+        this.embed.url = this.extractPullRequestUrl()
+        this.embed.description = this.body.pullRequest.description
+        this.embed.fields = this.extractPullRequestFields()
+        this.addEmbed(this.embed)
+    }
+
+    public async prDeclined() {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Pull request declined: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
+        this.embed.url = this.extractPullRequestUrl()
+        this.embed.description = this.body.pullRequest.description
+        this.embed.fields = this.extractPullRequestFields()
+        this.addEmbed(this.embed)
+    }
+
     public async prDeleted() {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.extractPullRequestRepositoryName()}] Deleted pull request: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
