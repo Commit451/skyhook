@@ -7,7 +7,6 @@ import moment from 'moment'
 
 class BitBucketServer extends BaseProvider {
     private embed: Embed
-    private baseLink: string = this.extractBitbucketUrl()
 
     private static _formatLargeString(str, limit = 256) {
         return (str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str)
@@ -64,7 +63,7 @@ class BitBucketServer extends BaseProvider {
     public async repoModified() {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.body.old.name}] Repository has been updated`
-        this.embed.url =  this.baseLink + '/projects/' + this.body.new.project.key + '/repos/' + this.body.new.slug + '/browse'
+        this.embed.url =  this.extractBaseLink() + '/projects/' + this.body.new.project.key + '/repos/' + this.body.new.slug + '/browse'
         this.addEmbed(this.embed)
     }
 
@@ -213,10 +212,6 @@ class BitBucketServer extends BaseProvider {
         this.embed.title = `[${this.extractRepoRepositoryName()}] Mirror Synchronized`
     }
 
-    private extractBitbucketUrl(): string {
-        return process.env.SERVER
-    }
-
     private extractAuthor(): EmbedAuthor {
         const author = new EmbedAuthor()
         author.name = this.body.actor.displayName
@@ -225,7 +220,7 @@ class BitBucketServer extends BaseProvider {
     }
 
     private extractPullRequestUrl() {
-        return this.baseLink + '/projects/' + this.body.pullRequest.fromRef.repository.project.key + '/repos/'
+        return this.extractBaseLink() + '/projects/' + this.body.pullRequest.fromRef.repository.project.key + '/repos/'
             + this.body.pullRequest.fromRef.repository.slug + '/pull-requests/' + this.body.pullRequest.id + '/overview'
     }
 
@@ -256,7 +251,7 @@ class BitBucketServer extends BaseProvider {
     }
 
     private extractRepoUrl() {
-        return this.baseLink + '/projects/' + this.body.repository.project.key + '/repos/' + this.body.repository.slug + '/browse'
+        return this.extractBaseLink() + '/projects/' + this.body.repository.project.key + '/repos/' + this.body.repository.slug + '/browse'
     }
 
     private extractRepoChangesField(): EmbedField[] {
@@ -272,7 +267,12 @@ class BitBucketServer extends BaseProvider {
     }
 
     private extractCommitCommentUrl() {
-        return this.baseLink + '/projects/' + this.body.repository.project.key + '/repos/' + this.body.repository.slug + '/commits/' + this.body.commit
+        return this.extractBaseLink() + '/projects/' + this.body.repository.project.key + '/repos/' + this.body.repository.slug + '/commits/' + this.body.commit
+    }
+
+    private extractBaseLink() {
+        const actorLink = this.body.actor.links.self[0].href
+        return actorLink.substring(0, actorLink.indexOf('/user'))
     }
 }
 
