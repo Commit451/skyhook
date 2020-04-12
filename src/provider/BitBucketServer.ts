@@ -74,6 +74,30 @@ class BitBucketServer extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
+    public async repoCommentAdded() {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.extractRepoRepositoryName()}] New comment on commit ${this.body.commit.slice(0, 10)}`
+        this.embed.description = this.body.comment.text
+        this.embed.url = this.extractCommitCommentUrl()
+        this.addEmbed(this.embed)
+    }
+
+    public async repoCommentEdited() {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.extractRepoRepositoryName()}] Comment edited on commit ${this.body.commit.slice(0, 10)}`
+        this.embed.description = this.body.comment.text
+        this.embed.url = this.extractCommitCommentUrl()
+        this.addEmbed(this.embed)
+    }
+
+    public async repoCommentDeleted() {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.extractRepoRepositoryName()}] Comment deleted on commit ${this.body.commit.slice(0, 10)}`
+        this.embed.description = this.body.comment.text
+        this.embed.url = this.extractCommitCommentUrl()
+        this.addEmbed(this.embed)
+    }
+
     public async prOpened() {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.extractPullRequestRepositoryName()}] Pull request opened: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
@@ -185,6 +209,10 @@ class BitBucketServer extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
+    public async mirrorRepoSynchronized() {
+        this.embed.title = `[${this.extractRepoRepositoryName()}] Mirror Synchronized`
+    }
+
     private extractBitbucketUrl(): string {
         return process.env.SERVER
     }
@@ -241,6 +269,10 @@ class BitBucketServer extends BaseProvider {
         })
 
         return fieldArray
+    }
+
+    private extractCommitCommentUrl() {
+        return this.baseLink + '/projects/' + this.body.repository.project.key + '/repos/' + this.body.repository.slug + '/commits/' + this.body.commit
     }
 }
 
