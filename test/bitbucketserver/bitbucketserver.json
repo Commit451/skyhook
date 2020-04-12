@@ -6,7 +6,14 @@
     "displayName":"Administrator",
     "active":true,
     "slug":"admin",
-    "type":"NORMAL"
+    "type":"NORMAL",
+    "links": {
+      "self": [
+        {
+          "href": "https://bitbucket.domain.com/users/admin"
+        }
+      ]
+    }
   },
   "repository":{
     "slug":"repository",

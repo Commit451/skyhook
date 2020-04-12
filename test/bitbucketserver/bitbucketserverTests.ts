@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { BitBucketServer } from '../src/provider/BitBucketServer'
-import { Tester } from './Tester'
+import { BitBucketServer } from '../../src/provider/BitBucketServer'
+import { Tester } from '../Tester'
 
 describe('/POST bitbucketserver', () => {
     it('repo:refs_changed', async() => {
@@ -8,7 +8,7 @@ describe('/POST bitbucketserver', () => {
             'x-event-key': 'repo:refs_changed'
         }
 
-        const res = await Tester.test(new BitBucketServer(), 'bitbucketserver.json', headers)
+        const res = await Tester.test(new BitBucketServer(), './bitbucketserver/bitbucketserver.json', headers)
         expect(res).to.not.be.an('error')
         expect(res).to.not.be.a('DiscordPayload')
     })
