@@ -1,3 +1,5 @@
+import {BitBucketServer} from './provider/BitBucketServer'
+
 require('dotenv').config()
 
 import axios from 'axios'
@@ -41,6 +43,7 @@ const providers: any[] = [
     AppVeyor,
     Bintray,
     BitBucket,
+    BitBucketServer,
     CircleCi,
     Codacy,
     DockerHub,
