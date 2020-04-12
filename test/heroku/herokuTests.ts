@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { Heroku } from '../src/provider/Heroku'
-import { Tester } from './Tester'
+import { Heroku } from '../../src/provider/Heroku'
+import { Tester } from '../Tester'
 
 describe('/POST heroku', () => {
     it('deploy', async () => {

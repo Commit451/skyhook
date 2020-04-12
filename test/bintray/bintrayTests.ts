@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { Bintray } from '../src/provider/Bintray'
-import { Tester } from './Tester'
+import { Bintray } from '../../src/provider/Bintray'
+import { Tester } from '../Tester'
 
 /*
  * Test the /POST route

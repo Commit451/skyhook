@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { AppVeyor } from '../src/provider/Appveyor'
-import { Tester } from './Tester'
+import { AppVeyor } from '../../src/provider/Appveyor'
+import { Tester } from '../Tester'
 
 describe('/POST appveyor', () => {
     it('build', async () => {

@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { DockerHub } from '../src/provider/DockerHub'
-import { Tester } from './Tester'
+import { DockerHub } from '../../src/provider/DockerHub'
+import { Tester } from '../Tester'
 
 describe('/POST dockerhub', () => {
     it('build', async () => {

@@ -8,7 +8,7 @@ describe('/POST bitbucketserver', () => {
             'x-event-key': 'repo:refs_changed'
         }
 
-        const res = await Tester.test(new BitBucketServer(), './bitbucketserver/bitbucketserver.json', headers)
+        const res = await Tester.test(new BitBucketServer(), 'bitbucketserver.json', headers)
         expect(res).to.not.be.an('error')
         expect(res).to.not.be.a('DiscordPayload')
     })
@@ -18,9 +18,7 @@ describe('/POST bitbucketserver', () => {
             'x-event-key': 'repo:refs_changed'
         }
 
-        const res = await Tester.test(new BitBucketServer(), './bitbucketserver/bitbucketserver.json', headers)
-
-
+        const res = await Tester.test(new BitBucketServer(), 'bitbucketserver.json', headers)
         expect(res.embeds[0].fields.length).to.not.be.greaterThan(18)
     })
 })

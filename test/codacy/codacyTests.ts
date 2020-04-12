@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { Codacy } from '../src/provider/Codacy'
-import { Tester } from './Tester'
+import { Codacy } from '../../src/provider/Codacy'
+import { Tester } from '../Tester'
 
 describe('/POST codacy', () => {
     it('commit', async () => {

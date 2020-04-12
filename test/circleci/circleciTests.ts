@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { CircleCi } from '../src/provider/CircleCi'
-import { Tester } from './Tester'
+import { CircleCi } from '../../src/provider/CircleCi'
+import { Tester } from '../Tester'
 
 describe('/POST circleci', () => {
     it('build', async () => {

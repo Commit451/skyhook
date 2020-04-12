@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { Unity } from '../src/provider/Unity'
-import { Tester } from './Tester'
+import { Unity } from '../../src/provider/Unity'
+import { Tester } from '../Tester'
 
 describe('/POST unity', () => {
     it('build', async () => {

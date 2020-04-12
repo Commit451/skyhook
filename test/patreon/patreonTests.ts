@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { Patreon } from '../src/provider/Patreon'
-import { Tester } from './Tester'
+import { Patreon } from '../../src/provider/Patreon'
+import { Tester } from '../Tester'
 
 describe('/POST patreon', () => {
     it('pledges:create (deprecated)', async () => {

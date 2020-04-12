@@ -11,7 +11,7 @@ class Tester {
         LoggerUtil.init()
         let jsonObject: any = null
         if (jsonFileName != null) {
-            const json = fs.readFileSync(`./test/${jsonFileName}`, 'utf-8')
+            const json = fs.readFileSync(`./test/${provider.getPath().toLowerCase()}/${jsonFileName}`, 'utf-8')
             jsonObject = JSON.parse(json)
         }
         try {

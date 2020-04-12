@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { BitBucket } from '../src/provider/Bitbucket'
-import { Tester } from './Tester'
+import { BitBucket } from '../../src/provider/Bitbucket'
+import { Tester } from '../Tester'
 
 describe('/POST bitbucket', () => {
     it('repo:push', async () => {

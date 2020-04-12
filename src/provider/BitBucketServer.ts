@@ -231,13 +231,6 @@ class BitBucketServer extends BaseProvider {
             fieldArray.push(changesEmbed)
         }
 
-        // this.body.changes.forEach((change) => {
-        //     const changesEmbed = new EmbedField()
-        //     changesEmbed.name = 'Change'
-        //     changesEmbed.value = `**Branch:** ${change.ref.displayId} \n **Old Hash:** ${change.fromHash.slice(0, 10)} \n **New Hash:** ${change.toHash.slice(0, 10)} \n **Type:** ${change.type}`
-        //     fieldArray.push(changesEmbed)
-        // })
-
         return fieldArray
     }
 

@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { Trello } from '../src/provider/Trello'
-import { Tester } from './Tester'
+import { Trello } from '../../src/provider/Trello'
+import { Tester } from '../Tester'
 
 describe('/POST trello', () => {
     it('commentCard', async () => {
