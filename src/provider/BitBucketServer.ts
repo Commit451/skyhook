@@ -52,6 +52,28 @@ class BitBucketServer extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
+    public async repoRefsChanged() {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.extractRepoRepositoryName()}] New commit`
+        this.embed.description = this.body.repository.description
+        this.embed.url = this.extractRepoUrl()
+        this.embed.fields = this.extractRepoChangesField()
+        this.addEmbed(this.embed)
+    }
+
+    public async repoModified() {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.body.old.name}] Repository has been updated`
+        this.embed.url =  this.baseLink + '/projects/' + this.body.new.project.key + '/repos/' + this.body.new.slug + '/browse'
+        this.addEmbed(this.embed)
+    }
+
+    public async repoForked() {
+        this.embed.author = this.extractAuthor()
+        this.embed.description = 'A new [`fork`] has been created.'
+        this.addEmbed(this.embed)
+    }
+
     public async prOpened() {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.extractPullRequestRepositoryName()}] Pull request opened: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
@@ -199,6 +221,26 @@ class BitBucketServer extends BaseProvider {
 
     private extractPullRequestRepositoryName(): string {
         return this.body.pullRequest.toRef.repository.name
+    }
+
+    private extractRepoRepositoryName(): string {
+        return this.body.repository.name
+    }
+
+    private extractRepoUrl() {
+        return this.baseLink + '/projects/' + this.body.repository.project.key + '/repos/' + this.body.repository.slug + '/browse'
+    }
+
+    private extractRepoChangesField(): EmbedField[] {
+        const fieldArray = new Array<EmbedField>()
+        this.body.changes.forEach((change) => {
+            const changesEmbed = new EmbedField()
+            changesEmbed.name = 'Change'
+            changesEmbed.value = `**Branch:** ${change.ref.displayId} \n **Old Hash:** ${change.fromHash.slice(0, 10)} \n **New Hash:** ${change.toHash.slice(0, 10)} \n **Type:** ${change.type}`
+            fieldArray.push(changesEmbed)
+        })
+
+        return fieldArray
     }
 }
 
