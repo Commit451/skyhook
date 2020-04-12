@@ -3,6 +3,7 @@ import { EmbedAuthor } from '../model/EmbedAuthor'
 import { EmbedField } from '../model/EmbedField'
 import { BaseProvider } from './BaseProvider'
 import { MarkdownUtil } from '../util/MarkdownUtil'
+import moment from 'moment'
 
 class BitBucketServer extends BaseProvider {
     private embed: Embed
@@ -53,7 +54,7 @@ class BitBucketServer extends BaseProvider {
 
     public async prOpened() {
         this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.body.pullRequest.toRef.repository.name}] Pull request opened: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
+        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Pull request opened: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
         this.embed.description = this.body.pullRequest.description
         this.embed.url = this.extractPullRequestUrl()
         this.embed.fields = this.extractPullRequestFields()
@@ -62,7 +63,31 @@ class BitBucketServer extends BaseProvider {
 
     public async prDeleted() {
         this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.body.pullRequest.toRef.repository.name}] Deleted pull request: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
+        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Deleted pull request: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
+        this.addEmbed(this.embed)
+    }
+
+    public async prCommentAdded() {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.extractPullRequestRepositoryName()}] New comment on pull request: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
+        this.embed.description = this.body.comment.text
+        this.embed.url = this.extractPullRequestUrl()
+        this.addEmbed(this.embed)
+    }
+
+    public async prCommentEdited() {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Updated comment on pull request: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
+        this.embed.description = this.body.comment.text
+        this.embed.url = this.extractPullRequestUrl()
+        this.addEmbed(this.embed)
+    }
+
+    public async prCommentDeleted() {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.extractPullRequestRepositoryName()}] Deleted comment on pull request: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
+        this.embed.description = this.body.comment.text
+        this.embed.url = this.extractPullRequestUrl()
         this.addEmbed(this.embed)
     }
 
@@ -86,8 +111,8 @@ class BitBucketServer extends BaseProvider {
         const fieldArray = new Array<EmbedField>()
 
         const toFromRefField = new EmbedField()
-        toFromRefField.name = this.body.pullRequest.title
-        toFromRefField.value = `**Destination branch:** ${this.body.pullRequest.toRef.displayId} \n **State:** ${this.body.pullRequest.state}`
+        toFromRefField.name = 'From --> To'
+        toFromRefField.value = `**Source branch:** ${this.body.pullRequest.fromRef.displayId} \n **Destination branch:** ${this.body.pullRequest.toRef.displayId} \n **State:** ${this.body.pullRequest.state}`
         fieldArray.push(toFromRefField)
 
         this.body.pullRequest.reviewers.forEach((reviewer) => {
@@ -98,6 +123,10 @@ class BitBucketServer extends BaseProvider {
         })
 
         return fieldArray
+    }
+
+    private extractPullRequestRepositoryName(): string {
+        return this.body.pullRequest.toRef.repository.name
     }
 }
 
