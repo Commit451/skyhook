@@ -10,27 +10,44 @@ window.mdc.autoInit();
     const show = function (sb, theMessage) {
         const data = {
             message: theMessage,
-            multiline: false
+            multiline: false,
+            timeout: 2750
         };
 
         sb.show(data);
     };
 
+    const validHookDomains = [
+        'discordapp.com',
+        'discord.com'
+    ];
+
     $('#button-generate').click(function () {
+
+
+
         let discordHookUrl = $('#url').val();
-        let error = false;
-        if (discordHookUrl && discordHookUrl.includes('discordapp.com')) {
+        let error = true;
 
-            const endSpacialPart = discordHookUrl.indexOf('discordapp.com');
-            const startSpacialPart = (discordHookUrl.indexOf(':') + 3);// + :// 3 chars:)
+        if(discordHookUrl) {
+            for(const domain of validHookDomains) {
 
-            discordHookUrl = discordHookUrl.replace(discordHookUrl.substring(startSpacialPart, endSpacialPart), '');
-            discordHookUrl = discordHookUrl.replace('https://discordapp.com', window.location.origin);
+                if(discordHookUrl.includes(domain)) {
 
-            const provider = $('input[name=ex2]:checked').val();
-            discordHookUrl = discordHookUrl + '/' + provider;
-        } else {
-            error = true;
+                    const endSpacialPart = discordHookUrl.indexOf(domain);
+                    const startSpacialPart = (discordHookUrl.indexOf(':') + 3);// + :// 3 chars:)
+
+                    discordHookUrl = discordHookUrl.replace(discordHookUrl.substring(startSpacialPart, endSpacialPart), '');
+                    discordHookUrl = discordHookUrl.replace(`https://${domain}`, window.location.origin);
+
+                    const provider = $('input[name=ex2]:checked').val();
+                    discordHookUrl = discordHookUrl + '/' + provider;
+
+                    error = false;
+                    break;
+                }
+
+            }
         }
 
         if (!error) {
