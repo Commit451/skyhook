@@ -10,7 +10,6 @@ describe('/POST uptimerobot', () => {
             alertDetails: 'Connection timeout'
         }
         const res = await Tester.test(new UptimeRobot(), null, null, query)
-        expect(res).to.not.be.an('error')
-        expect(res).to.not.be.a('DiscordPayload')
+        expect(res.embeds).to.be.an('array').that.has.length(1)
     })
 })

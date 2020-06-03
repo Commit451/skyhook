@@ -8,8 +8,7 @@ describe('/POST patreon', () => {
             'x-patreon-event': 'pledges:create'
         }
         const res = await Tester.test(new Patreon(), 'patreon-pledge-create.json', headers)
-        expect(res).to.not.be.an('error')
-        expect(res).to.not.be.a('DiscordPayload')
+        expect(res.embeds).to.be.an('array').that.has.length(1)
     })
 
     it('members:update', async () => {
@@ -17,7 +16,6 @@ describe('/POST patreon', () => {
             'x-patreon-event': 'members:create'
         }
         const res = await Tester.test(new Patreon(), 'patreon-member-create.json', headers)
-        expect(res).to.not.be.an('error')
-        expect(res).to.not.be.a('DiscordPayload')
+        expect(res.embeds).to.be.an('array').that.has.length(1)
     })
 })

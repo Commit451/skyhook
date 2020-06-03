@@ -9,8 +9,13 @@ import { LoggerUtil } from '../util/LoggerUtil'
  * Base provider, which all other providers will subclass. You can then
  * use the provided methods to format the data to Discord
  */
-class BaseProvider {
+abstract class BaseProvider {
 
+    /**
+     * Formats the type passed to make it work as a method reference. This means removing underscores
+     * and camel casing.
+     * @param type the event type
+     */
     public static formatType(type: string): string {
         if (type == null) {
             return null
@@ -40,16 +45,23 @@ class BaseProvider {
     }
 
     /**
-     * Right now, the path is always just the same as the name, all lower case. Override if that is not the case
+     * By default, the path is always just the same as the name, all lower case. Override if that is not the case
      */
     public getPath(): string {
         return this.getName().toLowerCase()
     }
 
+    /**
+     * Parse the request and respond with a DiscordPayload
+     * @param body the request body
+     * @param headers the request headers
+     * @param query the query
+     */
     public async parse(body: any, headers: any = null, query: any = null): Promise<DiscordPayload> {
         this.body = body
         this.headers = headers
         this.query = query
+        this.preParse()
         let type: string = 'parseData'
         if (typeof this['getType'] !== 'undefined') {
             type = await this['getType']()
@@ -60,9 +72,20 @@ class BaseProvider {
             this.logger.info(`Calling ${type}() in ${this.constructor.name} provider.`)
             await this[type]()
         }
+        this.postParse()
 
         return this.payload
     }
+
+    /**
+     * Open method to do certain things pre parse
+     */
+    protected preParse() {}
+
+    /**
+     * Open method to do certain things post parse and before the payload is returned
+     */
+    protected postParse() {}
 
     protected addEmbed(embed: Embed): void {
         // TODO check to see if too many fields

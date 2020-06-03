@@ -8,8 +8,7 @@ describe('/POST bitbucket', () => {
             'x-event-key': 'repo:push'
         }
         const res = await Tester.test(new BitBucket(), 'bitbucket.json', headers)
-        expect(res).to.not.be.an('error')
-        expect(res).to.not.be.a('DiscordPayload')
+        expect(res.embeds).to.be.an('array').that.has.length(1)
     })
 
     it('repo:push tag', async () => {
@@ -17,8 +16,7 @@ describe('/POST bitbucket', () => {
             'x-event-key': 'repo:push'
         }
         const res = await Tester.test(new BitBucket(), 'bitbucket-tag.json', headers)
-        expect(res).to.not.be.an('error')
-        expect(res).to.not.be.a('DiscordPayload')
+        expect(res.embeds).to.be.an('array').that.has.length(1)
     })
 
     it('repo:push anonymous-user', async () => {
@@ -26,7 +24,6 @@ describe('/POST bitbucket', () => {
             'x-event-key': 'repo:push'
         }
         const res = await Tester.test(new BitBucket(), 'bitbucket-anonymous.json', headers)
-        expect(res).to.not.be.an('error')
-        expect(res).to.not.be.a('DiscordPayload')
+        expect(res.embeds).to.be.an('array').that.has.length(1)
     })
 })

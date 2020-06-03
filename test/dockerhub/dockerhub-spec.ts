@@ -5,7 +5,6 @@ import { Tester } from '../Tester'
 describe('/POST dockerhub', () => {
     it('build', async () => {
         const res = await Tester.test(new DockerHub(), 'dockerhub.json', null)
-        expect(res).to.not.be.an('error')
-        expect(res).to.not.be.a('DiscordPayload')
+        expect(res.embeds).to.be.an('array').that.has.length(1)
     })
 })

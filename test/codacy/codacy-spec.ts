@@ -5,7 +5,6 @@ import { Tester } from '../Tester'
 describe('/POST codacy', () => {
     it('commit', async () => {
         const res = await Tester.test(new Codacy(), 'codacy.json', null)
-        expect(res).to.not.be.an('error')
-        expect(res).to.not.be.a('DiscordPayload')
+        expect(res.embeds).to.be.an('array').that.has.length(1)
     })
 })

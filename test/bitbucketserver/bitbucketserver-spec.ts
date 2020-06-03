@@ -9,8 +9,7 @@ describe('/POST bitbucketserver', () => {
         }
 
         const res = await Tester.test(new BitBucketServer(), 'bitbucketserver.json', headers)
-        expect(res).to.not.be.an('error')
-        expect(res).to.not.be.a('DiscordPayload')
+        expect(res.embeds).to.be.an('array').that.has.length(1)
     })
 
     it('repo:refs_changed 18 fields or less', async() => {

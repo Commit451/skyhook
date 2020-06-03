@@ -5,14 +5,12 @@ import { Tester } from '../Tester'
 describe('/POST jira', () => {
     it('issue_updated', async () => {
         const res = await Tester.test(new Jira(), 'jira-issue.json', null)
-        expect(res).to.not.be.an('error')
-        expect(res).to.not.be.a('DiscordPayload')
+        expect(res.embeds).to.be.an('array').that.has.length(1)
     })
 
     it('comment_added', async () => {
         const res = await Tester.test(new Jira(), 'jira-comment.json', null)
-        expect(res).to.not.be.an('error')
-        expect(res).to.not.be.a('DiscordPayload')
+        expect(res.embeds).to.be.an('array').that.has.length(1)
     })
 
     it('custom_no_event', async () => {
