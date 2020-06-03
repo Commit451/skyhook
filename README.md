@@ -23,7 +23,7 @@ https://skyhook.glitch.me/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/pr
 - [Bintray](https://bintray.com/docs/api/#_webhooks) - `/bintray`
 - [BitBucket](https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html) - `/bitbucket`
 - [BitBucket Server](https://confluence.atlassian.com/bitbucketserver/event-payload-938025882.html) - `/bitbucketserver`
-- [circleci](https://circleci.com/docs/1.0/configuration/#notify) - `/circleci`
+- [CircleCI](https://circleci.com/docs/1.0/configuration/#notify) - `/circleci`
 - [Codacy](https://support.codacy.com/hc/en-us/articles/207280359-WebHook-Notifications) - `/codacy`
 - [Dockerhub](https://docs.docker.com/docker-hub/webhooks) - `/dockerhub`
 - [GitLab](https://gitlab.com/help/user/project/integrations/webhooks) - `/gitlab`

@@ -319,10 +319,10 @@ class BitBucket extends BaseProvider {
         const author = new EmbedAuthor()
         author.name = this.body.actor.display_name
         if (this.body.actor.links === undefined) {
-            author.iconUrl = 'http://i0.wp.com/avatar-cdn.atlassian.com/default/96.png'
+            author.icon_url = 'http://i0.wp.com/avatar-cdn.atlassian.com/default/96.png'
             author.url = ''
         } else {
-            author.iconUrl = this.body.actor.links.avatar.href
+            author.icon_url = this.body.actor.links.avatar.href
             author.url = this.baseLink + this.body.actor.username
         }
         return author

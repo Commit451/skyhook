@@ -1,5 +1,4 @@
 import { Embed } from '../model/Embed'
-import { EmbedFooter } from '../model/EmbedFooter'
 
 /**
  * The data format needed for executing a webhook on Discord

@@ -1,5 +1,4 @@
 import { Embed } from '../model/Embed'
-import { EmbedAuthor } from '../model/EmbedAuthor'
 import { BaseProvider } from '../provider/BaseProvider'
 
 /**

@@ -4,8 +4,7 @@ import { EmbedAuthor } from '../model/EmbedAuthor'
 import { EmbedImage } from '../model/EmbedImage'
 import { BaseProvider } from '../provider/BaseProvider'
 import { MarkdownUtil } from '../util/MarkdownUtil'
-
-const urlMod = require('url')
+import urlMod from 'url'
 
 /**
  * https://developers.trello.com/apis/webhooks
@@ -890,7 +889,7 @@ class Trello extends BaseProvider {
         const memberCreator = this.body.action.memberCreator
         const author = new EmbedAuthor()
         author.name = memberCreator.fullName
-        author.iconUrl = Trello.baseAvatarUrl + memberCreator.avatarHash + '/170.png'
+        author.icon_url = Trello.baseAvatarUrl + memberCreator.avatarHash + '/170.png'
         author.url = Trello.baseLink + memberCreator.username
         return author
     }

@@ -190,14 +190,14 @@ class GitLab extends BaseProvider {
     private authorFromBody(): EmbedAuthor {
         const author = new EmbedAuthor()
         author.name = this.body.user.name
-        author.iconUrl = GitLab._formatAvatarURL(this.body.user.avatar_url)
+        author.icon_url = GitLab._formatAvatarURL(this.body.user.avatar_url)
         return author
     }
 
     private authorFromBodyPush(): EmbedAuthor {
         const author = new EmbedAuthor()
         author.name = this.body.user_name
-        author.iconUrl = GitLab._formatAvatarURL(this.body.user_avatar)
+        author.icon_url = GitLab._formatAvatarURL(this.body.user_avatar)
         return author
     }
 

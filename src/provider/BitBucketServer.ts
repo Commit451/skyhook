@@ -180,7 +180,7 @@ class BitBucketServer extends BaseProvider {
     private extractAuthor(): EmbedAuthor {
         const author = new EmbedAuthor()
         author.name = this.body.actor.displayName
-        author.iconUrl = 'https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/44_Bitbucket_logo_logos-512.png'
+        author.icon_url = 'https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/44_Bitbucket_logo_logos-512.png'
         return author
     }
 

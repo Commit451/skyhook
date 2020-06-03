@@ -1,8 +1,7 @@
 import { Embed } from '../model/Embed'
 import { EmbedAuthor } from '../model/EmbedAuthor'
 import { BaseProvider } from '../provider/BaseProvider'
-
-const gravatar = require('gravatar')
+import gravatar from 'gravatar'
 
 /**
  * https://devcenter.heroku.com/articles/app-webhooks
@@ -25,7 +24,7 @@ class Heroku extends BaseProvider {
         const author = new EmbedAuthor()
         author.name = authorName
         const imageUrl = gravatar.url(this.body.actor.email, { s: '100', r: 'x', d: 'retro' }, true)
-        author.iconUrl = imageUrl
+        author.icon_url = imageUrl
         embed.author = author
         this.addEmbed(embed)
     }

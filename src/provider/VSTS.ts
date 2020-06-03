@@ -28,7 +28,7 @@ class VSTS extends BaseProvider {
     public async gitPush() {
         const author = new EmbedAuthor()
         author.name = this.body.resource.pushedBy.displayName
-        author.iconUrl = this.body.resource.pushedBy.imageUrl
+        author.icon_url = this.body.resource.pushedBy.imageUrl
         const fields: EmbedField[] = []
         this.body.resource.commits.forEach((commit: any) => {
             const field = new EmbedField()
@@ -158,7 +158,7 @@ class VSTS extends BaseProvider {
     private extractCreatedByAuthor(): EmbedAuthor {
         const author = new EmbedAuthor()
         author.name = this.body.resource.createdBy.displayName
-        author.iconUrl = this.body.resource.createdBy.imageUrl
+        author.icon_url = this.body.resource.createdBy.imageUrl
         return author
     }
 }

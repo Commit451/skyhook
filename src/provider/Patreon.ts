@@ -105,7 +105,7 @@ class Patreon extends BaseProvider {
             } else if (entry.type === 'user' && entry.id === patronId) {
                 const author = new EmbedAuthor()
                 author.name = entry.attributes.full_name
-                author.iconUrl = entry.attributes.thumb_url
+                author.icon_url = entry.attributes.thumb_url
                 author.url = entry.attributes.url
                 embed.author = author
             }
@@ -169,7 +169,7 @@ class Patreon extends BaseProvider {
             } else if (attr.id === patreonId) {
                 const author = new EmbedAuthor()
                 author.name = attr.attributes.full_name
-                author.iconUrl = attr.attributes.thumb_url
+                author.icon_url = attr.attributes.thumb_url
                 author.url = attr.attributes.url
                 embed.author = author
             } else if (attr.id === rewardId) {
