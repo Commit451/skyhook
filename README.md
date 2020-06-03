@@ -33,6 +33,7 @@ https://skyhook.glitch.me/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/pr
 - [NewRelic](https://docs.newrelic.com/docs/alerts/new-relic-alerts/managing-notification-channels/customize-your-webhook-payload) - `/newrelic`
 - [Patreon](https://www.patreon.com/platform/documentation/webhooks) - `/patreon`
 - [Pingdom](https://www.pingdom.com/resources/webhooks) - `/pingdom`
+- [Rollbar](https://docs.rollbar.com/docs/webhooks) - `/rollbar`
 - [Travis](https://docs.travis-ci.com/user/notifications/#Webhooks-Delivery-Format) - `/travis`
 - [Trello](https://developers.trello.com/apis/webhooks) - `/trello`
 - [Unity Cloud](https://build-api.cloud.unity3d.com/docs/1.0.0/index.html#operation-webhooks-intro) - `/unity`

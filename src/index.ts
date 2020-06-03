@@ -22,6 +22,7 @@ import { Jira } from './provider/Jira'
 import { NewRelic } from './provider/NewRelic'
 import { Patreon } from './provider/Patreon'
 import { Pingdom } from './provider/Pingdom'
+import { Rollbar } from './provider/Rollbar'
 import { Travis } from './provider/Travis'
 import { Trello } from './provider/Trello'
 import { Unity } from './provider/Unity'
@@ -53,6 +54,7 @@ const providers: any[] = [
     NewRelic,
     Patreon,
     Pingdom,
+    Rollbar,
     Travis,
     Trello,
     Unity,
