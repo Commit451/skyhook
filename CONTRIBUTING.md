@@ -26,7 +26,7 @@ In order to accept data from the webhook providers, you should forward the port 
 
 Once the port is forwarded, you should be able to start the server and have it open for requests. You can validate this by going to `{your-public-ip}:8080`. If the skyhook webpage loads, then the port is forwarded correctly.
 
-From here you should be able to [setup](https://github.com/Commit451/skyhook#setup) webooks through your local copy of skyhook. **Note that when setting up your webhooks you MUST replace `skyhook.glitch.me` with `{your-public-ip}:8080`.**
+From here you should be able to [setup](https://github.com/Commit451/skyhook#setup) webooks through your local copy of skyhook. **Note that when setting up your webhooks you MUST replace `skyhookapi.com` with `{your-public-ip}:8080`.**
 
 If your changes work, the provider's webhooks should be parsed and forwarded to discord. You can also write tests in the `test` directory, using the other tests as an example, to make sure your webhook parsing is working.
 

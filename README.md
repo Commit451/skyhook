@@ -4,19 +4,19 @@ Parses webhooks and forwards them in the proper format to Discord.
 [![Build Status](https://travis-ci.org/Commit451/skyhook.svg?branch=master)](https://travis-ci.org/Commit451/skyhook) [![Discord](https://discordapp.com/api/guilds/303595820345851905/widget.png)](https://discord.gg/js7wD7p)
 
 ## Setup
-You can use the [site](https://skyhook.glitch.me/) to create the right webhook link. If you want to manually do it, here are the steps:
+You can use the [site](https://skyhookapi.com/) to create the right webhook link. If you want to manually do it, here are the steps:
 1. Create a webhook in Discord (Server Settings -> Webhooks -> Create Webhook)
 2. Copy the webhook url
 3. Turn the Discord webhook url into a skyhook webhook url like so:
 ```
-Replace discordapp.com in url with skyhook.glitch.me
+Replace discordapp.com in url with skyhookapi.com
 https://discordapp.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook
 ->
-https://skyhook.glitch.me/api/webhooks/firstPartOfWebhook/secondPartOfWebhook
+https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook
 ```
 4. Add the provider you want to the end of the url:
 ```
-https://skyhook.glitch.me/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/providerGoesHere
+https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/providerGoesHere
 ```
 ## Supported Providers
 - [AppVeyor](https://www.appveyor.com/docs/notifications/#webhook-payload-default) - `/appveyor`
@@ -43,9 +43,6 @@ https://skyhook.glitch.me/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/pr
 If you want support for a new provider, just create a pull request and add it!  
 Alternatively, a new provider can also be requested by creating an [issue](https://github.com/Commit451/skyhook/issues).
 
-## Outage
-If the service is down, please check https://status.glitch.com/ before creating an issue.
-
 ## Contributing
 If you wish to contribute, follow our [contributing guide](CONTRIBUTING.md).
 
@@ -62,23 +59,12 @@ To run tests:
 npm test
 ```
 
-## Running with Docker
-To build the image:
-```
-docker build -t skyhook .
-```
-To run the application:
-```
-docker run -p 8080:8080 --name skyhook skyhook
-```
-To run the tests:
-```
-docker run --name skyhook skyhook npm test
-```
-To remove the created container:
-```
-docker rm skyhook
-```
+## Deploying
+- [Docker](docs/docker)
+- [Google Cloud](ddocs/gcloud)
+
+## Thanks
+Special thanks to all our amazing contributors. skyhookapi.com is hosted for free for you, so if you feel so inclined, [buy a coffee!](https://ko-fi.com/jawnnypoo)
 
 ## License
 skyhook is available under the MIT license. See the LICENSE file for more info.

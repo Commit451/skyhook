@@ -24,8 +24,6 @@ window.mdc.autoInit();
 
     $('#button-generate').click(function () {
 
-
-
         let discordHookUrl = $('#url').val();
         let error = true;
 
