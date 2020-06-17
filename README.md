@@ -61,7 +61,7 @@ npm test
 
 ## Deploying
 - [Docker](docs/docker)
-- [Google Cloud](ddocs/gcloud)
+- [Google Cloud](docs/gcloud)
 
 ## Thanks
 Special thanks to all our amazing contributors. skyhookapi.com is hosted for free for you, so if you feel so inclined, [buy a coffee!](https://ko-fi.com/jawnnypoo)
