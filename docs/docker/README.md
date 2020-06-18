@@ -1,4 +1,6 @@
 ## Running with Docker
+We have a Docker image provided [here](https://hub.docker.com/repository/docker/commit451/skyhook).
+
 To build the image:
 ```
 docker build -t skyhook .
