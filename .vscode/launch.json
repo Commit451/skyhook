@@ -22,6 +22,26 @@
             "type": "node"
         },
         {
+            "args": [],
+            "cwd": "${workspaceRoot}",
+            "env": {
+                "NODE_ENV": "development"
+            },
+            "name": "TEST",
+            "outFiles": ["${workspaceRoot}/dist/**/*.js"],
+            "preLaunchTask": "compile",
+            "program": "${workspaceRoot}/src/test.ts",
+            "request": "launch",
+            "runtimeArgs": [
+                "--nolazy"
+            ],
+            "runtimeExecutable": null,
+            "outputCapture": "std",
+            "sourceMaps": true,
+            "stopOnEntry": false,
+            "type": "node"
+        },
+        {
             "type": "node",
             "request": "launch",
             "name": "Mocha All",
