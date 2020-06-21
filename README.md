@@ -59,6 +59,11 @@ To run tests:
 npm test
 ```
 
+Through Docker:
+```
+docker run -it --rm -p 8080:8080 commit451/skyhook
+```
+
 ## Deploying
 - [Docker](docs/docker)
 - [Google Cloud](docs/gcloud)

@@ -1,17 +1,12 @@
 ## Running with Docker
-To build the image:
+We have a Docker image provided [here](https://hub.docker.com/repository/docker/commit451/skyhook).
+
+To pull the image:
 ```
-docker build -t skyhook .
+docker pull commit451/skyhook
 ```
 To run the application:
 ```
-docker run -p 8080:8080 --name skyhook skyhook
+docker run -it --rm -p 80:8080 commit451/skyhook
 ```
-To run the tests:
-```
-docker run --name skyhook skyhook npm test
-```
-To remove the created container:
-```
-docker rm skyhook
-```
+Then, you can navigate to the IP of the docker in your browser and can see it is running!
