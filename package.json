@@ -11,7 +11,8 @@
     "buildstart": "npm run build && npm run start",
     "test": "mocha -r ts-node/register test/**/*.ts",
     "lint": "tslint --project .",
-    "deploy": "gcloud app deploy"
+    "deploy": "gcloud app deploy",
+    "logs": "gcloud app logs tail -s default"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",

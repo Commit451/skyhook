@@ -23,7 +23,7 @@ export { NewProvider }
 ```
 
 ## Example for providers with multiple methods
-```js
+```ts
 import { BaseProvider } from '../provider/BaseProvider'
 
 class NewProvider extends BaseProvider {
