@@ -121,7 +121,7 @@ class BitBucketServer extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
-    public async pullrequestFulfilled() {
+    public async prMerged() {
         this.formatPrPayload('Pull request merged')
         this.addEmbed(this.embed)
     }
