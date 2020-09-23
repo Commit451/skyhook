@@ -105,10 +105,14 @@ class GitLab extends BaseProvider {
         this.embed.title = actions[this.body.object_attributes.action] + ' issue #' + this.body.object_attributes.iid + ' on ' + this.body.project.name
         this.embed.url = this.body.object_attributes.url
         this.embed.author = this.authorFromBody()
-        const field = new EmbedField()
-        field.name = this.body.object_attributes.title
-        field.value = (this.body.object_attributes.description != null && this.body.object_attributes.description.length > 1024) ? this.body.object_attributes.description.substring(0, 1023) + '\u2026' : this.body.object_attributes.description
-        this.embed.fields = [field]
+        if (this.body.object_attributes.description !== '') {
+            const field = new EmbedField()
+            field.name = this.body.object_attributes.title
+            field.value = (this.body.object_attributes.description.length > 1024) ? this.body.object_attributes.description.substring(0, 1023) + '\u2026' : this.body.object_attributes.description
+            this.embed.fields = [field]
+        } else {
+            this.embed.description = `**${this.body.object_attributes.title}**`
+        }
         this.addEmbed(this.embed)
     }
 
@@ -145,13 +149,17 @@ class GitLab extends BaseProvider {
             approved: 'Approved',
             unapproved: 'Unapproved'
         }
-        const field = new EmbedField()
-        field.name = this.body.object_attributes.title
-        field.value = (this.body.object_attributes.description.length > 1024) ? this.body.object_attributes.description.substring(0, 1023) + '\u2026' : this.body.object_attributes.description
         this.embed.title = actions[this.body.object_attributes.action] + ' merge request #' + this.body.object_attributes.iid + ' on ' + this.body.project.name
         this.embed.url = this.body.object_attributes.url
         this.embed.author = this.authorFromBody()
-        this.embed.fields = [field]
+        if (this.body.object_attributes.description !== '') {
+            const field = new EmbedField()
+            field.name = this.body.object_attributes.title
+            field.value = (this.body.object_attributes.description.length > 1024) ? this.body.object_attributes.description.substring(0, 1023) + '\u2026' : this.body.object_attributes.description
+            this.embed.fields = [field]
+        } else {
+            this.embed.description = `**${this.body.object_attributes.title}**`
+        }
         this.addEmbed(this.embed)
     }
 
