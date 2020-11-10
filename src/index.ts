@@ -17,6 +17,7 @@ import { Codacy } from './provider/Codacy'
 import { DockerHub } from './provider/DockerHub'
 import { GitLab } from './provider/GitLab'
 import { Heroku } from './provider/Heroku'
+import { Instana } from './provider/Instana'
 import { Jenkins } from './provider/Jenkins'
 import { Jira } from './provider/Jira'
 import { NewRelic } from './provider/NewRelic'
@@ -49,6 +50,7 @@ const providers: any[] = [
     DockerHub,
     GitLab,
     Heroku,
+    Instana,
     Jenkins,
     Jira,
     NewRelic,
