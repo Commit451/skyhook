@@ -59,7 +59,6 @@ class Instana extends BaseProvider {
     }
 
     private parseUnrecognizedType(embed: Embed): Embed {
-        console.log('Inside unrecognized')
         embed.title = 'Unrecognized Webhook Type'
         embed.url = this.body.issue.link
         return embed
