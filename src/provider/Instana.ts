@@ -73,13 +73,9 @@ class Instana extends BaseProvider {
         return 'instana'
     }
 
-
     public async parseData() {
-        console.log(this.body.issue)
-
         const embed = new Embed()
         embed.fields = []
-
         switch (this.getEventType()) {
             case 'OPEN': {
                 this.addEmbed(this.parseOpenIncident(embed))
