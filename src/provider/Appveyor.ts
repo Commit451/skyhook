@@ -7,11 +7,11 @@ import { BaseProvider } from '../provider/BaseProvider'
  */
 class AppVeyor extends BaseProvider {
 
-    public getName() {
+    public getName(): string {
         return 'AppVeyor'
     }
 
-    public async parseData() {
+    public async parseData(): Promise<void> {
         this.setEmbedColor(0x00B3E0)
         const embed = new Embed()
         embed.title = 'Build ' + this.body.eventData.buildVersion

@@ -16,7 +16,7 @@ class VSTS extends BaseProvider {
         this.embed = new Embed()
     }
 
-    public getName() {
+    public getName(): string {
         return 'VSTS'
     }
 
@@ -25,12 +25,12 @@ class VSTS extends BaseProvider {
     }
 
     // PUSH
-    public async gitPush() {
+    public async gitPush(): Promise<void> {
         const author = new EmbedAuthor()
         author.name = this.body.resource.pushedBy.displayName
         author.icon_url = this.body.resource.pushedBy.imageUrl
         const fields: EmbedField[] = []
-        this.body.resource.commits.forEach((commit: any) => {
+        this.body.resource.commits.forEach((commit) => {
             const field = new EmbedField()
             field.name = 'Commit from ' + this.body.resource.pushedBy.displayName
             field.value = '([`' + commit.commitId.substring(0, 7) + '`](' + this.body.resource.repository.remoteUrl + '/commit/' + commit.commitId + ')) ' + commit.comment
@@ -43,7 +43,7 @@ class VSTS extends BaseProvider {
     }
 
     // CHECK IN
-    public async tfvcCheckin() {
+    public async tfvcCheckin(): Promise<void> {
         const name = this.body.resource.checkedInBy.displayName
         const field = new EmbedField()
         field.name = 'Check in from ' + name
@@ -54,7 +54,7 @@ class VSTS extends BaseProvider {
     }
 
     // PULL REQUEST
-    public async gitPullrequestCreated() {
+    public async gitPullrequestCreated(): Promise<void> {
         const author = this.extractCreatedByAuthor()
         this.embed.author = author
         const field = new EmbedField()
@@ -66,7 +66,7 @@ class VSTS extends BaseProvider {
     }
 
     // PULL REQUEST MERGE COMMIT
-    public async gitPullrequestMerged() {
+    public async gitPullrequestMerged(): Promise<void> {
         const author = this.extractCreatedByAuthor()
         this.embed.author = author
         const field = new EmbedField()
@@ -78,7 +78,7 @@ class VSTS extends BaseProvider {
     }
 
     // PULL REQUEST UPDATED
-    public async gitPullrequestUpdated() {
+    public async gitPullrequestUpdated(): Promise<void> {
         const author = this.extractCreatedByAuthor()
         this.embed.author = author
         const field = new EmbedField()
@@ -90,72 +90,73 @@ class VSTS extends BaseProvider {
     }
 
     // WORK ITEM COMMENTED ON
-    public async workitemCommented() {
+    public async workitemCommented(): Promise<void> {
         this.addMinimalMessage()
     }
 
     // WORK ITEM CREATED
-    public async workitemCreated() {
+    public async workitemCreated(): Promise<void> {
         this.addMinimalMessage()
     }
 
     // WORK ITEM DELETED
-    public async workitemDeleted() {
+    public async workitemDeleted(): Promise<void> {
         this.addMinimalMessage()
     }
 
     // WORK ITEM RESTORED
-    public async workitemRestored() {
+    public async workitemRestored(): Promise<void> {
         this.addMinimalMessage()
     }
 
     // WORK ITEM UPDATED
-    public async workitemUpdated() {
+    public async workitemUpdated(): Promise<void> {
         this.addMinimalMessage()
     }
 
     // BUILD COMPLETED
-    public async buildComplete() {
+    public async buildComplete(): Promise<void> {
         this.addMinimalMessage()
     }
 
     // RELEASE CREATED
-    public async msVssReleaseReleaseCreatedEvent() {
+    public async msVssReleaseReleaseCreatedEvent(): Promise<void> {
         this.addMinimalMessage()
     }
 
     // RELEASE ABANDONED
-    public async msVssReleaseReleaseAbandonedEvent() {
+    public async msVssReleaseReleaseAbandonedEvent(): Promise<void> {
         this.addMinimalMessage()
     }
 
     // RELEASE DEPLOYMENT APPROVAL COMPLETED
-    public async msVssReleaseDeploymentApprovalCompleted() {
+    public async msVssReleaseDeploymentApprovalCompleted(): Promise<void> {
         this.addMinimalMessage()
     }
 
     // RELEASE DEPLOYMENT APPROVAL PENDING
-    public async msVssReleaseDeploymentApprovalPendingEvent() {
+    public async msVssReleaseDeploymentApprovalPendingEvent(): Promise<void> {
         this.addMinimalMessage()
     }
 
     // RELEASE DEPLOYMENT COMPLETED
-    public async msVssReleaseDeploymentCompletedEvent() {
+    public async msVssReleaseDeploymentCompletedEvent(): Promise<void> {
         this.addMinimalMessage()
     }
 
     // RELEASE DEPLOYMENT STARTED
-    public async msVssReleaseDeplyomentStartedEvent() {
+    public async msVssReleaseDeplyomentStartedEvent(): Promise<void> {
         this.addMinimalMessage()
     }
 
     // Because carpal tunnel...
     private addMinimalMessage() {
         this.embed.title = this.body.message.markdown
-		
-		if (this.embed.title.length > 256)
-			this.embed.title = this.body.resource.title ?? this.body.message.markdown.substring(0, 256);
-		
+
+        if (this.embed.title.length > 256) {
+            this.embed.title = this.body.resource.title ?? this.body.message.markdown.substring(0, 256)
+        }
+
         this.addEmbed(this.embed)
     }
 

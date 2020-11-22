@@ -6,9 +6,8 @@ import winston from 'winston'
  */
 class LoggerUtil {
 
-    public static init() {
+    public static init(): void {
         if (!this.isInitialized) {
-            // @ts-ignore Method exists, will be added to ts def in next release.
             winston.loggers.add('logger', {
                 format: winston.format.combine(
                     winston.format.colorize(),
@@ -22,8 +21,7 @@ class LoggerUtil {
         }
     }
 
-    public static logger() {
-        // @ts-ignore Method exists, will be added to ts def in next release.
+    public static logger(): winston.Logger {
         return winston.loggers.get('logger')
     }
 

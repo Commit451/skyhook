@@ -6,15 +6,15 @@ import { BaseProvider } from '../provider/BaseProvider'
  */
 class Unity extends BaseProvider {
 
-    public getName() {
+    public getName(): string {
         return 'Unity Cloud'
     }
 
-    public getPath() {
+    public getPath(): string {
         return 'unity'
     }
 
-    public async parseData() {
+    public async parseData(): Promise<void> {
         this.setEmbedColor(0x222C37)
         const projectName = this.body.projectName
         const projectVersion = this.body.buildNumber

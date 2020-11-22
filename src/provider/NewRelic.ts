@@ -6,15 +6,15 @@ import { BaseProvider } from '../provider/BaseProvider'
  */
 class NewRelic extends BaseProvider {
 
-    public getName() {
+    public getName(): string {
         return 'New Relic'
     }
 
-    public getPath() {
+    public getPath(): string {
         return 'newrelic'
     }
 
-    public async parseData() {
+    public async parseData(): Promise<void> {
         const details = this.body.details
         const state = this.body.current_state
         const embed = new Embed()

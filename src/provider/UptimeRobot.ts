@@ -8,15 +8,15 @@ import { BaseProvider } from '../provider/BaseProvider'
  */
 class UptimeRobot extends BaseProvider {
 
-    public getName() {
+    public getName(): string {
         return 'Uptime Robot'
     }
 
-    public getPath() {
+    public getPath(): string {
         return 'uptimerobot'
     }
 
-    public async parseData() {
+    public async parseData(): Promise<void> {
         const embed = new Embed()
         embed.title = this.query.monitorFriendlyName
         embed.url = this.query.monitorURL

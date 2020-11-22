@@ -10,15 +10,15 @@ class Jira extends BaseProvider {
         this.setEmbedColor(0x1e45a8)
     }
 
-    public getName() {
+    public getName(): string {
         return 'Jira'
     }
 
-    public getPath() {
+    public getPath(): string {
         return 'jira'
     }
 
-    public async parseData() {
+    public async parseData(): Promise<void> {
         if (this.body.webhookEvent == null) {
             this.payload = null
             return
@@ -40,7 +40,7 @@ class Jira extends BaseProvider {
         }
         const user = this.body.user || { displayName: 'Anonymous' }
         const action = this.body.webhookEvent.split('_')[1]
-        const matches = issue.self.match(/^(https?:\/\/[^\/?#]+)(?:[\/?#]|$)/i)
+        const matches = issue.self.match(/^(https?:\/\/[^/?#]+)(?:[/?#]|$)/i)
         const domain = matches && matches[1]
 
         // create the embed

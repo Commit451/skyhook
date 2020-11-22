@@ -51,7 +51,7 @@ class MarkdownUtil {
         return lines.join('\n')
     }
 
-    public static _formatMarkdownBold(str: string) {
+    public static _formatMarkdownBold(str: string): string {
         let match
         while (boldRegex.test(str)) {
             match = boldRegex.exec(str)

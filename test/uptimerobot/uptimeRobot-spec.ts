@@ -4,7 +4,7 @@ import { Tester } from '../Tester'
 
 describe('/POST uptimerobot', () => {
     it('monitor', async () => {
-        const query: any = {
+        const query = {
             monitorFriendlyName: 'Test Monitor',
             monitorURL: 'http://www.example.com',
             alertDetails: 'Connection timeout'

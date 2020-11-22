@@ -7,6 +7,7 @@ class Project {
     public name?: string
     public url?: string
     public branch?: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public commits?: any[]
     public totalCommitsCount?: number
 }
@@ -31,7 +32,7 @@ class GitLab extends BaseProvider {
         this.embed = new Embed()
     }
 
-    public getName() {
+    public getName(): string {
         return 'GitLab'
     }
 
@@ -39,7 +40,7 @@ class GitLab extends BaseProvider {
         return this.body.object_kind
     }
 
-    public async push() {
+    public async push(): Promise<void> {
         const branch = this.body.ref.split('/')
         branch.shift()
         branch.shift()
@@ -75,7 +76,7 @@ class GitLab extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
-    public async tagPush() {
+    public async tagPush(): Promise<void> {
         const tmpTag = this.body.ref.split('/')
         tmpTag.shift()
         tmpTag.shift()
@@ -94,7 +95,7 @@ class GitLab extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
-    public async issue() {
+    public async issue(): Promise<void> {
         const actions = {
             open: 'Opened',
             close: 'Closed',
@@ -116,7 +117,7 @@ class GitLab extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
-    public async note() {
+    public async note(): Promise<void> {
         let type: string = null
         switch (this.body.object_attributes.noteable_type) {
             case 'Commit':
@@ -139,7 +140,7 @@ class GitLab extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
-    public async mergeRequest() {
+    public async mergeRequest(): Promise<void> {
         const actions = {
             open: 'Opened',
             close: 'Closed',
@@ -163,7 +164,7 @@ class GitLab extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
-    public async wikiPage() {
+    public async wikiPage(): Promise<void> {
         const actions = {
             create: 'Created',
             delete: 'Deleted',
@@ -177,7 +178,7 @@ class GitLab extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
-    public async pipeline() {
+    public async pipeline(): Promise<void> {
         this.embed.title = 'Pipeline #' + this.body.object_attributes.id + ' on ' + this.body.project.name
         this.embed.url = this.body.project.web_url + '/pipelines/' + this.body.object_attributes.id
         this.embed.author = this.authorFromBody()
@@ -185,7 +186,7 @@ class GitLab extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
-    public async build() {
+    public async build(): Promise<void> {
         // The build event uses the deprecated repository field.
         const realProj = this.body.project || this.body.repository
         this.embed.title = 'Build #' + this.body.build_id + ' on ' + realProj.name

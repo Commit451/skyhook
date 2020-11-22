@@ -1,0 +1,42 @@
+{
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+        "@typescript-eslint"
+    ],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "rules": {
+        "semi": "off",
+        "@typescript-eslint/semi": [
+            "error",
+            "never"
+        ],
+        "quotes": "off",
+        "@typescript-eslint/quotes": [
+            "error",
+            "single"
+        ],
+        "indent": "off",
+        "@typescript-eslint/indent": [
+            "error",
+            4
+        ],
+        "@typescript-eslint/member-delimiter-style": [
+            "error",
+            {
+                "multiline": {
+                    "delimiter": "none",
+                    "requireLast": false
+                },
+                "singleline": {
+                    "delimiter": "comma",
+                    "requireLast": false
+                }
+            }
+        ],
+        "@typescript-eslint/no-non-null-assertion": "off"
+    }
+}

@@ -1,14 +1,15 @@
 /**
  * For running quick test things in node
  */
-require('dotenv').config()
-
+import dotenv from 'dotenv'
 import axios from 'axios'
 import * as fs from 'fs'
 import { DiscordPayload } from './model/DiscordPayload'
 import { BaseProvider } from './provider/BaseProvider'
 import { Heroku } from './provider/Heroku'
 import { ErrorUtil } from './util/ErrorUtil'
+
+dotenv.config()
 
 testPayloadVisual(new Heroku(), 'heroku', 'heroku.json')
 
@@ -37,7 +38,7 @@ function sendPayload(discordPayload: DiscordPayload) {
         url: discordEndpoint
     }).then(() => {
         console.log('Sent')
-    }).catch((err: any) => {
-        console.log("Error sending to discord")
+    }).catch((err) => {
+        console.log('Error sending to discord', err)
     })
 }

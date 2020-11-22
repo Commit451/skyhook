@@ -6,11 +6,11 @@ import { BaseProvider } from './BaseProvider'
 class BitBucketServer extends BaseProvider {
     private embed: Embed
 
-    private static _formatLargeString(str, limit = 256) {
+    private static _formatLargeString(str, limit = 256): string {
         return (str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str)
     }
 
-    private static _titleCase(str: string, ifNull = 'None') {
+    private static _titleCase(str: string, ifNull = 'None'): string {
         if (str == null) {
             return ifNull
         }
@@ -30,7 +30,7 @@ class BitBucketServer extends BaseProvider {
         this.embed = new Embed()
     }
 
-    public getName() {
+    public getName(): string {
         return 'BitBucketServer'
     }
 
@@ -38,10 +38,10 @@ class BitBucketServer extends BaseProvider {
         return this.headers['x-event-key']
     }
 
-    public async diagnosticsPing() {
+    public async diagnosticsPing(): Promise<void> {
         const field = new EmbedField()
         this.embed.title = 'Test Connection'
-        this.embed.description = `You have successfully configured Skyhook with your BitBucket Server instance.`
+        this.embed.description = 'You have successfully configured Skyhook with your BitBucket Server instance.'
         field.name = 'Test'
         field.value = this.body.test
         this.embed.fields = [field]
@@ -49,7 +49,7 @@ class BitBucketServer extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
-    public async repoRefsChanged() {
+    public async repoRefsChanged(): Promise<void> {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.extractRepoRepositoryName()}] New commit`
         this.embed.description = this.body.repository.description
@@ -58,104 +58,104 @@ class BitBucketServer extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
-    public async repoModified() {
+    public async repoModified(): Promise<void> {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.body.old.name}] Repository has been updated`
         this.embed.url = this.extractBaseLink() + '/projects/' + this.body.new.project.key + '/repos/' + this.body.new.slug + '/browse'
         this.addEmbed(this.embed)
     }
 
-    public async repoForked() {
+    public async repoForked(): Promise<void> {
         this.embed.author = this.extractAuthor()
         this.embed.description = 'A new [`fork`] has been created.'
         this.addEmbed(this.embed)
     }
 
-    public async repoCommentAdded() {
-        this.formatCommitCommentPayload('New comment no commit')
+    public async repoCommentAdded(): Promise<void> {
+        this.formatCommitCommentPayload('New comment on commit')
         this.addEmbed(this.embed)
     }
 
-    public async repoCommentEdited() {
+    public async repoCommentEdited(): Promise<void> {
         this.formatCommitCommentPayload('Comment edited on commit')
         this.addEmbed(this.embed)
     }
 
-    public async repoCommentDeleted() {
+    public async repoCommentDeleted(): Promise<void> {
         this.formatCommitCommentPayload('Comment deleted on commit')
         this.addEmbed(this.embed)
     }
 
-    public async prOpened() {
+    public async prOpened(): Promise<void> {
         this.formatPrPayload('Pull request opened')
         this.addEmbed(this.embed)
     }
 
-    public async prFromRefUpdated() {
+    public async prFromRefUpdated(): Promise<void> {
         this.formatPrPayload('Pull request updated')
         this.addEmbed(this.embed)
     }
 
-    public async prModified() {
+    public async prModified(): Promise<void> {
         this.formatPrPayload('Pull request modified')
         this.addEmbed(this.embed)
     }
 
-    public async prReviewerUpdated() {
+    public async prReviewerUpdated(): Promise<void> {
         this.formatPrPayload('New reviewers for pull request')
         this.addEmbed(this.embed)
     }
 
-    public async prReviewerApproved() {
+    public async prReviewerApproved(): Promise<void> {
         this.formatPrPayload('Pull request approved')
         this.addEmbed(this.embed)
     }
 
-    public async prReviewerUnapproved() {
+    public async prReviewerUnapproved(): Promise<void> {
         this.formatPrPayload(('Removed approval for pull request'))
         this.addEmbed(this.embed)
     }
 
-    public async prReviewerNeedsWork() {
+    public async prReviewerNeedsWork(): Promise<void> {
         this.formatPrPayload('Pull request needs work')
         this.addEmbed(this.embed)
     }
 
-    public async prMerged() {
+    public async prMerged(): Promise<void> {
         this.formatPrPayload('Pull request merged')
         this.addEmbed(this.embed)
     }
 
-    public async prDeclined() {
+    public async prDeclined(): Promise<void> {
         this.formatPrPayload('Pull request declined')
         this.addEmbed(this.embed)
     }
 
-    public async prDeleted() {
+    public async prDeleted(): Promise<void> {
         this.formatPrPayload('Deleted pull request')
         this.addEmbed(this.embed)
     }
 
-    public async prCommentAdded() {
+    public async prCommentAdded(): Promise<void> {
         this.formatCommentPayload('New comment on pull request')
         this.addEmbed(this.embed)
     }
 
-    public async prCommentEdited() {
+    public async prCommentEdited(): Promise<void> {
         this.formatCommentPayload('Updated comment on pull request')
         this.addEmbed(this.embed)
     }
 
-    public async prCommentDeleted() {
+    public async prCommentDeleted(): Promise<void> {
         this.formatCommentPayload('Deleted comment on pull request')
         this.addEmbed(this.embed)
     }
 
-    public async mirrorRepoSynchronized() {
+    public async mirrorRepoSynchronized(): Promise<void> {
         this.embed.title = `[${this.extractRepoRepositoryName()}] Mirror Synchronized`
     }
 
-    private formatPrPayload(title: string) {
+    private formatPrPayload(title: string): void {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.extractPullRequestRepositoryName()}] ${title}: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
         this.embed.description = this.body.pullRequest.description
@@ -163,16 +163,16 @@ class BitBucketServer extends BaseProvider {
         this.embed.fields = this.extractPullRequestFields()
     }
 
-    private formatCommentPayload(title: string) {
+    private formatCommentPayload(title: string): void {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.extractPullRequestRepositoryName()}] ${title}: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
         this.embed.description = this.body.comment.text
         this.embed.url = this.extractPullRequestUrl()
     }
 
-    private formatCommitCommentPayload(title: string) {
+    private formatCommitCommentPayload(title: string): void {
         this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.extractRepoRepositoryName()}] New comment on commit ${this.body.commit.slice(0, 10)}`
+        this.embed.title = `[${this.extractRepoRepositoryName()}] ${title} ${this.body.commit.slice(0, 10)}`
         this.embed.description = this.body.comment.text
         this.embed.url = this.extractCommitCommentUrl()
     }

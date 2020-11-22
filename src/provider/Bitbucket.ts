@@ -27,7 +27,7 @@ class BitBucket extends BaseProvider {
         return strArray.join(' ')
     }
 
-    private baseLink: string = 'https://bitbucket.org/'
+    private baseLink = 'https://bitbucket.org/'
     private embed: Embed
 
     constructor() {
@@ -36,7 +36,7 @@ class BitBucket extends BaseProvider {
         this.embed = new Embed()
     }
 
-    public getName() {
+    public getName(): string {
         return 'BitBucket'
     }
 
@@ -44,7 +44,7 @@ class BitBucket extends BaseProvider {
         return this.headers['x-event-key']
     }
 
-    public async repoPush() {
+    public async repoPush(): Promise<void> {
         if (this.body.push != null && this.body.push.changes != null) {
             for (let i = 0; (i < this.body.push.changes.length && i < 4); i++) {
                 const change = this.body.push.changes[i]
@@ -90,13 +90,13 @@ class BitBucket extends BaseProvider {
         }
     }
 
-    public async repoFork() {
+    public async repoFork(): Promise<void> {
         this.embed.author = this.extractAuthor()
         this.embed.description = 'Created a [`fork`](' + this.baseLink + this.body.fork.full_name + ') of [`' + this.body.repository.name + '`](' + this.baseLink + this.body.repository.full_name + ')'
         this.addEmbed(this.embed)
     }
 
-    public async repoUpdated() {
+    public async repoUpdated(): Promise<void> {
 
         const changes: string[] = []
         if (typeof this.body.changes.name !== 'undefined') {
@@ -120,7 +120,7 @@ class BitBucket extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
-    public async repoCommitCommentCreated() {
+    public async repoCommitCommentCreated(): Promise<void> {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.body.repository.full_name}] New comment on commit \`${this.body.commit.hash.substring(0, 7)}\``
         this.embed.description = (this.body.comment.content.html.replace(/<.*?>/g, '').length > 1024) ? this.body.comment.content.html.replace(/<.*?>/g, '').substring(0, 1023) + '\u2026' : this.body.comment.content.html.replace(/<.*?>/g, '')
@@ -128,14 +128,14 @@ class BitBucket extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
-    public async repoCommitStatusCreated() {
+    public async repoCommitStatusCreated(): Promise<void> {
         this.embed.title = this.body.commit_status.name
         this.embed.description = '**State:** ' + this.body.commit_status.state + '\n' + this.body.commit_status.description
         this.embed.url = this.body.commit_status.url
         this.addEmbed(this.embed)
     }
 
-    public async repoCommitStatusUpdated() {
+    public async repoCommitStatusUpdated(): Promise<void> {
         this.embed.author = this.extractAuthor()
         this.embed.title = this.body.commit_status.name
         this.embed.url = this.body.commit_status.url
@@ -143,7 +143,7 @@ class BitBucket extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
-    public async issueCreated() {
+    public async issueCreated(): Promise<void> {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.body.repository.full_name}] Issue opened: #${this.body.issue.id} ${this.body.issue.title}`
         this.embed.url = this.extractIssueUrl()
@@ -178,7 +178,7 @@ class BitBucket extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
-    public async issueUpdated() {
+    public async issueUpdated(): Promise<void> {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.body.repository.full_name}] Issue updated: #${this.body.issue.id} ${this.body.issue.title}`
         this.embed.url = this.extractIssueUrl()
@@ -195,7 +195,7 @@ class BitBucket extends BaseProvider {
                     return
                 }
 
-                const actorNames: any = {}
+                const actorNames: {[state: string]: string} = {}
                 const unassigned = '`Unassigned`'
 
                 states.forEach((state) => {
@@ -236,7 +236,7 @@ class BitBucket extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
-    public async issueCommentCreated() {
+    public async issueCommentCreated(): Promise<void> {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.body.repository.full_name}] New comment on issue #${this.body.issue.id}: ${this.body.issue.title}`
         this.embed.url = this.extractIssueUrl()
@@ -244,7 +244,7 @@ class BitBucket extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
-    public async pullrequestCreated() {
+    public async pullrequestCreated(): Promise<void> {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.body.repository.full_name}] Pull request opened: #${this.body.pullrequest.id} ${this.body.pullrequest.title}`
         this.embed.url = this.extractPullRequestUrl()
@@ -253,7 +253,7 @@ class BitBucket extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
-    public async pullrequestUpdated() {
+    public async pullrequestUpdated(): Promise<void> {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.body.repository.full_name}] Updated pull request: #${this.body.pullrequest.id} ${this.body.pullrequest.title}`
         this.embed.url = this.extractPullRequestUrl()
@@ -262,28 +262,28 @@ class BitBucket extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
-    public async pullrequestApproved() {
+    public async pullrequestApproved(): Promise<void> {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.body.repository.full_name}] Approved pull request: #${this.body.pullrequest.id} ${this.body.pullrequest.title}`
         this.embed.url = this.extractPullRequestUrl()
         this.addEmbed(this.embed)
     }
 
-    public async pullrequestUnapproved() {
+    public async pullrequestUnapproved(): Promise<void> {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.body.repository.full_name}] Removed approval for pull request: #${this.body.pullrequest.id} ${this.body.pullrequest.title}`
         this.embed.url = this.extractPullRequestUrl()
         this.addEmbed(this.embed)
     }
 
-    public async pullrequestFulfilled() {
+    public async pullrequestFulfilled(): Promise<void> {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.body.repository.full_name}] Merged pull request: #${this.body.pullrequest.id} ${this.body.pullrequest.title}`
         this.embed.url = this.extractPullRequestUrl()
         this.addEmbed(this.embed)
     }
 
-    public async pullrequestRejected() {
+    public async pullrequestRejected(): Promise<void> {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.body.repository.full_name}] Rejected pull request: #${this.body.pullrequest.id} ${this.body.pullrequest.title}`
         this.embed.url = this.extractPullRequestUrl()
@@ -291,7 +291,7 @@ class BitBucket extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
-    public async pullrequestCommentCreated() {
+    public async pullrequestCommentCreated(): Promise<void> {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.body.repository.full_name}] New comment on pull request: #${this.body.pullrequest.id} ${this.body.pullrequest.title}`
         this.embed.url = this.extractPullRequestUrl()
@@ -299,7 +299,7 @@ class BitBucket extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
-    public async pullrequestCommentUpdated() {
+    public async pullrequestCommentUpdated(): Promise<void> {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.body.repository.full_name}] Updated comment on pull request: #${this.body.pullrequest.id} ${this.body.pullrequest.title}`
         this.embed.url = this.extractPullRequestUrl()
@@ -307,7 +307,7 @@ class BitBucket extends BaseProvider {
         this.addEmbed(this.embed)
     }
 
-    public async pullrequestCommentDeleted() {
+    public async pullrequestCommentDeleted(): Promise<void> {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.body.repository.full_name}] Deleted comment on pull request: #${this.body.pullrequest.id} ${this.body.pullrequest.title}`
         this.embed.description = (this.body.comment.content.html.replace(/<.*?>/g, '').length > 1024) ? this.body.comment.content.html.replace(/<.*?>/g, '').substring(0, 1023) + '\u2026' : this.body.comment.content.html.replace(/<.*?>/g, '')

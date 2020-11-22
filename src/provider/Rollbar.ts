@@ -22,48 +22,48 @@ class Rollbar extends BaseProvider {
         return this.body.event_name
     }
 
-    public async expRepeatItem() {
+    public async expRepeatItem(): Promise<void> {
         this.embed.title = `${this.body.data.occurrence} occurrence of issue`
         this.embed.description = this.body.data.item.title
     }
 
-    public async deploy() {
+    public async deploy(): Promise<void> {
         const deploy = this.body.data.deploy
         this.embed.title = `New Deploy to ${deploy.environment}`
         this.embed.description = deploy.comment
     }
 
-    public async itemVelocity() {
-        this.embed.title = `Velocity increase of issue`
+    public async itemVelocity(): Promise<void> {
+        this.embed.title = 'Velocity increase of issue'
         this.embed.description = this.body.data.item.title
     }
 
-    public async newItem() {
-        this.embed.title = `Velocity increase of issue`
+    public async newItem(): Promise<void> {
+        this.embed.title = 'Velocity increase of issue'
         this.embed.description = this.body.data.item.title
     }
 
-    public async occurrence() {
-        this.embed.title = `New issue`
+    public async occurrence(): Promise<void> {
+        this.embed.title = 'New issue'
         this.embed.description = this.body.data.item.title
     }
 
-    public async reactivatedItem() {
-        this.embed.title = `Issue reactivated`
+    public async reactivatedItem(): Promise<void> {
+        this.embed.title = 'Issue reactivated'
         this.embed.description = this.body.data.item.title
     }
 
-    public async reopenedItem() {
-        this.embed.title = `Issue reopened`
+    public async reopenedItem(): Promise<void> {
+        this.embed.title = 'Issue reopened'
         this.embed.description = this.body.data.item.title
     }
 
-    public async resolvedItem() {
-        this.embed.title = `Issue resolved`
+    public async resolvedItem(): Promise<void> {
+        this.embed.title = 'Issue resolved'
         this.embed.description = this.body.data.item.title
     }
 
-    public postParse() {
+    public postParse(): void {
         this.addEmbed(this.embed)
     }
 }

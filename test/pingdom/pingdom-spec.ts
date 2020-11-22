@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 import { Pingdom } from '../../src/provider/Pingdom'
 import { Tester } from '../Tester'
-import { DiscordPayload } from '../../src/model/DiscordPayload'
 
 describe('/POST pingdom', () => {
     it('check', async () => {

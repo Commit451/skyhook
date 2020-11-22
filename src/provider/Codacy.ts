@@ -11,7 +11,7 @@ class Codacy extends BaseProvider {
         return 'Codacy'
     }
 
-    public async parseData() {
+    public async parseData(): Promise<void> {
         this.setEmbedColor(0x242c33)
         const embed = new Embed()
         embed.title = 'New Commit'

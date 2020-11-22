@@ -43,7 +43,9 @@ class Trello extends BaseProvider {
     }
 
     private embed: Embed
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private action: any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private model: any
 
     constructor() {
@@ -51,7 +53,7 @@ class Trello extends BaseProvider {
         this.embed = new Embed()
     }
 
-    public getName() {
+    public getName(): string {
         return 'Trello'
     }
 
@@ -61,7 +63,7 @@ class Trello extends BaseProvider {
 
     // Webhook Type Responses
 
-    public async addAttachmentToCard() {
+    public async addAttachmentToCard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Added Attachment to "' + this.action.data.card.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
@@ -70,11 +72,11 @@ class Trello extends BaseProvider {
     }
 
     // How to Trigger?
-    public async addBoardsPinnedToMember() {
+    public async addBoardsPinnedToMember(): Promise<void> {
         console.log('Not implemented')
     }
 
-    public async addChecklistToCard() {
+    public async addChecklistToCard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Added Checklist to "' + this.action.data.card.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
@@ -82,7 +84,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async addLabelToCard() {
+    public async addLabelToCard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Added Label to "' + this.action.data.card.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
@@ -90,7 +92,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async addMemberToCard() {
+    public async addMemberToCard(): Promise<void> {
         const embed = this._preparePayload()
         if (this.action.memberCreator.id === this.action.member.id) {
             embed.title = '[' + this.action.data.board.name + '] Joined "' + this.action.data.card.name + '"'
@@ -103,7 +105,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async addMemberToBoard() {
+    public async addMemberToBoard(): Promise<void> {
         const embed = this._preparePayload()
         if (this.action.memberCreator.id === this.action.member.id) {
             embed.title = 'Joined Board "' + this.action.data.board.name + '"'
@@ -116,7 +118,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async addMemberToOrganization() {
+    public async addMemberToOrganization(): Promise<void> {
         const embed = this._preparePayload()
         if (this.action.memberCreator.id === this.action.member.id) {
             embed.title = 'Joined Organization "' + this.action.data.organization.name + '"'
@@ -129,7 +131,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async addToOrganizationBoard() {
+    public async addToOrganizationBoard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = 'Created Board in "' + this.action.data.organization.name + '"'
         embed.description = '[`' + this.action.data.board.name + '`](' + this._resolveFullBoardURL(this.action.data.board) + ') has been created.'
@@ -137,7 +139,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async commentCard() {
+    public async commentCard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Commented on Card "' + this.action.data.card.name + '"'
         embed.url = this._resolveFullCommentURL(this.action.data.card, this.action.id)
@@ -145,7 +147,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async convertToCardFromCheckItem() {
+    public async convertToCardFromCheckItem(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Converted Check Item to Card'
         embed.url = this._resolveFullCardURL(this.action.data.card)
@@ -153,7 +155,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async copyBoard() {
+    public async copyBoard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = 'Copied Board'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
@@ -161,7 +163,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async copyCard() {
+    public async copyCard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = 'Copied Card'
         embed.description = '[`' + this.action.data.cardSource.name + '`](' + this._resolveFullCardURL(this.action.data.cardSource) + ') \uD83E\uDC6A [`' + this.action.data.card.name + '``](' + this._resolveFullCardURL(this.action.data.card) + ')'
@@ -169,7 +171,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async copyChecklist() {
+    public async copyChecklist(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Copied Checklist'
         embed.description = '`' + this.action.data.checklistSource.name + '` \uD83E\uDC6A `' + this.action.data.checklist.name + '`'
@@ -177,7 +179,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async createLabel() {
+    public async createLabel(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Created Label'
         this._formatLabel(this.action.data.label.name, this.action.data.label.color, embed)
@@ -186,11 +188,11 @@ class Trello extends BaseProvider {
     }
 
     // How to Trigger?
-    public async copyCommentCard() {
+    public async copyCommentCard(): Promise<void> {
         console.log('Not implemented')
     }
 
-    public async createBoard() {
+    public async createBoard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = 'Created Board "' + Trello._formatLargeString(this.action.data.board.name) + '"'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
@@ -198,16 +200,16 @@ class Trello extends BaseProvider {
     }
 
     // Won't Trigger?
-    public async createBoardInvitation() {
+    public async createBoardInvitation(): Promise<void> {
         console.log('Not implemented')
     }
 
     // How to Trigger?
-    public async createBoardPreference() {
+    public async createBoardPreference(): Promise<void> {
         console.log('Not implemented')
     }
 
-    public async createCard() {
+    public async createCard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Created Card'
         embed.url = this._resolveFullCardURL(this.action.data.card)
@@ -215,7 +217,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async createCheckItem() {
+    public async createCheckItem(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Created Check Item in "' + this.action.data.card.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
@@ -224,11 +226,11 @@ class Trello extends BaseProvider {
     }
 
     // How to Trigger?
-    public async createChecklist() {
+    public async createChecklist(): Promise<void> {
         console.log('Not implemented')
     }
 
-    public async createList() {
+    public async createList(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Created List'
         embed.description = '`' + this.action.data.list.name + '` has been created.'
@@ -236,7 +238,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async createOrganization() {
+    public async createOrganization(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = 'Created Organization'
         embed.description = '`' + this.action.data.organization.name + '` has been created.'
@@ -245,11 +247,11 @@ class Trello extends BaseProvider {
     }
 
     // Won't Trigger?
-    public async createOrganizationInvitation() {
+    public async createOrganizationInvitation(): Promise<void> {
         console.log('Not implemented')
     }
 
-    public async deleteAttachmentFromCard() {
+    public async deleteAttachmentFromCard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Removed Attachment from "' + this.action.data.card.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
@@ -258,11 +260,11 @@ class Trello extends BaseProvider {
     }
 
     // Won't Trigger?
-    public async deleteBoardInvitation() {
+    public async deleteBoardInvitation(): Promise<void> {
         console.log('Not implemented')
     }
 
-    public async deleteCard() {
+    public async deleteCard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Deleted Card'
         embed.description = 'A card was deleted from list `' + this.action.data.list.name + '`.'
@@ -270,7 +272,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async deleteCheckItem() {
+    public async deleteCheckItem(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Deleted Check Item from "' + this.action.data.card.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
@@ -278,7 +280,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async deleteLabel() {
+    public async deleteLabel(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Deleted Label'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
@@ -286,11 +288,11 @@ class Trello extends BaseProvider {
     }
 
     // Won't Trigger?
-    public async deleteOrganizationInvitation() {
+    public async deleteOrganizationInvitation(): Promise<void> {
         console.log('Not implemented')
     }
 
-    public async disablePlugin() {
+    public async disablePlugin(): Promise<void> {
         const embed = this._preparePayload()
         embed.url = this._resolveFullBoardURL(this.action.data.board)
         const url = this.action.data.plugin.url
@@ -316,16 +318,16 @@ class Trello extends BaseProvider {
     }
 
     // How to Trigger?
-    public async disablePowerUp() {
+    public async disablePowerUp(): Promise<void> {
         console.log('Not implemented')
     }
 
     // How to Trigger?
-    public async emailCard() {
+    public async emailCard(): Promise<void> {
         console.log('Not implemented')
     }
 
-    public async enablePlugin() {
+    public async enablePlugin(): Promise<void> {
         const embed = this._preparePayload()
         embed.url = this._resolveFullBoardURL(this.action.data.board)
         const url = this.action.data.plugin.url
@@ -351,11 +353,11 @@ class Trello extends BaseProvider {
     }
 
     // How to Trigger?
-    public async enablePowerUp() {
+    public async enablePowerUp(): Promise<void> {
         console.log('Not implemented')
     }
 
-    public async makeAdminOfBoard() {
+    public async makeAdminOfBoard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Set User to Admin'
         embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + Trello.baseLink + this.action.member.username + '))'
@@ -364,7 +366,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async makeAdminOfOrganization() {
+    public async makeAdminOfOrganization(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.organization.name + '] Set User to Admin'
         embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + Trello.baseLink + this.action.member.username + '))'
@@ -373,7 +375,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async makeNormalMemberOfBoard() {
+    public async makeNormalMemberOfBoard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Set User to Member'
         embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + Trello.baseLink + this.action.member.username + '))'
@@ -382,7 +384,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async makeNormalMemberOfOrganization() {
+    public async makeNormalMemberOfOrganization(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.organization.name + '] Set User to Member'
         embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + Trello.baseLink + this.action.member.username + '))'
@@ -392,7 +394,7 @@ class Trello extends BaseProvider {
     }
 
     // Unable to test, business class+ feature.
-    public async makeObserverOfBoard() {
+    public async makeObserverOfBoard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Set User to Observer'
         embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + Trello.baseLink + this.action.member.username + '))'
@@ -402,11 +404,11 @@ class Trello extends BaseProvider {
     }
 
     // How to Trigger?
-    public async memberJoinedTrello() {
+    public async memberJoinedTrello(): Promise<void> {
         console.log('Not implemented')
     }
 
-    public async moveCardFromBoard() {
+    public async moveCardFromBoard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Moved Card to Another Board'
         embed.description = '[`' + this.action.data.card.name + '`](' + this._resolveCardURL(this.action.data.card.id) + ') has been moved from list `' + this.action.data.list.name + '` to [another board](' + this._resolveBoardURL(this.action.data.boardTarget.id) + ').'
@@ -414,7 +416,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async moveCardToBoard() {
+    public async moveCardToBoard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Moved Card to Board'
         embed.description = '[`' + this.action.data.card.name + '`](' + this._resolveFullCardURL(this.action.data.card) + ') has been moved to list `' + this.action.data.list.name + '` from [another board](' + this._resolveBoardURL(this.action.data.boardSource.id) + ').'
@@ -422,7 +424,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async moveListFromBoard() {
+    public async moveListFromBoard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Moved List to Another Board'
         embed.description = '`' + this.action.data.list.name + '` has been moved to [another board](' + this._resolveBoardURL(this.action.data.boardTarget.id) + ').'
@@ -430,7 +432,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async moveListToBoard() {
+    public async moveListToBoard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Moved List to Board'
         embed.description = '`' + this.action.data.list.name + '` has been moved from [another board](' + this._resolveBoardURL(this.action.data.boardSource.id) + ').'
@@ -439,13 +441,13 @@ class Trello extends BaseProvider {
     }
 
     // How to Trigger?
-    public async removeBoardsPinnedFromMember() {
+    public async removeBoardsPinnedFromMember(): Promise<void> {
         const embed = this._preparePayload()
 
         this.addEmbed(embed)
     }
 
-    public async removeChecklistFromCard() {
+    public async removeChecklistFromCard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Removed Checklist from "' + this.action.data.card.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
@@ -453,7 +455,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async removeFromOrganizationBoard() {
+    public async removeFromOrganizationBoard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = 'Removed Board from "' + this.action.data.organization.name + '"'
         embed.description = '`' + this.action.data.board.name + '` has been deleted.'
@@ -461,7 +463,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async removeLabelFromCard() {
+    public async removeLabelFromCard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Removed Label from "' + this.action.data.card.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
@@ -469,7 +471,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async removeMemberFromCard() {
+    public async removeMemberFromCard(): Promise<void> {
         const embed = this._preparePayload()
         if (this.action.memberCreator.id === this.action.member.id) {
             embed.title = '[' + this.action.data.board.name + '] Left "' + this.action.data.card.name + '"'
@@ -482,7 +484,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async removeMemberFromBoard() {
+    public async removeMemberFromBoard(): Promise<void> {
         const embed = this._preparePayload()
         if (this.action.memberCreator.id === this.action.member.id) {
             embed.title = 'Left Board "' + this.action.data.board.name + '"'
@@ -495,7 +497,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async removeMemberFromOrganization() {
+    public async removeMemberFromOrganization(): Promise<void> {
         const embed = this._preparePayload()
         if (this.action.memberCreator.id === this.action.member.id) {
             embed.title = 'Left Organization "' + this.action.data.organization.name + '"'
@@ -509,16 +511,16 @@ class Trello extends BaseProvider {
     }
 
     // How to Trigger?
-    public async unconfirmedBoardInvitation() {
+    public async unconfirmedBoardInvitation(): Promise<void> {
         console.log('Not implemented')
     }
 
     // How to trigger?
-    public async unconfirmedOrganizationInvitation() {
+    public async unconfirmedOrganizationInvitation(): Promise<void> {
         console.log('Not implemented')
     }
 
-    public async updateBoard() {
+    public async updateBoard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] '
         embed.url = this._resolveFullBoardURL(this.action.data.board)
@@ -583,7 +585,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async updateCard() {
+    public async updateCard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] '
         embed.url = this._resolveFullCardURL(this.action.data.card)
@@ -646,7 +648,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async updateCheckItem() {
+    public async updateCheckItem(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Renamed Item in Checklist "' + this.action.data.checklist.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
@@ -654,7 +656,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async updateCheckItemStateOnCard() {
+    public async updateCheckItemStateOnCard(): Promise<void> {
         const embed = this._preparePayload()
         const capitalized = this.action.data.checkItem.state.charAt(0).toUpperCase() + this.action.data.checkItem.state.slice(1)
         embed.title = '[' + this.action.data.board.name + '] Marked Item as ' + capitalized
@@ -668,7 +670,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async updateChecklist() {
+    public async updateChecklist(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Renamed Checklist'
         embed.description = '`' + Trello._formatLargeString(this.action.data.old.name) + '` \uD83E\uDC6A `' + Trello._formatLargeString(this.action.data.checklist.name) + '`'
@@ -676,7 +678,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async updateLabel() {
+    public async updateLabel(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Updated Label'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
@@ -732,7 +734,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async updateList() {
+    public async updateList(): Promise<void> {
         const embed = this._preparePayload()
         if (this.action.data.old.closed != null) {
             if (this.action.data.list.closed) {
@@ -749,11 +751,11 @@ class Trello extends BaseProvider {
     }
 
     // How to Trigger?
-    public async updateMember() {
+    public async updateMember(): Promise<void> {
         console.log('Not implemented')
     }
 
-    public async updateOrganization() {
+    public async updateOrganization(): Promise<void> {
         const embed = this._preparePayload()
         let field = null
         const organization = this.action.data.organization
@@ -817,7 +819,7 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    public async voteOnCard() {
+    public async voteOnCard(): Promise<void> {
         const embed = this._preparePayload()
         if (this.action.data.voted) {
             embed.title = '[' + this.action.data.board.name + '] Voted on Card "' + this.action.data.card.name + '" \u2705'

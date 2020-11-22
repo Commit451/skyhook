@@ -6,11 +6,11 @@ import { BaseProvider } from '../provider/BaseProvider'
  */
 class Pingdom extends BaseProvider {
 
-    public getName() {
+    public getName(): string {
         return 'Pingdom'
     }
 
-    public async parseData() {
+    public async parseData(): Promise<void> {
         if (this.body.current_state !== this.body.previous_state) {
             const embed = new Embed()
             embed.title = 'State changed'

@@ -5,7 +5,7 @@ import { Embed } from '../model/Embed'
  * https://discordapp.com/developers/docs/resources/webhook#execute-webhook
  */
 class DiscordPayload {
-    public content: any
+    public content: string
     public username: string
     // tslint:disable-next-line:variable-name
     public avatar_url: string

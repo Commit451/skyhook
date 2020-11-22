@@ -11,15 +11,15 @@ class Jenkins extends BaseProvider {
         return tmp.charAt(0).toUpperCase() + tmp.slice(1)
     }
 
-    public getName() {
+    public getName(): string {
         return 'Jenkins-CI'
     }
 
-    public getPath() {
+    public getPath(): string {
         return 'jenkins'
     }
 
-    public async parseData() {
+    public async parseData(): Promise<void> {
         this.setEmbedColor(0xF0D6B7)
         const phase = this.body.build.phase
         const embed = new Embed()

@@ -30,6 +30,7 @@ class Instana extends BaseProvider {
         const field = new EmbedField()
         field.inline = isInline
         field.name = fieldName
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         field.value = isValueDate ? DateTime.fromMillis(fieldValue as any as number).toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS) : fieldValue
         embed.fields.push(field)
     }
@@ -70,15 +71,15 @@ class Instana extends BaseProvider {
         return embed
     }
 
-    public getName() {
+    public getName(): string {
         return 'Instana'
     }
 
-    public getPath() {
+    public getPath(): string {
         return 'instana'
     }
 
-    public async parseData() {
+    public async parseData(): Promise<void> {
         const embed = new Embed()
         embed.fields = []
         switch (this.getEventType()) {

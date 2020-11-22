@@ -10,7 +10,7 @@ class CircleCi extends BaseProvider {
         return 'CircleCi'
     }
 
-    public async parseData(req) {
+    public async parseData(): Promise<void> {
         const subject = this.body.payload.subject.length > 48 ? `${this.body.payload.subject.substring(0, 48)}\u2026` : this.body.payload.subject
         this.setEmbedColor(0x343433)
         const embed = new Embed()

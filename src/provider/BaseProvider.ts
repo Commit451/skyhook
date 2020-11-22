@@ -26,8 +26,11 @@ abstract class BaseProvider {
 
     protected payload: DiscordPayload
     protected logger: winston.Logger
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     protected headers: any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     protected body: any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     protected query: any
     // all embeds will use this color
     protected embedColor: number
@@ -56,13 +59,14 @@ abstract class BaseProvider {
      * @param body the request body
      * @param headers the request headers
      * @param query the query
-     */
+     */ 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-module-boundary-types
     public async parse(body: any, headers: any = null, query: any = null): Promise<DiscordPayload> {
         this.body = body
         this.headers = headers
         this.query = query
         this.preParse()
-        let type: string = 'parseData'
+        let type = 'parseData'
         if (typeof this['getType'] !== 'undefined') {
             type = await this['getType']()
         }
@@ -80,12 +84,14 @@ abstract class BaseProvider {
     /**
      * Open method to do certain things pre parse
      */
-    protected preParse() {}
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    protected preParse(): void {}
 
     /**
      * Open method to do certain things post parse and before the payload is returned
      */
-    protected postParse() {}
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    protected postParse(): void {}
 
     protected addEmbed(embed: Embed): void {
         // TODO check to see if too many fields
@@ -100,7 +106,7 @@ abstract class BaseProvider {
         this.payload.embeds.push(embed)
     }
 
-    protected setEmbedColor(color: number) {
+    protected setEmbedColor(color: number): void {
         this.embedColor = color
     }
 }

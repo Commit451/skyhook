@@ -8,11 +8,11 @@ import gravatar from 'gravatar'
  */
 class Heroku extends BaseProvider {
 
-    public getName() {
+    public getName(): string {
         return 'Heroku'
     }
 
-    public async parseData() {
+    public async parseData(): Promise<void> {
         this.setEmbedColor(0xC9C3E6)
         const embed = new Embed()
         const action: string = this.actionAsPastTense(this.body.action)

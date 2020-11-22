@@ -5,11 +5,12 @@ import { BaseProvider } from '../provider/BaseProvider'
  * https://docs.docker.com/docker-hub/webhooks/
  */
 class DockerHub extends BaseProvider {
-    public getName() {
+
+    public getName(): string {
         return 'DockerHub'
     }
 
-    public async parseData() {
+    public async parseData(): Promise<void> {
         this.setEmbedColor(0xFFFFFF)
         const embed = new Embed()
         embed.title = this.body.repository.repo_name
@@ -17,6 +18,7 @@ class DockerHub extends BaseProvider {
         embed.url = this.body.repository.repo_url
         this.addEmbed(embed)
     }
+
 }
 
 export { DockerHub }

@@ -23,7 +23,7 @@ class Patreon extends BaseProvider {
     private static liRegex = /<li>(.*?)<\/li>/
     private static imageRegex = /<img.*src="(.*?)">/
 
-    private static _formatHTML(html, baseLink) {
+    private static _formatHTML(html: string, baseLink: string): string {
         const newLineRegex = /<br>/g
         // Match lists
         while (this.ulRegex.test(html)) {
@@ -72,7 +72,7 @@ class Patreon extends BaseProvider {
         this.setEmbedColor(0xF96854)
     }
 
-    public getName() {
+    public getName(): string {
         return 'Patreon'
     }
 
@@ -80,7 +80,7 @@ class Patreon extends BaseProvider {
         return this.headers['x-patreon-event']
     }
 
-    private _handleAPIV2(type: PatreonAction) {
+    private _handleAPIV2(type: PatreonAction): void {
         const embed = new Embed()
         const campaignId = this.body.data.relationships.campaign?.data?.id
         const patronId = this.body.data.relationships.user?.data?.id
@@ -89,6 +89,7 @@ class Patreon extends BaseProvider {
         // Does not provide a way to get the reward without keying off of amount_cents.
         // Keep an eye on data.relationships.currently_entitled_tiers
         // For now, find closest tier that is below or at the cents value.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const rewards = (this.body.included as any[])
             .filter(val => val.type === 'reward' && val.attributes.published && val.attributes.amount_cents <= this.body.data.attributes.pledge_amount_cents)
         const reward = rewards.length > 0 ? rewards.reduce((a, b) => {
@@ -125,34 +126,34 @@ class Patreon extends BaseProvider {
 
     }
 
-    private async membersCreate() {
+    private async membersCreate(): Promise<void> {
         this._handleAPIV2(PatreonAction.CREATE)
     }
 
-    private async membersUpdate() {
+    private async membersUpdate(): Promise<void> {
         this._handleAPIV2(PatreonAction.UPDATE)
     }
 
-    private async membersDelete() {
+    private async membersDelete(): Promise<void> {
         this._handleAPIV2(PatreonAction.DELETE)
     }
 
-    private async membersPledgeCreate() {
+    private async membersPledgeCreate(): Promise<void> {
         this._handleAPIV2(PatreonAction.CREATE)
     }
 
-    private async membersPledgeUpdate() {
+    private async membersPledgeUpdate(): Promise<void> {
         this._handleAPIV2(PatreonAction.UPDATE)
     }
 
-    private async membersPledgeDelete() {
+    private async membersPledgeDelete(): Promise<void> {
         this._handleAPIV2(PatreonAction.DELETE)
     }
 
     /**
      * @deprecated Patreon v1 API
      */
-    private _createUpdateCommon(type: PatreonAction) {
+    private _createUpdateCommon(type: PatreonAction): void {
         const embed = new Embed()
         const createorId = this.body.data.relationships.campaign?.data?.id
         const patreonId = this.body.data.relationships.patron?.data?.id
@@ -160,7 +161,7 @@ class Patreon extends BaseProvider {
 
         const incl = this.body.included
         let reward = null
-        incl.forEach((attr: any) => {
+        incl.forEach((attr) => {
             if (attr.id === createorId) {
                 const dollarAmount = (this.body.data.attributes.amount_cents / 100).toFixed(2)
                 if (type === PatreonAction.DELETE) {
@@ -192,21 +193,21 @@ class Patreon extends BaseProvider {
     /**
      * @deprecated Patreon v1 API
      */
-    private async pledgesCreate() {
+    private async pledgesCreate(): Promise<void> {
         this._createUpdateCommon(PatreonAction.CREATE)
     }
 
     /**
      * @deprecated Patreon v1 API
      */
-    private async pledgesUpdate() {
+    private async pledgesUpdate(): Promise<void> {
         this._createUpdateCommon(PatreonAction.UPDATE)
     }
 
     /**
      * @deprecated Patreon v1 API
      */
-    private async pledgesDelete() {
+    private async pledgesDelete(): Promise<void> {
         this._createUpdateCommon(PatreonAction.DELETE)
     }
 

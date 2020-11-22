@@ -8,9 +8,10 @@ import { DiscordPayload } from '../src/model/DiscordPayload'
  * Helps with testing things
  */
 class Tester {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public static async test(provider: BaseProvider, jsonFileName: string = null, headers: any = null, query: any = null): Promise<DiscordPayload> {
         LoggerUtil.init()
-        let jsonObject: any = null
+        let jsonObject = null
         if (jsonFileName != null) {
             const json = fs.readFileSync(`./test/${provider.getPath().toLowerCase()}/${jsonFileName}`, 'utf-8')
             jsonObject = JSON.parse(json)

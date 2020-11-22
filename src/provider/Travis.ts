@@ -14,11 +14,11 @@ class Travis extends BaseProvider {
         canceled: 0x9d9d9d
     }
 
-    public getName() {
+    public getName(): string {
         return 'Travis'
     }
 
-    public async parseData() {
+    public async parseData(): Promise<void> {
         this.setEmbedColor(0x39aa56)
         const embed = new Embed()
         let targetBody = this.body

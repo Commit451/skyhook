@@ -8,11 +8,11 @@ import { MarkdownUtil } from '../util/MarkdownUtil'
  */
 class Bintray extends BaseProvider {
 
-    public getName() {
+    public getName(): string {
         return 'Bintray'
     }
 
-    public async parseData() {
+    public async parseData(): Promise<void> {
         this.setEmbedColor(0x43a047)
         const embed = new Embed()
         embed.timestamp = this.body.released
