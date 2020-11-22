@@ -8,7 +8,10 @@
             "type": "npm",
             "script": "build",
             "group": "build",
-            "problemMatcher": []
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "silent"
+            }
         }
     ]
 }

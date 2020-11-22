@@ -38,7 +38,7 @@ class Jira extends BaseProvider {
         if (issue.fields.assignee == null) {
             issue.fields.assignee = {displayName: 'nobody'}
         }
-        const user = this.body.user
+        const user = this.body.user || { displayName: 'Anonymous' }
         const action = this.body.webhookEvent.split('_')[1]
         const matches = issue.self.match(/^(https?:\/\/[^\/?#]+)(?:[\/?#]|$)/i)
         const domain = matches && matches[1]

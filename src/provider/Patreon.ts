@@ -91,7 +91,10 @@ class Patreon extends BaseProvider {
         // For now, find closest tier that is below or at the cents value.
         const rewards = (this.body.included as any[])
             .filter(val => val.type === 'reward' && val.attributes.published && val.attributes.amount_cents <= this.body.data.attributes.pledge_amount_cents)
-        const reward = rewards.length > 0 ? rewards.reduce((a, b) => Math.max(a.attributes.amount_cents, b.attributes.amount_cents)) : null
+        const reward = rewards.length > 0 ? rewards.reduce((a, b) => {
+            const max = Math.max(a.attributes.amount_cents, b.attributes.amount_cents)
+            return max === a.attributes.amount_cents ? a : b
+        }) : null
 
         for (const entry of this.body.included) {
             if (entry.type === 'campaign' && entry.id === campaignId) {
