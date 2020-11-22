@@ -1,0 +1,16 @@
+{
+  "issue": {
+    "id": "53650436-8e35-49a3-a610-56b442ae7620",
+    "type": "presence",
+    "start": 1460537793322,
+    "text": "online",
+    "description": "Java virtual machine on Host host1.demo.com",
+    "link": "https://xyz.com/#/?snapshotId=rjhkZXdNzegliVVEswMScGNn0YY",
+    "zone": "prod",
+    "fqdn": "host1.demo.com",
+    "entity": "jvm",
+    "entityLabel": "Test jvm",
+    "tags": "production, documents, elasticsearch",
+    "container": "test-container"
+  }
+}

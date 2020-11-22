@@ -1,0 +1,18 @@
+{
+  "issue": {
+    "id": "53650436-8e35-49a3-a610-56b442ae7620",
+    "type": "issue",
+    "state": "OPEN",
+    "start": 1460537793322,
+    "severity": 5,
+    "text": "Garbage Collection Activity High (11%)",
+    "suggestion": "Tune your Garbage Collector, reduce allocation rate through code changes",
+    "link": "https://xyz.com/#/?snapshotId=rjhkZXdNzegliVVEswMScGNn0YY",
+    "zone": "prod",
+    "fqdn": "host1.demo.com",
+    "entity": "jvm",
+    "entityLabel": "Test jvm",
+    "tags": "production, documents, elasticsearch",
+    "container": "test-container"
+  }
+}
