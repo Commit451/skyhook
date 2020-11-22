@@ -5,7 +5,7 @@
     "start": 1460537793322,
     "text": "online",
     "description": "Java virtual machine on Host host1.demo.com",
-    "link": "https://XXXXXXX/#/?snapshotId=rjhkZXdNzegliVVEswMScGNn0YY",
+    "link": "https://xyz.com/#/?snapshotId=rjhkZXdNzegliVVEswMScGNn0YY",
     "zone": "prod",
     "fqdn": "host1.demo.com",
     "entity": "jvm",

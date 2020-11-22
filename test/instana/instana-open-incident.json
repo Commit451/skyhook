@@ -7,7 +7,7 @@
     "severity": 5,
     "text": "Garbage Collection Activity High (11%)",
     "suggestion": "Tune your Garbage Collector, reduce allocation rate through code changes",
-    "link": "https://XXXXXXX/#/?snapshotId=rjhkZXdNzegliVVEswMScGNn0YY",
+    "link": "https://xyz.com/#/?snapshotId=rjhkZXdNzegliVVEswMScGNn0YY",
     "zone": "prod",
     "fqdn": "host1.demo.com",
     "entity": "jvm",

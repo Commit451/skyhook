@@ -1,6 +1,13 @@
 import { Embed } from '../model/Embed'
 import { BaseProvider } from '../provider/BaseProvider'
 import { EmbedField } from '../model/EmbedField'
+import { DateTime } from 'luxon'
+
+enum InstanaEventType {
+    OPEN = 'OPEN',
+    CLOSED = 'CLOSED',
+    CHANGE_EVENT = 'CHANGE EVENT'
+}
 
 /**
  * https://www.instana.com/docs/ecosystem/webhook/
@@ -13,23 +20,22 @@ class Instana extends BaseProvider {
     }
 
     private getEventType() {
-        return this.body.issue.state || 'CHANGE EVENT'
+        return this.body.issue.state || InstanaEventType.CHANGE_EVENT
     }
 
-    private addField(embed: Embed, isInline: boolean, fieldName: string, fieldValue: string, isValueDate: boolean): Embed {
+    private addField(embed: Embed, isInline: boolean, fieldName: string, fieldValue: string, isValueDate: boolean): void {
         if (!fieldValue) {
-            return embed
+            return
         }
         const field = new EmbedField()
         field.inline = isInline
         field.name = fieldName
-        field.value = isValueDate ? new Date(fieldValue).toISOString() : fieldValue
+        field.value = isValueDate ? DateTime.fromMillis(fieldValue as any as number).toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS) : fieldValue
         embed.fields.push(field)
-        return embed
     }
 
     private parseOpenIncident(embed: Embed): Embed {
-        embed.title = 'Issue is opened'
+        embed.title = 'Issue Opened'
         embed.url = this.body.issue.link
         this.addField(embed, false, 'Id', this.body.issue.id, false)
         this.addField(embed, false, 'Description', this.body.issue.text, false)
@@ -40,7 +46,7 @@ class Instana extends BaseProvider {
     }
 
     private parseClosedIncident(embed: Embed): Embed {
-        embed.title = 'Issue is closed'
+        embed.title = 'Issue Closed'
         this.addField(embed, false, 'Id', this.body.issue.id, false)
         this.addField(embed, false, 'Start Time', this.body.issue.start, true)
         this.addField(embed, false, 'End Time', this.body.issue.end, true)
@@ -76,15 +82,15 @@ class Instana extends BaseProvider {
         const embed = new Embed()
         embed.fields = []
         switch (this.getEventType()) {
-            case 'OPEN': {
+            case InstanaEventType.OPEN: {
                 this.addEmbed(this.parseOpenIncident(embed))
                 break
             }
-            case 'CLOSED': {
+            case InstanaEventType.CLOSED: {
                 this.addEmbed(this.parseClosedIncident(embed))
                 break
             }
-            case 'CHANGE EVENT': {
+            case InstanaEventType.CHANGE_EVENT: {
                 this.addEmbed(this.parseChangeEvent(embed))
                 break
             }
