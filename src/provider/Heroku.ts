@@ -18,7 +18,10 @@ class Heroku extends BaseProvider {
         const action: string = this.actionAsPastTense(this.body.action)
         const type: string = this.typeAsReadable(this.body.webhook_metadata.event.include)
         const authorName: string = this.body.actor.email
-        const name = this.body.data.name
+        let name = this.body.data.name
+        if (name == null) {
+            name = this.body.data.app.name
+        }
         embed.title = `${authorName} ${action} ${type}. App: ${name}`
         embed.url = this.body.data.web_url
         const author = new EmbedAuthor()
