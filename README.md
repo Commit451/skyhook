@@ -1,7 +1,7 @@
 # skyhook
 Parses webhooks and forwards them in the proper format to Discord.
 
-[![Build Status](https://travis-ci.org/Commit451/skyhook.svg?branch=master)](https://travis-ci.org/Commit451/skyhook) [![Discord](https://discordapp.com/api/guilds/303595820345851905/widget.png)](https://discord.gg/js7wD7p)
+[![Discord](https://discordapp.com/api/guilds/303595820345851905/widget.png)](https://discord.gg/js7wD7p)
 
 ## Setup
 You can use the [site](https://skyhookapi.com/) to create the right webhook link. If you want to manually do it, here are the steps:

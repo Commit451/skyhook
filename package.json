@@ -11,7 +11,7 @@
     "buildstart": "npm run build && npm run start",
     "test": "mocha -r ts-node/register test/**/*.ts",
     "lint": "eslint . --ext .js,.ts",
-    "deploy": "gcloud app deploy",
+    "deploy": "npm run build && gcloud app deploy",
     "logs": "gcloud app logs tail -s default"
   },
   "devDependencies": {
