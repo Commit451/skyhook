@@ -53,7 +53,7 @@ If you want to create a new provider please follow the examples shown at our sma
 ## Testing Locally
 To build:
 ```
-npm build
+npm run build
 ```
 To run server (after building):
 ```

@@ -1,10 +1,10 @@
-FROM node:12 as buildenv
+FROM node:14 as buildenv
 
 WORKDIR /app
 COPY . .
 RUN npm install && npm run build
 
-FROM node:12
+FROM node:14
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
