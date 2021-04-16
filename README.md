@@ -51,7 +51,11 @@ If you wish to contribute, follow our [contributing guide](CONTRIBUTING.md).
 If you want to create a new provider please follow the examples shown at our small [documentation](docs/CreateNewProvider.md).
 
 ## Testing Locally
-To run server:
+To build:
+```
+npm build
+```
+To run server (after building):
 ```
 npm start
 ```
