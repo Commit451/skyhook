@@ -40,13 +40,11 @@ class Jira extends BaseProvider {
         }
         const user = this.body.user || { displayName: 'Anonymous' }
         const action = this.body.webhookEvent.split('_')[1]
-        const matches = issue.self.match(/^(https?:\/\/[^/?#]+)(?:[/?#]|$)/i)
-        const domain = matches && matches[1]
 
         // create the embed
         const embed = new Embed()
         embed.title = `${issue.key} - ${issue.fields.summary}`
-        embed.url = `${domain}/browse/${issue.key}`
+        embed.url = this.createBrowseUrl(issue)
         if (isIssue) {
             embed.description = `${user.displayName} ${action} issue: ${embed.title} (${issue.fields.assignee.displayName})`
         } else {
@@ -54,6 +52,13 @@ class Jira extends BaseProvider {
             embed.description = `${comment.updateAuthor.displayName} ${action} comment: ${comment.body}`
         }
         this.addEmbed(embed)
+    }
+
+    private createBrowseUrl(issue): string {
+        const url: URL = new URL(issue.self)
+        const path: string|RegExpMatchArray = url.pathname.match(/.+?(?=\/rest\/api)/) ?? ''
+        url.pathname = `${path}/browse/${issue.key}`
+        return url.toString()
     }
 }
 
