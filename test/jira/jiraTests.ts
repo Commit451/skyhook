@@ -19,5 +19,15 @@ describe('/POST jira', () => {
         expect(res).to.be.a('null')
     })
 
+    it('browse_url', async () => {
+        const provider: Jira = new Jira()
+        const requestBody = JSON.parse(Tester.readTestFile(provider, 'jira-issue.json'))
 
+        let res = await Tester.testWithBody(new Jira(), requestBody, null)
+        expect(res.embeds[0].url).to.be.equal('https://jira.atlassian.com/browse/JRA-20002')
+
+        requestBody.issue.self = 'https://jira.atlassian.com/our/path/rest/api/2/issue/99291'
+        res = await Tester.testWithBody(new Jira(), requestBody, null)
+        expect(res.embeds[0].url).to.be.equal('https://jira.atlassian.com/our/path/browse/JRA-20002')
+    })
 })
