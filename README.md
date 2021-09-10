@@ -20,6 +20,7 @@ https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/provi
 ```
 ## Supported Providers
 - [AppVeyor](https://www.appveyor.com/docs/notifications/#webhook-payload-default) - `/appveyor`
+- [Basecamp 3](https://github.com/basecamp/bc3-api/blob/master/sections/webhooks.md) - `/basecamp`
 - [Bintray](https://bintray.com/docs/api/#_webhooks) - `/bintray`
 - [BitBucket](https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html) - `/bitbucket`
 - [BitBucket Server](https://confluence.atlassian.com/bitbucketserver/event-payload-938025882.html) - `/bitbucketserver`

@@ -8,6 +8,7 @@ import { ErrorUtil } from './util/ErrorUtil'
 import { LoggerUtil } from './util/LoggerUtil'
 
 import { AppVeyor } from './provider/Appveyor'
+import { Basecamp } from './provider/Basecamp'
 import { Bintray } from './provider/Bintray'
 import { BitBucket } from './provider/Bitbucket'
 import { BitBucketServer } from './provider/BitBucketServer'
@@ -43,6 +44,7 @@ const app = express()
  */
 const providers = [
     AppVeyor,
+    Basecamp,
     Bintray,
     BitBucket,
     BitBucketServer,
