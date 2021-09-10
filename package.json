@@ -40,6 +40,7 @@
     "express": "^4.17.1",
     "gravatar": "^1.8.1",
     "luxon": "^1.25.0",
+    "turndown": "^7.1.1",
     "winston": "^3.3.3"
   },
   "engines": {
