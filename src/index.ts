@@ -77,7 +77,7 @@ providers.forEach((Provider) => {
     const instance = new Provider()
     providerInstances.push(instance)
     providersMap.set(instance.getPath(), Provider)
-    console.log(`Adding provider name ${instance.getName()}`)
+    logger.debug(`Adding provider name ${instance.getName()}`)
     providerNames.push(instance.getName())
     const providerInfo = {
         name: instance.getName(),
