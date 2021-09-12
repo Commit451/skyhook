@@ -9,7 +9,6 @@ import { LoggerUtil } from './util/LoggerUtil'
 
 import { AppVeyor } from './provider/Appveyor'
 import { Basecamp } from './provider/Basecamp'
-import { Bintray } from './provider/Bintray'
 import { BitBucket } from './provider/Bitbucket'
 import { BitBucketServer } from './provider/BitBucketServer'
 import { CircleCi } from './provider/CircleCi'
@@ -45,7 +44,6 @@ const app = express()
 const providers = [
     AppVeyor,
     Basecamp,
-    Bintray,
     BitBucket,
     BitBucketServer,
     CircleCi,
