@@ -1,11 +1,11 @@
-import {Embed} from '../model/Embed'
-import {BaseProvider} from '../provider/BaseProvider'
-import * as fs from 'fs'
-import {EmbedAuthor} from '../model/EmbedAuthor'
+import { Embed } from '../model/Embed'
+import { BaseProvider } from '../provider/BaseProvider'
+import { EmbedAuthor} from '../model/EmbedAuthor'
 
 import TurndownService from 'turndown'
 
 class Basecamp extends BaseProvider {
+
     private turndown: TurndownService
     private colorCreated = 0x00ff00
     private colorDeleted = 0xff0000
@@ -212,4 +212,4 @@ class Basecamp extends BaseProvider {
     }
 }
 
-export {Basecamp}
+export { Basecamp }
