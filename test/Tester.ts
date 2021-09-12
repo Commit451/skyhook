@@ -8,6 +8,7 @@ import { DiscordPayload } from '../src/model/DiscordPayload'
  * Helps with testing things
  */
 class Tester {
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public static async test(provider: BaseProvider, jsonFileName: string = null, headers: any = null, query: any = null): Promise<DiscordPayload> {
         LoggerUtil.init()
@@ -31,8 +32,7 @@ class Tester {
         }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public static readTestFile(provider: BaseProvider, fileName: string): any {
+    public static readTestFile(provider: BaseProvider, fileName: string): string {
         return fs.readFileSync(`./test/${provider.getPath().toLowerCase()}/${fileName}`, 'utf-8')
     }
 }
