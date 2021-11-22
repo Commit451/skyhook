@@ -29,15 +29,20 @@ class Jira extends BaseProvider {
             isIssue = true
         } else if (this.body.webhookEvent.startsWith('comment_')) {
             isIssue = false
+            if(this.body.issue == null) {
+                // What's the point of notifying a new comment if ONLY comment information is sent?
+                // Do we care that a comment was made if we cant tell what was commented on?
+                // This solution will silence errors until someone makes sense of Atlassian's decisions..
+                this.payload = null
+                return
+            }
         } else {
             return
         }
 
         // extract variable from Jira
+        const issueHasAsignee = this.body?.issue?.fields?.assignee != null
         const issue = this.body.issue
-        if (issue.fields.assignee == null) {
-            issue.fields.assignee = {displayName: 'nobody'}
-        }
         const user = this.body.user || { displayName: 'Anonymous' }
         const action = this.body.webhookEvent.split('_')[1]
 
@@ -46,7 +51,7 @@ class Jira extends BaseProvider {
         embed.title = `${issue.key} - ${issue.fields.summary}`
         embed.url = this.createBrowseUrl(issue)
         if (isIssue) {
-            embed.description = `${user.displayName} ${action} issue: ${embed.title} (${issue.fields.assignee.displayName})`
+            embed.description = `${user.displayName} ${action} issue: ${embed.title}${issueHasAsignee ? ` (${issue.fields.assignee.displayName})` : ''} `
         } else {
             const comment = this.body.comment
             embed.description = `${comment.updateAuthor.displayName} ${action} comment: ${comment.body}`

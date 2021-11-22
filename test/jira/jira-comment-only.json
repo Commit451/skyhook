@@ -1,0 +1,39 @@
+{
+    "timestamp": 1615150687039,
+    "webhookEvent": "comment_created",
+    "comment": {
+        "self": "https://redacted/rest/api/2/issue/17334/comment/18977",
+        "id": "18977",
+        "author": {
+            "self": "https://redacted/rest/api/2/user?username=redacted",
+            "name": "redacted",
+            "key": "redacted",
+            "avatarUrls": {
+                "48x48": "https://redacted/secure/useravatar?ownerId=redacted&avatarId=10500",
+                "24x24": "https://redacted/secure/useravatar?size=small&ownerId=redacted&avatarId=10500",
+                "16x16": "https://redacted/secure/useravatar?size=xsmall&ownerId=redacted&avatarId=10500",
+                "32x32": "https://redacted/secure/useravatar?size=medium&ownerId=redacted&avatarId=10500"
+            },
+            "displayName": "redacted",
+            "active": true,
+            "timeZone": "Europe/Budapest"
+        },
+        "body": "Test yeah.",
+        "updateAuthor": {
+            "self": "https://redacted/rest/api/2/user?username=redacted",
+            "name": "redacted",
+            "key": "redacted",
+            "avatarUrls": {
+                "48x48": "https://redacted/secure/useravatar?ownerId=redacted&avatarId=10500",
+                "24x24": "https://redacted/secure/useravatar?size=small&ownerId=redacted&avatarId=10500",
+                "16x16": "https://redacted/secure/useravatar?size=xsmall&ownerId=redacted&avatarId=10500",
+                "32x32": "https://redacted/secure/useravatar?size=medium&ownerId=redacted&avatarId=10500"
+            },
+            "displayName": "redacted",
+            "active": true,
+            "timeZone": "Europe/Budapest"
+        },
+        "created": "2021-03-07T20:58:07.039+0000",
+        "updated": "2021-03-07T20:58:07.039+0000"
+    }
+}

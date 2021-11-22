@@ -19,6 +19,12 @@ describe('/POST jira', () => {
         expect(res).to.be.a('null')
     })
 
+    it('comment_only', async () => {
+        const res = await Tester.test(new Jira(), 'jira-comment-only.json', null)
+        expect(res).to.not.be.an('error')
+        expect(res).to.be.a('null')
+    })
+
     it('browse_url', async () => {
         const provider: Jira = new Jira()
         const requestBody = JSON.parse(Tester.readTestFile(provider, 'jira-issue.json'))
