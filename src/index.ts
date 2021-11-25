@@ -28,6 +28,7 @@ import { Trello } from './provider/Trello'
 import { Unity } from './provider/Unity'
 import { UptimeRobot } from './provider/UptimeRobot'
 import { VSTS } from './provider/VSTS'
+import { Type } from './util/TSUtility'
 
 dotenv.config()
 
@@ -41,7 +42,7 @@ const app = express()
 /**
  * Array of the classes
  */
-const providers = [
+const providers: Type<BaseProvider>[] = [
     AppVeyor,
     Basecamp,
     BitBucket,
@@ -65,13 +66,9 @@ const providers = [
     VSTS
 ]
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ArrayType<T extends Array<any>> = T extends (infer U)[] ? U : never
-type ProviderType = ArrayType<typeof providers>
-
-const providersMap = new Map<string, ProviderType>()
+const providersMap = new Map<string, Type<BaseProvider>>()
 const providerNames: string[] = []
-const providerInstances: InstanceType<ProviderType>[] = []
+const providerInstances: BaseProvider[] = []
 const providerInfos: { name: string, path: string }[] = []
 providers.forEach((Provider) => {
     const instance = new Provider()
@@ -126,7 +123,7 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
 
     const Provider = providersMap.get(providerName)
     if (Provider != null) {
-        const instance: BaseProvider = new Provider()
+        const instance = new Provider()
         try {
             const queryString = JSON.stringify(req.query)
             const queryObject = JSON.parse(queryString)
