@@ -1,10 +1,9 @@
-import { Embed } from '../model/Embed'
-import { BaseProvider } from '../provider/BaseProvider'
+import { DirectParseProvider } from '../provider/BaseProvider'
 
 /**
  * https://build-api.cloud.unity3d.com/docs/1.0.0/index.html#operation-webhooks-intro
  */
-class Unity extends BaseProvider {
+export class Unity extends DirectParseProvider {
 
     public getName(): string {
         return 'Unity Cloud'
@@ -47,12 +46,10 @@ class Unity extends BaseProvider {
                 break
 
         }
-        const embed = new Embed()
-        embed.title = '[' + projectName + '] ' + ' version #' + projectVersion
-        embed.url = download
-        embed.description = content
-        this.addEmbed(embed)
+        this.addEmbed({
+            title: '[' + projectName + '] ' + ' version #' + projectVersion,
+            url: download,
+            description: content
+        })
     }
 }
-
-export { Unity }

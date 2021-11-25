@@ -1,10 +1,9 @@
-import { Embed } from '../model/Embed'
-import { BaseProvider } from '../provider/BaseProvider'
+import { DirectParseProvider } from '../provider/BaseProvider'
 
 /**
  * https://www.pingdom.com/resources/webhooks
  */
-class Pingdom extends BaseProvider {
+export class Pingdom extends DirectParseProvider {
 
     public getName(): string {
         return 'Pingdom'
@@ -12,13 +11,11 @@ class Pingdom extends BaseProvider {
 
     public async parseData(): Promise<void> {
         if (this.body.current_state !== this.body.previous_state) {
-            const embed = new Embed()
-            embed.title = this.body.check_name + ' - State changed'
-            embed.description = 'State change from ' + this.body.previous_state + ' to ' + this.body.current_state
             this.setEmbedColor((this.body.current_state === 'UP') ? 0x4caf50 : 0xd32f2f)
-            this.addEmbed(embed)
+            this.addEmbed({
+                title: this.body.check_name + ' - State changed',
+                description: 'State change from ' + this.body.previous_state + ' to ' + this.body.current_state
+            })
         }
     }
 }
-
-export { Pingdom }

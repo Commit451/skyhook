@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "noImplicitUseStrict": true,
+    "strict": true,
+    "useUnknownInCatchVariables": false,
     "esModuleInterop": true,
     "target": "es6",
     "moduleResolution": "node",

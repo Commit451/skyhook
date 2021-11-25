@@ -1,5 +1,4 @@
-import { Embed } from '../model/Embed'
-import { EmbedImage } from '../model/EmbedImage'
+import { Embed } from '../model/DiscordApi'
 
 // Regular Expressions
 const mdUL1 = /^={3,}$/
@@ -9,7 +8,7 @@ const cleanupRegex = /__([^\\]*)__/
 const italicRegex = /\*([^\\]*)\*/
 const imageRegex = /!\[.*\]\((.*)\)/
 
-class MarkdownUtil {
+export class MarkdownUtil {
 
     public static _formatMarkdownHeader(str: string): string {
         const lines = str.split('\n')
@@ -54,7 +53,7 @@ class MarkdownUtil {
     public static _formatMarkdownBold(str: string): string {
         let match
         while (boldRegex.test(str)) {
-            match = boldRegex.exec(str)
+            match = boldRegex.exec(str)!
             str = str.replace(boldRegex, '__' + match[1] + '__')
         }
         return str
@@ -63,7 +62,7 @@ class MarkdownUtil {
     public static _cleanupMarkdownBold(str: string): string {
         let match
         while (cleanupRegex.test(str)) {
-            match = cleanupRegex.exec(str)
+            match = cleanupRegex.exec(str)!
             str = str.replace(cleanupRegex, '**' + match[1] + '**')
         }
         return str
@@ -72,7 +71,7 @@ class MarkdownUtil {
     public static _formatMarkdownItalic(str: string): string {
         let match
         while (italicRegex.test(str)) {
-            match = italicRegex.exec(str)
+            match = italicRegex.exec(str)!
             str = str.replace(italicRegex, '_' + match[1] + '_')
         }
         return str
@@ -80,10 +79,10 @@ class MarkdownUtil {
 
     public static _formatMarkdownImage(str: string, embed: Embed): string {
         if (imageRegex.test(str)) {
-            const match = imageRegex.exec(str)
-            const image = new EmbedImage()
-            image.url = match[1]
-            embed.image = image
+            const match = imageRegex.exec(str)!
+            embed.image = {
+                url: match[1]
+            }
             str = str.replace(imageRegex, '')
         }
         return str
@@ -116,4 +115,3 @@ class MarkdownUtil {
     }
 
 }
-export { MarkdownUtil }

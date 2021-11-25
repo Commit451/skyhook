@@ -1,19 +1,24 @@
 import axios from 'axios'
-import { Embed } from '../model/Embed'
-import { EmbedAuthor } from '../model/EmbedAuthor'
-import { EmbedImage } from '../model/EmbedImage'
-import { BaseProvider } from '../provider/BaseProvider'
+import { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi'
+import { TypeParseProvder } from '../provider/BaseProvider'
 import { MarkdownUtil } from '../util/MarkdownUtil'
-import urlMod from 'url'
+import { URL } from 'url'
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Card = any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Board = any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Attachment = any
 
 /**
  * https://developers.trello.com/apis/webhooks
  */
-class Trello extends BaseProvider {
+export class Trello extends TypeParseProvder {
 
     private static baseLink = 'https://trello.com/'
     private static baseAvatarUrl = 'https://trello-avatars.s3.amazonaws.com/'
-    private static defTrelloColors = {
+    private static defTrelloColors: Record<string, number> = {
         blue: 0x0079bf,
         yellow: 0xd9b51c,
         orange: 0xd29034,
@@ -30,7 +35,7 @@ class Trello extends BaseProvider {
 
     // Utility Functions
 
-    private static _addMemberThumbnail(avatarHash, embed) {
+    private static _addMemberThumbnail(avatarHash: string, embed: Embed): void {
         if (avatarHash != null && avatarHash !== 'null') {
             embed.thumbnail = {
                 url: this.baseAvatarUrl + avatarHash + '/170.png'
@@ -38,8 +43,8 @@ class Trello extends BaseProvider {
         }
     }
 
-    private static _formatLargeString(str, limit = 256) {
-        return (str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str)
+    private static _formatLargeString(str: string, limit = 256): string {
+        return str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str
     }
 
     private embed: Embed
@@ -50,14 +55,14 @@ class Trello extends BaseProvider {
 
     constructor() {
         super()
-        this.embed = new Embed()
+        this.embed = {}
     }
 
     public getName(): string {
         return 'Trello'
     }
 
-    public getType(): string {
+    public getType(): string | null {
         return this.body.action.type
     }
 
@@ -73,6 +78,7 @@ class Trello extends BaseProvider {
 
     // How to Trigger?
     public async addBoardsPinnedToMember(): Promise<void> {
+        this.nullifyPayload()
         console.log('Not implemented')
     }
 
@@ -189,6 +195,7 @@ class Trello extends BaseProvider {
 
     // How to Trigger?
     public async copyCommentCard(): Promise<void> {
+        this.nullifyPayload()
         console.log('Not implemented')
     }
 
@@ -201,11 +208,13 @@ class Trello extends BaseProvider {
 
     // Won't Trigger?
     public async createBoardInvitation(): Promise<void> {
+        this.nullifyPayload()
         console.log('Not implemented')
     }
 
     // How to Trigger?
     public async createBoardPreference(): Promise<void> {
+        this.nullifyPayload()
         console.log('Not implemented')
     }
 
@@ -227,6 +236,7 @@ class Trello extends BaseProvider {
 
     // How to Trigger?
     public async createChecklist(): Promise<void> {
+        this.nullifyPayload()
         console.log('Not implemented')
     }
 
@@ -248,6 +258,7 @@ class Trello extends BaseProvider {
 
     // Won't Trigger?
     public async createOrganizationInvitation(): Promise<void> {
+        this.nullifyPayload()
         console.log('Not implemented')
     }
 
@@ -261,6 +272,7 @@ class Trello extends BaseProvider {
 
     // Won't Trigger?
     public async deleteBoardInvitation(): Promise<void> {
+        this.nullifyPayload()
         console.log('Not implemented')
     }
 
@@ -289,6 +301,7 @@ class Trello extends BaseProvider {
 
     // Won't Trigger?
     public async deleteOrganizationInvitation(): Promise<void> {
+        this.nullifyPayload()
         console.log('Not implemented')
     }
 
@@ -306,9 +319,9 @@ class Trello extends BaseProvider {
                 value: desc,
                 inline: false
             }]
-            const thumbnail = new EmbedImage()
-            thumbnail.url = urlMod.resolve(url, manifest.icon.url)
-            embed.image = thumbnail
+            embed.image = {
+                url: new URL(manifest.icon.url, url).toString()
+            }
         } catch (err) {
             console.log('[Trello Provider] Error while retrieving plugin manifest.')
             console.log(err)
@@ -319,11 +332,13 @@ class Trello extends BaseProvider {
 
     // How to Trigger?
     public async disablePowerUp(): Promise<void> {
+        this.nullifyPayload()
         console.log('Not implemented')
     }
 
     // How to Trigger?
     public async emailCard(): Promise<void> {
+        this.nullifyPayload()
         console.log('Not implemented')
     }
 
@@ -341,9 +356,9 @@ class Trello extends BaseProvider {
                 value: desc,
                 inline: false
             }]
-            const thumbnail = new EmbedImage()
-            thumbnail.url = urlMod.resolve(url, manifest.icon.url)
-            embed.image = thumbnail
+            embed.image = {
+                url: new URL(manifest.icon.url, url).toString()
+            }
         } catch (err) {
             console.log('[Trello Provider] Error while retrieving plugin manifest.')
             console.log(err)
@@ -354,6 +369,7 @@ class Trello extends BaseProvider {
 
     // How to Trigger?
     public async enablePowerUp(): Promise<void> {
+        this.nullifyPayload()
         console.log('Not implemented')
     }
 
@@ -405,6 +421,7 @@ class Trello extends BaseProvider {
 
     // How to Trigger?
     public async memberJoinedTrello(): Promise<void> {
+        this.nullifyPayload()
         console.log('Not implemented')
     }
 
@@ -512,11 +529,13 @@ class Trello extends BaseProvider {
 
     // How to Trigger?
     public async unconfirmedBoardInvitation(): Promise<void> {
+        this.nullifyPayload()
         console.log('Not implemented')
     }
 
     // How to trigger?
     public async unconfirmedOrganizationInvitation(): Promise<void> {
+        this.nullifyPayload()
         console.log('Not implemented')
     }
 
@@ -524,7 +543,7 @@ class Trello extends BaseProvider {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] '
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        let field = null
+        let field: EmbedField | null = null
         if (this.action.data.old != null) {
             const old = this.action.data.old
             if (old.closed != null) {
@@ -589,7 +608,7 @@ class Trello extends BaseProvider {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] '
         embed.url = this._resolveFullCardURL(this.action.data.card)
-        let field = null
+        let field: EmbedField | null = null
         if (this.action.data.old != null) {
             const old = this.action.data.old
             if (old.name != null) {
@@ -682,7 +701,7 @@ class Trello extends BaseProvider {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Updated Label'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        let field = null
+        let field: EmbedField | null = null
         if (this.action.data.old != null) {
             if (this.action.data.old.color != null) {
                 if (this.action.data.label.color) {
@@ -752,12 +771,13 @@ class Trello extends BaseProvider {
 
     // How to Trigger?
     public async updateMember(): Promise<void> {
+        this.nullifyPayload()
         console.log('Not implemented')
     }
 
     public async updateOrganization(): Promise<void> {
         const embed = this._preparePayload()
-        let field = null
+        let field: EmbedField | null = null
         const organization = this.action.data.organization
         const old = this.action.data.old
         embed.title = '[' + organization.name + '] '
@@ -830,35 +850,35 @@ class Trello extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    private _resolveFullCardURL(card) {
+    private _resolveFullCardURL(card: Card): string {
         return Trello.baseLink + 'c/' + card.shortLink + '/' + card.idShort + '-' + card.name.replace(/\s/g, '-').toLowerCase()
     }
 
-    private _resolveFullBoardURL(board) {
+    private _resolveFullBoardURL(board: Board): string {
         return Trello.baseLink + 'b/' + board.shortLink + '/' + board.name.replace(/\s/g, '-').toLowerCase()
     }
 
-    private _resolveFullCommentURL(card, commentID) {
-        return this._resolveFullCardURL(card) + '#comment-' + commentID
+    private _resolveFullCommentURL(card: Card, commentId: string): string {
+        return this._resolveFullCardURL(card) + '#comment-' + commentId
     }
 
-    private _resolveCardURL(id) {
+    private _resolveCardURL(id: string): string {
         return Trello.baseLink + 'c/' + id
     }
 
-    private _resolveBoardURL(id) {
+    private _resolveBoardURL(id: string): string {
         return Trello.baseLink + 'b/' + id
     }
 
-    private _resolveCommentURL(cardID, commentID) {
-        return this._resolveCardURL(cardID) + '#comment-' + commentID
+    private _resolveCommentURL(cardID: string, commentId: string): string {
+        return this._resolveCardURL(cardID) + '#comment-' + commentId
     }
 
-    private _resolveGenericURL(id) {
+    private _resolveGenericURL(id: string): string {
         return Trello.baseLink + id
     }
 
-    private _formatAttachment(attachment, embed) {
+    private _formatAttachment(attachment: Attachment, embed: Embed): void {
         if (attachment.previewUrl != null) {
             embed.image = {url: attachment.previewUrl}
         }
@@ -876,7 +896,7 @@ class Trello extends BaseProvider {
         }
     }
 
-    private _formatLabel(text, value, embed) {
+    private _formatLabel(text: string, value: string, embed: Embed): void {
         if (value && Trello.defTrelloColors[value] != null) {
             embed.color = Trello.defTrelloColors[value]
         } else {
@@ -887,16 +907,16 @@ class Trello extends BaseProvider {
         }
     }
 
-    private _resolveUser() {
+    private _resolveUser(): EmbedAuthor {
         const memberCreator = this.body.action.memberCreator
-        const author = new EmbedAuthor()
-        author.name = memberCreator.fullName
-        author.icon_url = Trello.baseAvatarUrl + memberCreator.avatarHash + '/170.png'
-        author.url = Trello.baseLink + memberCreator.username
-        return author
+        return {
+            name: memberCreator.fullName,
+            icon_url: Trello.baseAvatarUrl + memberCreator.avatarHash + '/170.png',
+            url: Trello.baseLink + memberCreator.username
+        }
     }
 
-    private _preparePayload() {
+    private _preparePayload(): Embed {
         this.action = this.body.action
         this.model = this.body.model
 
@@ -904,7 +924,9 @@ class Trello extends BaseProvider {
         // console.info(this.body.action.type);
         // console.info(this.action.data);
 
-        const embed = new Embed()
+        const embed: Embed = {
+            author: this._resolveUser()
+        }
 
         // Use the background color of the board if applicable. Otherwise, use the default trello color.
         if (this.model.prefs != null && this.model.prefs.background != null && Trello.defTrelloColors[this.model.prefs.background] != null) {
@@ -913,10 +935,6 @@ class Trello extends BaseProvider {
             embed.color = Trello.defTrelloColors.trello
         }
 
-        embed.author = this._resolveUser()
-
         return embed
     }
 }
-
-export { Trello }

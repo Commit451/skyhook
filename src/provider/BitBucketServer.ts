@@ -1,12 +1,11 @@
-import { Embed } from '../model/Embed'
-import { EmbedAuthor } from '../model/EmbedAuthor'
-import { EmbedField } from '../model/EmbedField'
-import { BaseProvider } from './BaseProvider'
+import { Embed, EmbedField, EmbedAuthor } from '../model/DiscordApi'
+import { TypeParseProvder } from './BaseProvider'
 
-class BitBucketServer extends BaseProvider {
+export class BitBucketServer extends TypeParseProvder {
+
     private embed: Embed
 
-    private static _formatLargeString(str, limit = 256): string {
+    private static _formatLargeString(str: string, limit = 256): string {
         return (str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str)
     }
 
@@ -27,24 +26,24 @@ class BitBucketServer extends BaseProvider {
     constructor() {
         super()
         this.setEmbedColor(0x205081)
-        this.embed = new Embed()
+        this.embed = {}
     }
 
     public getName(): string {
         return 'BitBucketServer'
     }
 
-    public getType(): string {
+    public getType(): string | null {
         return this.headers['x-event-key']
     }
 
     public async diagnosticsPing(): Promise<void> {
-        const field = new EmbedField()
         this.embed.title = 'Test Connection'
         this.embed.description = 'You have successfully configured Skyhook with your BitBucket Server instance.'
-        field.name = 'Test'
-        field.value = this.body.test
-        this.embed.fields = [field]
+        this.embed.fields = [{
+            name: 'Test',
+            value: this.body.test
+        }]
 
         this.addEmbed(this.embed)
     }
@@ -178,30 +177,30 @@ class BitBucketServer extends BaseProvider {
     }
 
     private extractAuthor(): EmbedAuthor {
-        const author = new EmbedAuthor()
-        author.name = this.body.actor.displayName
-        author.icon_url = 'https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/44_Bitbucket_logo_logos-512.png'
-        return author
+        return {
+            name: this.body.actor.displayName,
+            icon_url: 'https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/44_Bitbucket_logo_logos-512.png'
+        }
     }
 
-    private extractPullRequestUrl() {
+    private extractPullRequestUrl(): string {
         return this.extractBaseLink() + '/projects/' + this.body.pullRequest.fromRef.repository.project.key + '/repos/'
             + this.body.pullRequest.fromRef.repository.slug + '/pull-requests/' + this.body.pullRequest.id + '/overview'
     }
 
     private extractPullRequestFields(): EmbedField[] {
-        const fieldArray = new Array<EmbedField>()
+        const fieldArray: EmbedField[] = []
 
-        const toFromRefField = new EmbedField()
-        toFromRefField.name = 'From --> To'
-        toFromRefField.value = `**Source branch:** ${this.body.pullRequest.fromRef.displayId} \n **Destination branch:** ${this.body.pullRequest.toRef.displayId} \n **State:** ${this.body.pullRequest.state}`
-        fieldArray.push(toFromRefField)
+        fieldArray.push({
+            name: 'From --> To',
+            value: `**Source branch:** ${this.body.pullRequest.fromRef.displayId} \n **Destination branch:** ${this.body.pullRequest.toRef.displayId} \n **State:** ${this.body.pullRequest.state}`
+        })
 
         for (let i = 0; i < Math.min(this.body.pullRequest.reviewers.length, 18); i++) {
-            const reviewerField = new EmbedField()
-            reviewerField.name = 'Reviewer'
-            reviewerField.value = this.body.pullRequest.reviewers[i].user.displayName
-            fieldArray.push(reviewerField)
+            fieldArray.push({
+                name: 'Reviewer',
+                value: this.body.pullRequest.reviewers[i].user.displayName
+            })
         }
 
         return fieldArray
@@ -215,31 +214,29 @@ class BitBucketServer extends BaseProvider {
         return this.body.repository.name
     }
 
-    private extractRepoUrl() {
+    private extractRepoUrl(): string {
         return this.extractBaseLink() + '/projects/' + this.body.repository.project.key + '/repos/' + this.body.repository.slug + '/browse'
     }
 
     private extractRepoChangesField(): EmbedField[] {
-        const fieldArray = new Array<EmbedField>()
+        const fieldArray: EmbedField[] = []
 
         for (let i = 0; i < Math.min(this.body.changes.length, 18); i++) {
-            const changesEmbed = new EmbedField()
-            changesEmbed.name = 'Change'
-            changesEmbed.value = `**Branch:** ${this.body.changes[i].ref.displayId} \n **Old Hash:** ${this.body.changes[i].fromHash.slice(0, 10)} \n **New Hash:** ${this.body.changes[i].toHash.slice(0, 10)} \n **Type:** ${this.body.changes[i].type}`
-            fieldArray.push(changesEmbed)
+            fieldArray.push({
+                name: 'Change',
+                value: `**Branch:** ${this.body.changes[i].ref.displayId} \n **Old Hash:** ${this.body.changes[i].fromHash.slice(0, 10)} \n **New Hash:** ${this.body.changes[i].toHash.slice(0, 10)} \n **Type:** ${this.body.changes[i].type}`
+            })
         }
 
         return fieldArray
     }
 
-    private extractCommitCommentUrl() {
+    private extractCommitCommentUrl(): string {
         return this.extractBaseLink() + '/projects/' + this.body.repository.project.key + '/repos/' + this.body.repository.slug + '/commits/' + this.body.commit
     }
 
-    private extractBaseLink() {
+    private extractBaseLink(): string {
         const actorLink = this.body.actor.links.self[0].href
         return actorLink.substring(0, actorLink.indexOf('/user'))
     }
 }
-
-export { BitBucketServer }

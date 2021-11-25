@@ -1,23 +1,21 @@
-import { Embed } from '../model/Embed'
-import { EmbedAuthor } from '../model/EmbedAuthor'
-import { EmbedField } from '../model/EmbedField'
-import { BaseProvider } from '../provider/BaseProvider'
+import { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi'
+import { TypeParseProvder } from '../provider/BaseProvider'
 
-class Project {
-    public name?: string
-    public url?: string
-    public branch?: string
+interface Project {
+    name: string
+    url: string
+    branch: string
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public commits?: any[]
-    public totalCommitsCount?: number
+    commits: any[]
+    totalCommitsCount: number
 }
 
 /**
  * https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/user/project/integrations/webhooks.md
  */
-class GitLab extends BaseProvider {
+export class GitLab extends TypeParseProvder {
 
-    private static _formatAvatarURL(url): string {
+    private static _formatAvatarURL(url: string): string {
         if (!/^https?:\/\/|^\/\//i.test(url)) {
             return 'https://gitlab.com' + url
         }
@@ -29,14 +27,14 @@ class GitLab extends BaseProvider {
     constructor() {
         super()
         this.setEmbedColor(0xFCA326)
-        this.embed = new Embed()
+        this.embed = {}
     }
 
     public getName(): string {
         return 'GitLab'
     }
 
-    public getType(): string {
+    public getType(): string | null {
         return this.body.object_kind
     }
 
@@ -52,11 +50,11 @@ class GitLab extends BaseProvider {
 
             for (const commit of project.commits) {
                 const message = (commit.message.length > 256) ? commit.message.substring(0, 255) + '\u2026' : commit.message
-                const field = new EmbedField()
-                field.name = 'Commit from ' + commit.author.name
-                field.value = '(' + '[`' + commit.id.substring(0, 7) + '`](' + commit.url + ')' + ') ' + (message == null ? '' : message.replace(/\n/g, ' ').replace(/\r/g, ' '))
-                field.inline = false
-                fields.push(field)
+                fields.push({
+                    name: 'Commit from ' + commit.author.name,
+                    value: '(' + '[`' + commit.id.substring(0, 7) + '`](' + commit.url + ')' + ') ' + (message == null ? '' : message.replace(/\n/g, ' ').replace(/\r/g, ' ')),
+                    inline: false
+                })
             }
 
             this.embed.title = '[' + project.name + ':' + project.branch + '] ' + project.totalCommitsCount + ' commit' + ((project.totalCommitsCount > 1) ? 's' : '')
@@ -96,7 +94,7 @@ class GitLab extends BaseProvider {
     }
 
     public async issue(): Promise<void> {
-        const actions = {
+        const actions: Record<string, string> = {
             open: 'Opened',
             close: 'Closed',
             reopen: 'Reopened',
@@ -107,10 +105,10 @@ class GitLab extends BaseProvider {
         this.embed.url = this.body.object_attributes.url
         this.embed.author = this.authorFromBody()
         if (this.body.object_attributes.description !== '') {
-            const field = new EmbedField()
-            field.name = this.body.object_attributes.title
-            field.value = (this.body.object_attributes.description.length > 1024) ? this.body.object_attributes.description.substring(0, 1023) + '\u2026' : this.body.object_attributes.description
-            this.embed.fields = [field]
+            this.embed.fields = [{
+                name: this.body.object_attributes.title,
+                value: (this.body.object_attributes.description.length > 1024) ? this.body.object_attributes.description.substring(0, 1023) + '\u2026' : this.body.object_attributes.description
+            }]
         } else {
             this.embed.description = `**${this.body.object_attributes.title}**`
         }
@@ -118,7 +116,7 @@ class GitLab extends BaseProvider {
     }
 
     public async note(): Promise<void> {
-        let type: string = null
+        let type: string
         switch (this.body.object_attributes.noteable_type) {
             case 'Commit':
                 type = 'commit (' + this.body.commit.id.substring(0, 7) + ')'
@@ -132,6 +130,9 @@ class GitLab extends BaseProvider {
             case 'Snippet':
                 type = 'snippet #' + this.body.snippet.id
                 break
+            default:
+                type = 'unknown'
+                break
         }
         this.embed.title = 'Wrote a comment on ' + type + ' on ' + this.body.project.name
         this.embed.url = this.body.object_attributes.url
@@ -141,7 +142,7 @@ class GitLab extends BaseProvider {
     }
 
     public async mergeRequest(): Promise<void> {
-        const actions = {
+        const actions: Record<string, string> = {
             open: 'Opened',
             close: 'Closed',
             reopen: 'Reopened',
@@ -154,10 +155,10 @@ class GitLab extends BaseProvider {
         this.embed.url = this.body.object_attributes.url
         this.embed.author = this.authorFromBody()
         if (this.body.object_attributes.description !== '') {
-            const field = new EmbedField()
-            field.name = this.body.object_attributes.title
-            field.value = (this.body.object_attributes.description.length > 1024) ? this.body.object_attributes.description.substring(0, 1023) + '\u2026' : this.body.object_attributes.description
-            this.embed.fields = [field]
+            this.embed.fields = [{
+                name: this.body.object_attributes.title,
+                value: (this.body.object_attributes.description.length > 1024) ? this.body.object_attributes.description.substring(0, 1023) + '\u2026' : this.body.object_attributes.description
+            }]
         } else {
             this.embed.description = `**${this.body.object_attributes.title}**`
         }
@@ -165,7 +166,7 @@ class GitLab extends BaseProvider {
     }
 
     public async wikiPage(): Promise<void> {
-        const actions = {
+        const actions: Record<string, string> = {
             create: 'Created',
             delete: 'Deleted',
             update: 'Updated'
@@ -197,17 +198,17 @@ class GitLab extends BaseProvider {
     }
 
     private authorFromBody(): EmbedAuthor {
-        const author = new EmbedAuthor()
-        author.name = this.body.user.name
-        author.icon_url = GitLab._formatAvatarURL(this.body.user.avatar_url)
-        return author
+        return {
+            name: this.body.user.name,
+            icon_url: GitLab._formatAvatarURL(this.body.user.avatar_url)
+        }
     }
 
     private authorFromBodyPush(): EmbedAuthor {
-        const author = new EmbedAuthor()
-        author.name = this.body.user_name
-        author.icon_url = GitLab._formatAvatarURL(this.body.user_avatar)
-        return author
+        return {
+            name: this.body.user_name,
+            icon_url: GitLab._formatAvatarURL(this.body.user_avatar)
+        }
     }
 
     private projectFromBody(): Project {
@@ -215,23 +216,25 @@ class GitLab extends BaseProvider {
         branch.shift()
         branch.shift()
 
-        const project = new Project()
         if (this.body.project != null) {
-            project.name = this.body.project.name
-            project.url = this.body.project.web_url
-            project.branch = branch.join('/')
-            project.commits = this.body.commits || []
-            project.totalCommitsCount = this.body.total_commits_count || 0
+            return {
+                name: this.body.project.name,
+                url: this.body.project.web_url,
+                branch: branch.join('/'),
+                commits: this.body.commits || [],
+                totalCommitsCount: this.body.total_commits_count || 0,
+            }
+            
         } else if (this.body.repository != null) {
-            project.name = this.body.repository.name
-            project.url = this.body.repository.homepage
-            project.branch = branch.join('/')
-            project.commits = this.body.commits || []
-            project.totalCommitsCount = this.body.total_commits_count || 0
+            return {
+                name: this.body.repository.name,
+                url: this.body.repository.homepage,
+                branch: branch.join('/'),
+                commits: this.body.commits || [],
+                totalCommitsCount: this.body.total_commits_count || 0
+            }
         }
 
-        return project
+        throw new Error('Failed to resolve project from body! Did GitLab\'s webhook format change?')
     }
 }
-
-export { GitLab }

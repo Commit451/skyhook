@@ -1,19 +1,17 @@
-import { Embed } from '../model/Embed'
-import { EmbedAuthor } from '../model/EmbedAuthor'
-import { EmbedField } from '../model/EmbedField'
-import { BaseProvider } from '../provider/BaseProvider'
+import { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi'
+import { TypeParseProvder } from '../provider/BaseProvider'
 import { MarkdownUtil } from '../util/MarkdownUtil'
 
 /**
  * https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html
  */
-class BitBucket extends BaseProvider {
+export class BitBucket extends TypeParseProvder {
 
-    private static _formatLargeString(str, limit = 256) {
-        return (str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str)
+    private static _formatLargeString(str: string, limit = 256): string {
+        return str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str
     }
 
-    private static _titleCase(str: string, ifNull = 'None') {
+    private static _titleCase(str: string, ifNull = 'None'): string {
         if (str == null) {
             return ifNull
         }
@@ -33,14 +31,14 @@ class BitBucket extends BaseProvider {
     constructor() {
         super()
         this.setEmbedColor(0x205081)
-        this.embed = new Embed()
+        this.embed = {}
     }
 
     public getName(): string {
         return 'BitBucket'
     }
 
-    public getType(): string {
+    public getType(): string | null {
         return this.headers['x-event-key']
     }
 
@@ -48,7 +46,7 @@ class BitBucket extends BaseProvider {
         if (this.body.push != null && this.body.push.changes != null) {
             for (let i = 0; (i < this.body.push.changes.length && i < 4); i++) {
                 const change = this.body.push.changes[i]
-                const embed = new Embed()
+                const embed: Embed = {}
 
                 if (change.new == null && change.old.type === 'branch') {
                     // Branch Deleted
@@ -76,10 +74,10 @@ class BitBucket extends BaseProvider {
                         const commit = commits[j]
                         const message = (commit.message.length > 256) ? commit.message.substring(0, 255) + '\u2026' : commit.message
                         const author = (typeof commit.author.user !== 'undefined') ? commit.author.user.display_name : 'Unknown'
-                        const field = new EmbedField()
-                        field.name = 'Commit from ' + author
-                        field.value = '(' + '[`' + commit.hash.substring(0, 7) + '`](' + commit.links.html.href + ')' + ') ' + message.replace(/\n/g, ' ').replace(/\r/g, ' ')
-                        fields.push(field)
+                        fields.push({
+                            name: 'Commit from ' + author,
+                            value: '(' + '[`' + commit.hash.substring(0, 7) + '`](' + commit.links.html.href + ')' + ') ' + message.replace(/\n/g, ' ').replace(/\r/g, ' ')
+                        })
                     }
                     embed.fields = fields
                 }
@@ -316,8 +314,9 @@ class BitBucket extends BaseProvider {
     }
 
     private extractAuthor(): EmbedAuthor {
-        const author = new EmbedAuthor()
-        author.name = this.body.actor.display_name
+        const author: EmbedAuthor = {
+            name: this.body.actor.display_name
+        }
         if (this.body.actor.links === undefined) {
             author.icon_url = 'http://i0.wp.com/avatar-cdn.atlassian.com/default/96.png'
             author.url = ''
@@ -333,15 +332,13 @@ class BitBucket extends BaseProvider {
     }
 
     private extractPullRequestField(): EmbedField {
-        const field = new EmbedField()
-        field.name = this.body.pullrequest.title
-        field.value = '**Destination branch:** ' + this.body.pullrequest.destination.branch.name + '\n' + '**State:** ' + this.body.pullrequest.state + '\n'
-        return field
+        return {
+            name: this.body.pullrequest.title,
+            value: '**Destination branch:** ' + this.body.pullrequest.destination.branch.name + '\n' + '**State:** ' + this.body.pullrequest.state + '\n'
+        }
     }
 
     private extractIssueUrl(): string {
         return this.baseLink + this.body.repository.full_name + '/issues/' + this.body.issue.id
     }
 }
-
-export { BitBucket }
