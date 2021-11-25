@@ -1,13 +1,13 @@
-import { Embed } from '../model/Embed'
-import { BaseProvider } from '../provider/BaseProvider'
+import { Embed } from '../model/DiscordApi'
+import { DirectParseProvider } from '../provider/BaseProvider'
 
 /**
  * https://docs.travis-ci.com/user/notifications/#Configuring-webhook-notifications
  */
-class Travis extends BaseProvider {
+export class Travis extends DirectParseProvider {
 
     // States https://github.com/travis-ci/travis-api/blob/master/lib/travis/model/build/states.rb#L25
-    private static STATUS_COLORS = {
+    private static STATUS_COLORS: Record<string, number> = {
         passed: 0x39aa56,
         failed: 0xdb4545,
         errored: 0xdb4545,
@@ -20,7 +20,7 @@ class Travis extends BaseProvider {
 
     public async parseData(): Promise<void> {
         this.setEmbedColor(0x39aa56)
-        const embed = new Embed()
+        const embed: Embed = {}
         let targetBody = this.body
         if (this.body.payload != null && typeof this.body.payload === 'string') {
             // Travis now sends data inside of a string payload property.
@@ -49,5 +49,3 @@ class Travis extends BaseProvider {
         this.addEmbed(embed)
     }
 }
-
-export { Travis }

@@ -1,24 +1,24 @@
-import { Embed } from '../model/Embed'
-import { BaseProvider } from '../provider/BaseProvider'
+import { Embed } from '../model/DiscordApi'
+import { TypeParseProvder } from '../provider/BaseProvider'
 
 /**
  * https://docs.rollbar.com/docs/webhooks
  */
-class Rollbar extends BaseProvider {
+export class Rollbar extends TypeParseProvder {
 
     private embed: Embed
 
     constructor() {
         super()
         this.setEmbedColor(0x3884CB)
-        this.embed = new Embed()
+        this.embed = {}
     }
 
     public getName(): string {
         return 'Rollbar'
     }
 
-    public getType(): string {
+    public getType(): string | null {
         return this.body.event_name
     }
 
@@ -67,5 +67,3 @@ class Rollbar extends BaseProvider {
         this.addEmbed(this.embed)
     }
 }
-
-export { Rollbar }

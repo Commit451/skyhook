@@ -9,7 +9,8 @@ describe('/POST bitbucketserver', () => {
         }
 
         const res = await Tester.test(new BitBucketServer(), 'bitbucketserver.json', headers)
-        expect(res.embeds).to.be.an('array').that.has.length(1)
+        expect(res).to.not.be.null
+        expect(res!.embeds).to.be.an('array').that.has.length(1)
     })
 
     it('repo:refs_changed 18 fields or less', async() => {
@@ -18,6 +19,7 @@ describe('/POST bitbucketserver', () => {
         }
 
         const res = await Tester.test(new BitBucketServer(), 'bitbucketserver.json', headers)
-        expect(res.embeds[0].fields.length).to.not.be.greaterThan(18)
+        expect(res).to.not.be.null
+        expect(res!.embeds![0]?.fields?.length).to.not.be.greaterThan(18)
     })
 })

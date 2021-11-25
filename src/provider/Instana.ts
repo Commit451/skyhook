@@ -1,6 +1,5 @@
-import { Embed } from '../model/Embed'
-import { BaseProvider } from '../provider/BaseProvider'
-import { EmbedField } from '../model/EmbedField'
+import { Embed } from '../model/DiscordApi'
+import { DirectParseProvider } from '../provider/BaseProvider'
 import { DateTime } from 'luxon'
 
 enum InstanaEventType {
@@ -12,27 +11,27 @@ enum InstanaEventType {
 /**
  * https://www.instana.com/docs/ecosystem/webhook/
  */
-class Instana extends BaseProvider {
+export class Instana extends DirectParseProvider {
 
     constructor() {
         super()
         this.setEmbedColor(0x54C0DE)
     }
 
-    private getEventType() {
+    private getEventType(): string {
         return this.body.issue.state || InstanaEventType.CHANGE_EVENT
     }
 
-    private addField(embed: Embed, isInline: boolean, fieldName: string, fieldValue: string, isValueDate: boolean): void {
+    private addField(embed: Embed, inline: boolean, name: string, fieldValue: string | number, isValueDate: boolean): void {
         if (!fieldValue) {
             return
         }
-        const field = new EmbedField()
-        field.inline = isInline
-        field.name = fieldName
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        field.value = isValueDate ? DateTime.fromMillis(fieldValue as any as number).toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS) : fieldValue
-        embed.fields.push(field)
+
+        embed.fields!.push({
+            name,
+            value: isValueDate ? DateTime.fromMillis(fieldValue as number).toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS) : fieldValue as string,
+            inline
+        })
     }
 
     private parseOpenIncident(embed: Embed): Embed {
@@ -80,7 +79,7 @@ class Instana extends BaseProvider {
     }
 
     public async parseData(): Promise<void> {
-        const embed = new Embed()
+        const embed: Embed = {}
         embed.fields = []
         switch (this.getEventType()) {
             case InstanaEventType.OPEN: {
@@ -102,5 +101,3 @@ class Instana extends BaseProvider {
         }
     }
 }
-
-export { Instana }

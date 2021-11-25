@@ -1,11 +1,10 @@
-import { Embed } from '../model/Embed'
-import { EmbedAuthor } from '../model/EmbedAuthor'
-import { BaseProvider } from '../provider/BaseProvider'
+import { Embed } from '../model/DiscordApi'
+import { DirectParseProvider } from '../provider/BaseProvider'
 
 /**
  * https://www.appveyor.com/docs/notifications/#webhook-payload-default
  */
-class AppVeyor extends BaseProvider {
+export class AppVeyor extends DirectParseProvider {
 
     public getName(): string {
         return 'AppVeyor'
@@ -13,16 +12,18 @@ class AppVeyor extends BaseProvider {
 
     public async parseData(): Promise<void> {
         this.setEmbedColor(0x00B3E0)
-        const embed = new Embed()
-        embed.title = 'Build ' + this.body.eventData.buildVersion
-        embed.url = this.body.eventData.buildUrl
-        embed.description = this.body.eventData.commitMessage + '\n\n' + '**Status**: ' + this.body.eventData.status
-        const author = new EmbedAuthor()
-        author.name = this.body.eventData.commitAuthor
-        if (this.body.eventData.repositoryProvider === 'gitHub') {
-            author.url = 'https://github.com/' + this.body.eventData.repositoryName + '/commit/' + this.body.eventData.commitId
+        const embed: Embed = {
+            title: 'Build ' + this.body.eventData.buildVersion,
+            url: this.body.eventData.buildUrl,
+            description: this.body.eventData.commitMessage + '\n\n' + '**Status**: ' + this.body.eventData.status,
+            author: {
+                name: this.body.eventData.commitAuthor
+            }
         }
-        embed.author = author
+        if (this.body.eventData.repositoryProvider === 'gitHub') {
+            embed.author!.url = 'https://github.com/' + this.body.eventData.repositoryName + '/commit/' + this.body.eventData.commitId
+        }
+
         if (this.body.eventData.jobs[0].artifacts.length !== 0) {
             embed.description += '\n**Artifacts**:'
             for (const artifact of this.body.eventData.jobs[0].artifacts) {
@@ -32,5 +33,3 @@ class AppVeyor extends BaseProvider {
         this.addEmbed(embed)
     }
 }
-
-export { AppVeyor }

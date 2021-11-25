@@ -4,7 +4,7 @@ import winston from 'winston'
 /**
  * Helps with logging things. Basically a Winston helper
  */
-class LoggerUtil {
+export class LoggerUtil {
 
     public static init(): void {
         if (!this.isInitialized) {
@@ -27,5 +27,3 @@ class LoggerUtil {
 
     private static isInitialized = false
 }
-
-export { LoggerUtil }

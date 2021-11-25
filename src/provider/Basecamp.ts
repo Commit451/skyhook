@@ -1,10 +1,9 @@
-import { Embed } from '../model/Embed'
-import { BaseProvider } from '../provider/BaseProvider'
-import { EmbedAuthor} from '../model/EmbedAuthor'
+import { Embed } from '../model/DiscordApi'
+import { DirectParseProvider } from '../provider/BaseProvider'
 
 import TurndownService from 'turndown'
 
-class Basecamp extends BaseProvider {
+export class Basecamp extends DirectParseProvider {
 
     private turndown: TurndownService
     private colorCreated = 0x00ff00
@@ -185,31 +184,33 @@ class Basecamp extends BaseProvider {
         return this.turndown.turndown(str)
     }
 
-    private prepareEmbed(color: number, title: string, fields: Array<string> = [], content = false): Embed {
-        const embed = new Embed()
-        embed.url = this.body.recording.app_url
-        embed.color = color
-        embed.title = `${title} on ${this.body.recording.bucket.name} / ${this.body.recording.parent.type} : ${this.body.recording.parent.title}`
-        embed.author = new EmbedAuthor()
-        embed.author.name = this.body.recording.creator.name
-        embed.author.icon_url = this.body.recording.creator.avatar_url
+    private prepareEmbed(color: number, title: string, fields: string[] = [], content = false): Embed {
+        const embed: Embed = {
+            title: `${title} on ${this.body.recording.bucket.name} / ${this.body.recording.parent.type} : ${this.body.recording.parent.title}`,
+            url: this.body.recording.app_url,
+            color: color,
+            author: {
+                name: this.body.recording.creator.name,
+                icon_url: this.body.recording.creator.avatar_url
+            },
+            fields: []
+        }
+
         if (content) {
             embed.description = this.escapeString(this.body.recording.content).substring(0, 4096)
         }
-        embed.fields = []
+
         const body = this.body
-        fields.forEach(function (field) {
+        fields.forEach((field) => {
             switch (field) {
                 case 'title':
-                    embed.fields.push({name: 'Title', value: body.recording.title, inline: true})
+                    embed.fields!.push({name: 'Title', value: body.recording.title, inline: true})
                     break
                 case 'type':
-                    embed.fields.push({name: 'Type', value: body.recording.type, inline: true})
+                    embed.fields!.push({name: 'Type', value: body.recording.type, inline: true})
             }
         })
         this.addEmbed(embed)
         return embed
     }
 }
-
-export { Basecamp }

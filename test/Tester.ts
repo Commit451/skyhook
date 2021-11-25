@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import { inspect } from 'util'
 import { BaseProvider } from '../src/provider/BaseProvider'
 import { LoggerUtil } from '../src/util/LoggerUtil'
-import { DiscordPayload } from '../src/model/DiscordPayload'
+import { DiscordPayload } from '../src/model/DiscordApi'
 
 /**
  * Helps with testing things
@@ -10,7 +10,7 @@ import { DiscordPayload } from '../src/model/DiscordPayload'
 class Tester {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public static async test(provider: BaseProvider, jsonFileName: string = null, headers: any = null, query: any = null): Promise<DiscordPayload> {
+    public static async test(provider: BaseProvider, jsonFileName: string | null = null, headers: any = null, query: any = null): Promise<DiscordPayload | null> {
         LoggerUtil.init()
         let requestBody = null
         if (jsonFileName != null) {
@@ -20,7 +20,7 @@ class Tester {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public static async testWithBody(provider: BaseProvider, body: Record<string, any> = null, headers: any = null, query: any = null): Promise<DiscordPayload> {
+    public static async testWithBody(provider: BaseProvider, body: Record<string, any> | null = null, headers: any = null, query: any = null): Promise<DiscordPayload | null> {
         LoggerUtil.init()
         try {
             const res = await provider.parse(body, headers, query)

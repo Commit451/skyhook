@@ -1,10 +1,9 @@
-import { Embed } from '../model/Embed'
-import { BaseProvider } from '../provider/BaseProvider'
+import { DirectParseProvider } from '../provider/BaseProvider'
 
 /**
  * https://docs.newrelic.com/docs/alerts/new-relic-alerts/managing-notification-channels/customize-your-webhook-payload
  */
-class NewRelic extends BaseProvider {
+export class NewRelic extends DirectParseProvider {
 
     public getName(): string {
         return 'New Relic'
@@ -15,14 +14,10 @@ class NewRelic extends BaseProvider {
     }
 
     public async parseData(): Promise<void> {
-        const details = this.body.details
-        const state = this.body.current_state
-        const embed = new Embed()
-        embed.title = `${this.body.condition_name} ${state}`
-        embed.url = this.body.incident_url
-        embed.description = details
-        this.addEmbed(embed)
+        this.addEmbed({
+            title: `${this.body.condition_name} ${this.body.current_state}`,
+            url: this.body.incident_url,
+            description: this.body.details
+        })
     }
 }
-
-export { NewRelic }

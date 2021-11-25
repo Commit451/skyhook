@@ -1,10 +1,10 @@
-import { Embed } from '../model/Embed'
-import { BaseProvider } from '../provider/BaseProvider'
+import { Embed } from '../model/DiscordApi'
+import { DirectParseProvider } from '../provider/BaseProvider'
 
 /**
  * https://developer.atlassian.com/server/jira/platform/webhooks/
  */
-class Jira extends BaseProvider {
+export class Jira extends DirectParseProvider {
     constructor() {
         super()
         this.setEmbedColor(0x1e45a8)
@@ -20,7 +20,7 @@ class Jira extends BaseProvider {
 
     public async parseData(): Promise<void> {
         if (this.body.webhookEvent == null) {
-            this.payload = null
+            this.nullifyPayload()
             return
         }
 
@@ -33,7 +33,7 @@ class Jira extends BaseProvider {
                 // What's the point of notifying a new comment if ONLY comment information is sent?
                 // Do we care that a comment was made if we cant tell what was commented on?
                 // This solution will silence errors until someone makes sense of Atlassian's decisions..
-                this.payload = null
+                this.nullifyPayload()
                 return
             }
         } else {
@@ -47,9 +47,10 @@ class Jira extends BaseProvider {
         const action = this.body.webhookEvent.split('_')[1]
 
         // create the embed
-        const embed = new Embed()
-        embed.title = `${issue.key} - ${issue.fields.summary}`
-        embed.url = this.createBrowseUrl(issue)
+        const embed: Embed = {
+            title: `${issue.key} - ${issue.fields.summary}`,
+            url: this.createBrowseUrl(issue)
+        }
         if (isIssue) {
             embed.description = `${user.displayName} ${action} issue: ${embed.title}${issueHasAsignee ? ` (${issue.fields.assignee.displayName})` : ''} `
         } else {
@@ -59,12 +60,10 @@ class Jira extends BaseProvider {
         this.addEmbed(embed)
     }
 
-    private createBrowseUrl(issue): string {
+    private createBrowseUrl(issue: { self: string, key: string }): string {
         const url: URL = new URL(issue.self)
         const path: string|RegExpMatchArray = url.pathname.match(/.+?(?=\/rest\/api)/) ?? ''
         url.pathname = `${path}/browse/${issue.key}`
         return url.toString()
     }
 }
-
-export { Jira }

@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 import axios from 'axios'
 import bodyParser from 'body-parser'
 import express from 'express'
-import { DiscordPayload } from './model/DiscordPayload'
+import { DiscordPayload } from './model/DiscordApi'
 import { BaseProvider } from './provider/BaseProvider'
 import { ErrorUtil } from './util/ErrorUtil'
 import { LoggerUtil } from './util/LoggerUtil'
@@ -119,7 +119,7 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
     }
     const discordEndpoint = `https://discordapp.com/api/webhooks/${webhookID}/${webhookSecret}`
 
-    let discordPayload: DiscordPayload = null
+    let discordPayload: DiscordPayload | null = null
 
     const Provider = providersMap.get(providerName)
     if (Provider != null) {
@@ -141,9 +141,18 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
         const errorMessage = `Unknown provider ${providerName}`
         logger.error(errorMessage)
         res.status(400).send(errorMessage)
+        return
     }
 
     if (discordPayload != null) {
+
+        // We could implement a more robust validation on this at some point.
+        if(Object.keys(discordPayload).length === 0) {
+            logger.error('Bad implementation, outbound payload is empty.')
+            res.status(500).send('Bad implementation.')
+            return
+        }
+
         const jsonString = JSON.stringify(discordPayload)
         axios({
             data: jsonString,
@@ -158,6 +167,9 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
             logger.error(err)
             res.status(502).send(err)
         })
+    } else {
+        res.status(200).send(`Webhook event is either not supported or not implemented by /${providerName}.`)
+        return
     }
 })
 
@@ -172,7 +184,7 @@ const server = app.listen(port, () => {
     logger.debug(`Your app is listening on port ${port}`)
 })
 
-function normalizePort(givenPort: string) {
+function normalizePort(givenPort: string): string | number | boolean {
     const normalizedPort = parseInt(givenPort, 10)
 
     if (isNaN(normalizedPort)) {
