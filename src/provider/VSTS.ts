@@ -22,6 +22,28 @@ export class VSTS extends TypeParseProvder {
         return this.body.eventType
     }
 
+    public knownTypes(): string[] {
+        return [
+            'gitPush',
+            'tfvcCheckin',
+            'gitPullrequestCreated',
+            'gitPullrequestMerged',
+            'gitPullrequestUpdated',
+            'workitemCommented',
+            'workitemCreated',
+            'workitemDeleted',
+            'workitemRestored',
+            'workitemUpdated',
+            'buildComplete',
+            'msVssReleaseReleaseCreatedEvent',
+            'msVssReleaseReleaseAbandonedEvent',
+            'msVssReleaseDeploymentApprovalCompleted',
+            'msVssReleaseDeploymentApprovalPendingEvent',
+            'msVssReleaseDeploymentCompletedEvent',
+            'msVssReleaseDeplyomentStartedEvent'
+        ]
+    }
+
     // PUSH
     public async gitPush(): Promise<void> {
         const fields: EmbedField[] = []

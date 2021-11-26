@@ -42,6 +42,29 @@ export class BitBucket extends TypeParseProvder {
         return this.headers['x-event-key']
     }
 
+    public knownTypes(): string[] {
+        return [
+            'repoPush',
+            'repoFork',
+            'repoUpdated',
+            'repoCommitCommentCreated',
+            'repoCommitStatusCreated',
+            'repoCommitStatusUpdated',
+            'issueCreated',
+            'issueUpdated',
+            'issueCommentCreated',
+            'pullrequestCreated',
+            'pullrequestUpdated',
+            'pullrequestApproved',
+            'pullrequestUnapproved',
+            'pullrequestFulfilled',
+            'pullrequestRejected',
+            'pullrequestCommentCreated',
+            'pullrequestCommentUpdated',
+            'pullrequestCommentDeleted'
+        ]
+    }
+
     public async repoPush(): Promise<void> {
         if (this.body.push != null && this.body.push.changes != null) {
             for (let i = 0; (i < this.body.push.changes.length && i < 4); i++) {

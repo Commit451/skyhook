@@ -22,6 +22,19 @@ export class Rollbar extends TypeParseProvder {
         return this.body.event_name
     }
 
+    public knownTypes(): string[] {
+        return [
+            'expRepeatItem',
+            'deploy',
+            'itemVelocity',
+            'newItem',
+            'occurrence',
+            'reactivatedItem',
+            'reopenedItem',
+            'resolvedItem'
+        ]
+    }
+
     public async expRepeatItem(): Promise<void> {
         this.embed.title = `${this.body.data.occurrence} occurrence of issue`
         this.embed.description = this.body.data.item.title

@@ -125,6 +125,8 @@ export abstract class TypeParseProvder extends BaseProvider {
 
     public abstract getType(): string | null
 
+    public abstract knownTypes(): string[]
+
     /**
      * Formats the type passed to make it work as a method reference. This means removing underscores
      * and camel casing.
@@ -144,12 +146,14 @@ export abstract class TypeParseProvder extends BaseProvider {
         const type = TypeParseProvder.formatType(this.getType())
         if(type != null) {
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const method: () => Promise<void> | null = (this as any)[type]
-            if(method != null && typeof method === 'function') {
-                this.logger.info(`Calling ${type}() in ${this.constructor.name} provider.`)
-                await method.bind(this)()
-                return
+            if(this.knownTypes().includes(type)) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const method: () => Promise<void> | null = (this as any)[type]
+                if(method != null && typeof method === 'function') {
+                    this.logger.info(`Calling ${type}() in ${this.constructor.name} provider.`)
+                    await method.bind(this)()
+                    return
+                }
             }
         }
         // If we didn't succeed, dont send anything.
