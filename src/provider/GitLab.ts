@@ -38,6 +38,19 @@ export class GitLab extends TypeParseProvder {
         return this.body.object_kind
     }
 
+    public knownTypes(): string[] {
+        return [
+            'push',
+            'tagPush',
+            'issue',
+            'note',
+            'mergeRequest',
+            'wikiPage',
+            'pipeline',
+            'build'
+        ]
+    }
+
     public async push(): Promise<void> {
         const branch = this.body.ref.split('/')
         branch.shift()

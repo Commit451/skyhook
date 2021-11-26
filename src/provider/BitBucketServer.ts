@@ -37,6 +37,32 @@ export class BitBucketServer extends TypeParseProvder {
         return this.headers['x-event-key']
     }
 
+    public knownTypes(): string[] {
+        return [
+            'diagnosticsPing',
+            'repoRefsChanged',
+            'repoModified',
+            'repoForked',
+            'repoCommentAdded',
+            'repoCommentEdited',
+            'repoCommentDeleted',
+            'prOpened',
+            'prFromRefUpdated',
+            'prModified',
+            'prReviewerUpdated',
+            'prReviewerApproved',
+            'prReviewerUnapproved',
+            'prReviewerNeedsWork',
+            'prMerged',
+            'prDeclined',
+            'prDeleted',
+            'prCommentAdded',
+            'prCommentEdited',
+            'prCommentDeleted',
+            'mirrorRepoSynchronized'
+        ]
+    }
+
     public async diagnosticsPing(): Promise<void> {
         this.embed.title = 'Test Connection'
         this.embed.description = 'You have successfully configured Skyhook with your BitBucket Server instance.'

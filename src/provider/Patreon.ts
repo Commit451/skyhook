@@ -78,6 +78,20 @@ export class Patreon extends TypeParseProvder {
         return this.headers['x-patreon-event']
     }
 
+    public knownTypes(): string[] {
+        return [
+            'membersCreate',
+            'membersUpdate',
+            'membersDelete',
+            'membersPledgeCreate',
+            'membersPledgeUpdate',
+            'membersPledgeDelete',
+            'pledgesCreate',
+            'pledgesUpdate',
+            'pledgesDelete'
+        ]
+    }
+
     private _handleAPIV2(type: PatreonAction): void {
         const embed: Embed = {}
         const campaignId = this.body.data.relationships.campaign?.data?.id
