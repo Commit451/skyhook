@@ -46,7 +46,11 @@ window.mdc.autoInit();
         }
 
         if (!error) {
-            window.copyToClipboard(discordHookUrl);
+            new ClipboardJS('#button-generate', {
+                text: function() {
+                    return discordHookUrl
+                }
+            })
             show(snackbar, 'URL Generated. Copied to Clipboard');
         } else {
             show(snackbar, 'Unable to create URL. Make sure your Discord URL is valid');
