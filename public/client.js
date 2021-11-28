@@ -6,15 +6,12 @@ window.mdc.autoInit();
     //init snackbar things
     const MDCSnackbar = global.mdc.snackbar.MDCSnackbar;
     const snackbar = new MDCSnackbar(document.getElementById('mdc-js-snackbar'));
+    snackbar.timeoutMs = 4000
 
     const show = function (sb, theMessage) {
-        const data = {
-            message: theMessage,
-            multiline: false,
-            timeout: 2750
-        };
 
-        sb.show(data);
+        sb.labelText = theMessage
+        sb.open();
     };
 
     const validHookDomains = [
