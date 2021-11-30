@@ -29,6 +29,7 @@ import { Unity } from './provider/Unity'
 import { UptimeRobot } from './provider/UptimeRobot'
 import { VSTS } from './provider/VSTS'
 import { Type } from './util/TSUtility'
+import { Prometheus } from './provider/Prometheus'
 
 dotenv.config()
 
@@ -58,6 +59,7 @@ const providers: Type<BaseProvider>[] = [
     NewRelic,
     Patreon,
     Pingdom,
+    Prometheus,
     Rollbar,
     Travis,
     Trello,
