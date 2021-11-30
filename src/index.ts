@@ -39,6 +39,8 @@ logger.debug('Winston setup successfully.')
 
 const app = express()
 
+const hostPath = process.env.HOST_PATH || '/'
+
 /**
  * Array of the classes
  */
@@ -90,7 +92,7 @@ app.use(express.static('public'))
 app.set('view engine', 'ejs')
 
 app.get('/', (req, res) => {
-    res.render('index', { providers: providerInfos })
+    res.render('index', { providers: providerInfos, hostPath })
 })
 
 app.get('/providers', (req, res) => {
