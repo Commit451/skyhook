@@ -29,6 +29,7 @@ import { Unity } from './provider/Unity'
 import { UptimeRobot } from './provider/UptimeRobot'
 import { VSTS } from './provider/VSTS'
 import { Type } from './util/TSUtility'
+import { AzureDevops } from './provider/AzureDevops'
 
 dotenv.config()
 
@@ -44,6 +45,7 @@ const app = express()
  */
 const providers: Type<BaseProvider>[] = [
     AppVeyor,
+    AzureDevops,
     Basecamp,
     BitBucket,
     BitBucketServer,
@@ -147,7 +149,7 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
     if (discordPayload != null) {
 
         // We could implement a more robust validation on this at some point.
-        if(Object.keys(discordPayload).length === 0) {
+        if (Object.keys(discordPayload).length === 0) {
             logger.error('Bad implementation, outbound payload is empty.')
             res.status(500).send('Bad implementation.')
             return
