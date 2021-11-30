@@ -11,18 +11,12 @@ export class AzureDevops extends TypeParseProvder {
         this.embed = {}
     }
 
-    public preParse(): void {
-        this.headers = ['x-skyhook-event']
-
-        this.headers['x-skyhook-event'] = this.body.eventType
-    }
-
     public getName(): string {
         return 'Azure-DevOps'
     }
 
     public getType(): string | null {
-        return this.headers['x-skyhook-event']
+        return this.body.eventType
     }
 
     public knownTypes(): string[] {
