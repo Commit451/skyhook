@@ -1,7 +1,7 @@
 import { Embed, EmbedField, EmbedAuthor } from '../model/DiscordApi'
-import { TypeParseProvder } from './BaseProvider'
+import { DirectParseProvider } from './BaseProvider'
 
-export class Prometheus extends TypeParseProvder {
+export class Prometheus extends DirectParseProvider {
     private embed: Embed
     constructor() {
         super()
@@ -9,30 +9,15 @@ export class Prometheus extends TypeParseProvder {
         this.embed = {}
     }
 
-    public preParse(): void {
-        this.headers = ['x-skyhook-event']
-        // Prometheus does not have a type, so we set our own.
-        this.headers['x-skyhook-event'] = 'fire'
-    }
-
     public getName(): string {
         return 'Prometheus'
-    }
-
-    public getType(): string | null {
-        // Prometheus does not have a type, so we set our own.
-        return this.headers['x-skyhook-event']
-    }
-
-    public knownTypes(): string[] {
-        return ['fire']
     }
 
     /**
      * There is no event type for this provider. Creating a single
      * method to handle all events.
      */
-    public async fire(): Promise<void> {
+    public async parseData(): Promise<void> {
         // Set Embed Author
         this.embed.author = this.extractAuthor()
 
