@@ -1,0 +1,24 @@
+{
+  "userAccountId": "59fdbfc4a392de337954d52b",
+  "accountType": "customer",
+  "updateTrigger": "edit_page",
+  "page": {
+    "creatorAccountId": "59fdbfc4a392de337954d52b",
+    "spaceKey": "EX",
+    "modificationDate": 1640921032197,
+    "lastModifierAccountId": "59fdbfc4a392de337954d52b",
+    "self": "https://example.atlassian.net/wiki/spaces/EX/pages/108265543/example_page",
+    "id": 108265543,
+    "title": "example_page",
+    "creationDate": 1640920574721,
+    "contentType": "page",
+    "version": 3,
+    "creatorDisplayName": "Zaphod Beeblebrox",
+    "spaceName": "Example",
+    "lastModifierDisplayName": "Zaphod Beeblebrox"
+  },
+  "timestamp": 1640921032214,
+  "eventType": "page_updated",
+  "transformedAt": "2021-12-31T03:23:52.702",
+  "userDisplayName": "Zaphod Beeblebrox"
+}

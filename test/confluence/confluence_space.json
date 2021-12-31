@@ -1,0 +1,22 @@
+{
+  "accountType": "customer",
+  "userAccountId": "59fdbfc4a392de337954d52b",
+  "space": {
+    "creatorAccountId": "59fdbfc4a392de337954d52b",
+    "modificationDate": 1640921127797,
+    "isPersonalSpace": false,
+    "lastModifierAccountId": "59fdbfc4a392de337954d52b",
+    "description": "",
+    "self": "https://example.atlassian.net/wiki/spaces/TES",
+    "title": "test-space",
+    "creationDate": 1640921127797,
+    "homePage": { "id": 108298438 },
+    "key": "TES",
+    "creatorDisplayName": "Zaphod Beeblebrox",
+    "lastModifierDisplayName": "Zaphod Beeblebrox"
+  },
+  "timestamp": 1640921127858,
+  "eventType": "space_created",
+  "transformedAt": "2021-12-31T03:25:28.635",
+  "userDisplayName": "Zaphod Beeblebrox"
+}

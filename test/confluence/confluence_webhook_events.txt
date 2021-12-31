@@ -1,0 +1,54 @@
+Event	Triggered when...
+attachment_created	a file is attached to a page or blog post
+attachment_removed	a file is deleted (sent to the trash) from the attachments page(not triggered when a version is deleted from the file history)
+attachment_restored	a file is restored from the trash
+attachment_trashed	a file is purged from the trash
+attachment_updated	a new file version of is uploaded directly or by editing the file
+
+blog_created	a blog post is published
+blog_removed	a blog post is deleted (sent to the trash)
+blog_restored	a blog post is restored from the trash
+blog_trashed	a blog post is purged from the trash
+blog_updated	a blog post is edited
+
+blueprint_page_created	a page is created from a blueprint (such as meeting notes, decision, or how-to)
+
+comment_created	a page comment, inline comment or file comment is made
+comment_removed	a page comment, inline comment, or file comment is deleted
+comment_updated	a page comment, inline comment, or file comment is edited
+
+content_created	a page, blog post, attachment (file), comment (page, inline, or file), or other file (such as a space logo) is created or uploaded.
+content_restored	a page, blog post, or attachment (file) is restored from the trash 
+content_trashed	a page, blog post, or attachment (file) is purged from the trash
+content_updated	a page, blog post, attachment (file), or comment (page, inline, and file) is edited.
+content_permissions_updated a view or edit restriction is applied or removed from a page or blog post
+
+group_created a new group is created 
+group_removed a group is deleted
+
+label_added	 an existing label is applied to a page, blog post, or space
+label_created  a label is added for the first time (did not already exist)
+label_deleted  a label is removed from the last page, blog post, or space, and so ceases to exist
+label_removed  a label is removed from a page, blog post, or space
+page_children_reordered  the default ordering of pages is changed to alphabetical in the Space Tools > Reorder pages tab(is not triggered when you drag a page, or move a page, to change the page order)
+page_created  a page is published for the first time, including pages created from a template or blueprint
+page_moved	 a page is moved to a different position in the page tree, to a different parent page, or to another space
+page_removed	a page is deleted (sent to the trash)
+page_restored	a page is restored from the trash
+page_trashed	a page is purged from the trash
+page_updated	a page is edited (triggered at the point the unpublished changes are published)
+
+space_created	a new space is created
+space_logo_updated	a new file is uploaded for use as the logo of a space
+space_permissions_updated	
+space permissions are changed in the Space Tools > Permissions tab(is not triggered when you edit space permissions using Inspect Permissions)
+space_removed	a space is deleted
+space_updated  the space details (title, description, status) is updated in the Space Tools > Overview tab 
+
+theme_enabled a specific theme or default theme is applied to to a space or the whole site 
+
+user_created    a new user account is created
+user_deactivated	a user account is disabled
+user_followed	someone follows a user
+user_reactivated	a disabled user account is enabled
+user_removed	a user account is deleted 

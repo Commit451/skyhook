@@ -1,0 +1,23 @@
+{
+  "userAccountId": "59fdbfc4a392de337954d52b",
+  "accountType": "customer",
+  "blog": {
+    "creatorAccountId": "59fdbfc4a392de337954d52b",
+    "spaceKey": "EX",
+    "modificationDate": 1640924555481,
+    "lastModifierAccountId": "59fdbfc4a392de337954d52b",
+    "self": "https://example.atlassian.net/wiki/spaces/EX/blog/2021/12/31/108396632/Heyyyyyyy+Guyyyyyys+It%27s+blog+post+here",
+    "id": 108396632,
+    "title": "Heyyyyyyy Guyyyyyys It's blog post here",
+    "creationDate": 1640924553463,
+    "contentType": "blogpost",
+    "version": 1,
+    "creatorDisplayName": "Zaphod Beeblebrox",
+    "spaceName": "Example",
+    "lastModifierDisplayName": "Zaphod Beeblebrox"
+  },
+  "timestamp": 1640924555490,
+  "eventType": "blog_created",
+  "transformedAt": "2021-12-31T04:22:35.959",
+  "userDisplayName": "Zaphod Beeblebrox"
+}
