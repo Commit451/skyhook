@@ -263,7 +263,6 @@ export class Confluence extends DirectParseProvider {
          */
 
         const title = this.setEventTitle(event)
-        const action = this.setActionTitle(event)
         const content_title = this.body.userProfile.fullName
 
         const embed: Embed = {
@@ -282,7 +281,6 @@ export class Confluence extends DirectParseProvider {
          */
 
         const title = this.setEventTitle(event)
-        const action = this.setActionTitle(event)
         const content_title = this.body.groupName
 
         const embed: Embed = {
