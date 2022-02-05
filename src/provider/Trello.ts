@@ -949,7 +949,7 @@ export class Trello extends TypeParseProvder {
 
     private _formatAttachment(attachment: Attachment, embed: Embed): void {
         if (attachment.previewUrl != null) {
-            embed.image = {url: attachment.previewUrl}
+            embed.image = { url: attachment.previewUrl }
         }
         if (attachment.url != null) {
             if (attachment.name !== attachment.url) {

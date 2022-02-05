@@ -204,10 +204,10 @@ export class Basecamp extends DirectParseProvider {
         fields.forEach((field) => {
             switch (field) {
                 case 'title':
-                    embed.fields!.push({name: 'Title', value: body.recording.title, inline: true})
+                    embed.fields!.push({ name: 'Title', value: body.recording.title, inline: true })
                     break
                 case 'type':
-                    embed.fields!.push({name: 'Type', value: body.recording.type, inline: true})
+                    embed.fields!.push({ name: 'Type', value: body.recording.type, inline: true })
             }
         })
         this.addEmbed(embed)

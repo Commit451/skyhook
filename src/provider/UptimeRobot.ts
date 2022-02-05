@@ -19,7 +19,7 @@ export class UptimeRobot extends DirectParseProvider {
         this.addEmbed({
             title: this.query.monitorFriendlyName,
             url: this.query.monitorURL,
-            description: this.query.alertDetails 
+            description: this.query.alertDetails
         })
     }
 }

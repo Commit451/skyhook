@@ -237,7 +237,7 @@ export class GitLab extends TypeParseProvder {
                 commits: this.body.commits || [],
                 totalCommitsCount: this.body.total_commits_count || 0,
             }
-            
+
         } else if (this.body.repository != null) {
             return {
                 name: this.body.repository.name,

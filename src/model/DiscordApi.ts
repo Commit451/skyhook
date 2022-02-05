@@ -310,7 +310,7 @@ export interface AllowedMentions {
     /**
      * For replies, whether to mention the author of the message being replied to (default false)
      */
-    replied_user?: boolean 
+    replied_user?: boolean
 }
 
 /**

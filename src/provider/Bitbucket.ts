@@ -82,7 +82,7 @@ export class BitBucket extends TypeParseProvder {
                     // Tag Created
                     embed.title = '[' + this.body.repository.full_name + '] New tag created: ' + change.new.name
                     embed.url = change.new.links.html.href
-                }  else if (change.new == null && change.old.type === 'tag') {
+                } else if (change.new == null && change.old.type === 'tag') {
                     // Tag Deleted
                     embed.title = '[' + this.body.repository.full_name + '] Tag deleted: ' + change.old.name
                 } else {
@@ -216,7 +216,7 @@ export class BitBucket extends TypeParseProvder {
                     return
                 }
 
-                const actorNames: {[state: string]: string} = {}
+                const actorNames: { [state: string]: string } = {}
                 const unassigned = '`Unassigned`'
 
                 states.forEach((state) => {

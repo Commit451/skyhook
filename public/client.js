@@ -24,10 +24,10 @@ window.mdc.autoInit();
         let discordHookUrl = $('#url').val();
         let error = true;
 
-        if(discordHookUrl) {
-            for(const domain of validHookDomains) {
+        if (discordHookUrl) {
+            for (const domain of validHookDomains) {
 
-                if(discordHookUrl.includes(domain)) {
+                if (discordHookUrl.includes(domain)) {
 
                     const endSpacialPart = discordHookUrl.indexOf(domain);
                     const startSpacialPart = (discordHookUrl.indexOf(':') + 3);// + :// 3 chars:)
@@ -47,7 +47,7 @@ window.mdc.autoInit();
 
         if (!error) {
             new ClipboardJS('#button-generate', {
-                text: function() {
+                text: function () {
                     return discordHookUrl
                 }
             })

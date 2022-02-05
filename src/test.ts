@@ -16,7 +16,7 @@ testPayloadVisual(new Heroku(), 'heroku', 'heroku.json')
 function testPayloadVisual(provider: BaseProvider, providerName: string, jsonFileName: string): void {
     const json = fs.readFileSync(`./test/${providerName}/${jsonFileName}`, 'utf-8')
     provider.parse(JSON.parse(json)).then((discordPayload) => {
-        if(discordPayload != null) {
+        if (discordPayload != null) {
             sendPayload(discordPayload)
         } else {
             console.log('Payload is null.')

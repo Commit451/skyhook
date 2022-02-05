@@ -44,7 +44,7 @@ export abstract class BaseProvider {
      * @param body the request body
      * @param headers the request headers
      * @param query the query
-     */ 
+     */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-module-boundary-types
     public async parse(body: any, headers: any = null, query: any = null): Promise<DiscordPayload | null> {
         this.body = body
@@ -144,12 +144,12 @@ export abstract class TypeParseProvder extends BaseProvider {
     protected async parseImpl(): Promise<void> {
 
         const type = TypeParseProvder.formatType(this.getType())
-        if(type != null) {
+        if (type != null) {
 
-            if(this.knownTypes().includes(type)) {
+            if (this.knownTypes().includes(type)) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const method: () => Promise<void> | null = (this as any)[type]
-                if(method != null && typeof method === 'function') {
+                if (method != null && typeof method === 'function') {
                     this.logger.info(`Calling ${type}() in ${this.constructor.name} provider.`)
                     await method.bind(this)()
                     return

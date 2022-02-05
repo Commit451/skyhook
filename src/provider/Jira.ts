@@ -29,7 +29,7 @@ export class Jira extends DirectParseProvider {
             isIssue = true
         } else if (this.body.webhookEvent.startsWith('comment_')) {
             isIssue = false
-            if(this.body.issue == null) {
+            if (this.body.issue == null) {
                 // What's the point of notifying a new comment if ONLY comment information is sent?
                 // Do we care that a comment was made if we cant tell what was commented on?
                 // This solution will silence errors until someone makes sense of Atlassian's decisions..
@@ -62,7 +62,7 @@ export class Jira extends DirectParseProvider {
 
     private createBrowseUrl(issue: { self: string, key: string }): string {
         const url: URL = new URL(issue.self)
-        const path: string|RegExpMatchArray = url.pathname.match(/.+?(?=\/rest\/api)/) ?? ''
+        const path: string | RegExpMatchArray = url.pathname.match(/.+?(?=\/rest\/api)/) ?? ''
         url.pathname = `${path}/browse/${issue.key}`
         return url.toString()
     }

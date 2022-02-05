@@ -149,7 +149,7 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
     if (discordPayload != null) {
 
         // We could implement a more robust validation on this at some point.
-        if(Object.keys(discordPayload).length === 0) {
+        if (Object.keys(discordPayload).length === 0) {
             logger.error('Bad implementation, outbound payload is empty.')
             res.status(500).send('Bad implementation.')
             return
