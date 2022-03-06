@@ -86,7 +86,7 @@ export abstract class BaseProvider {
     protected addEmbed(embed: Embed): void {
         // TODO check to see if too many fields
         // add the footer to all embeds added
-        embed.footer = { text: 'Powered by Skyhook' }
+        embed.footer = { text: 'Powered by Decipher Tech' }
         if (this.embedColor != null) {
             embed.color = this.embedColor
         }

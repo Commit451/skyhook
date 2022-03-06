@@ -180,7 +180,7 @@ app.use((req, res, next) => {
     res.status(404).send('Not Found')
 })
 
-const port = normalizePort(process.env.PORT || '8080')
+const port = normalizePort(process.env.PORT || '3991')
 
 const server = app.listen(port, () => {
     logger.debug(`Your app is listening on port ${port}`)

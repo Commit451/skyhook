@@ -1,0 +1,9 @@
+export const EmbedColors = [
+    0x1e45a8,
+    0x44bd32,
+    0x8c7ae6,
+    0xc23616,
+    0x00a8ff,
+    0x833471,
+    0xA3CB38
+]
