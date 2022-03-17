@@ -16,6 +16,7 @@ COPY package-lock.json /usr/src/app/
 RUN npm install && npm cache clean --force
 COPY . /usr/src/app
 
+RUN rm -rf dist
 RUN mkdir dist
 COPY --from=buildenv /app/dist /usr/src/app/dist
 
