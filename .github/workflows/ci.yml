@@ -3,7 +3,8 @@ name: Node.js CI
 on:
   push:
     branches: [ main ]
-    paths-ignore: - '**.md'
+    paths-ignore: 
+      - '**.md'
   pull_request:
     branches: [ main ]
   
