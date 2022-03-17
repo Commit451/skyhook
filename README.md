@@ -1,4 +1,4 @@
-# skyhook
+# Skyhook API (customized by Decipher Tech)
 Parses webhooks and forwards them in the proper format to Discord.
 
 [![Discord](https://discordapp.com/api/guilds/303595820345851905/widget.png)](https://discord.gg/js7wD7p)
