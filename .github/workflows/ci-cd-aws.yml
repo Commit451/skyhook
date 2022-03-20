@@ -62,13 +62,12 @@ jobs:
       run: ls -R
     - name: Download task definition
       id: download-task
-      env:
-        task-definition: ${{ secrets.ECS_TASK_DEFINITION }}
+      
       run: |
         aws ecs describe-task-definition \
-          --task-definition ${{ env.task-definition }} \
-          --query taskDefinition > task-definition.json
-        echo "::set-output name=revision::$(cat task-definition.json | jq .revision)"
+          --task-definition ${{ secrets.TASK_DEFINITION_NAME }} \
+          --query taskDefinition > task-definition-current.json
+        echo "::set-output name=revision::$(cat task-definition-current.json | jq .revision)"
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
@@ -89,4 +88,4 @@ jobs:
           task-definition: ${{ secrets.ECS_TASK_DEFINITION }}
       run: |
         aws ecs deregister-task-definition \
-          --task-definition ${{ env.task-definition }}:${{ steps.download-task.outputs.revision }}
+          --task-definition ${{ secrets.TASK_DEFINITION_NAME }}:${{ steps.download-task.outputs.revision }}
