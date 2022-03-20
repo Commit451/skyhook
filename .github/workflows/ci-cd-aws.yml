@@ -83,9 +83,4 @@ jobs:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
         cluster: ${{ secrets.ECS_CLUSTER }}
     
-    - name: De-register previous revision
-      env:
-          task-definition: ${{ secrets.ECS_TASK_DEFINITION }}
-      run: |
-        aws ecs deregister-task-definition \
-          --task-definition ${{ secrets.TASK_DEFINITION_NAME }}:${{ steps.download-task.outputs.revision }}
+    
