@@ -60,6 +60,16 @@ jobs:
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
     - name: List files
       run: ls -R
+    - name: Download task definition
+      id: download-task
+      env:
+        task-definition: ${{ secrets.ECS_TASK_DEFINITION }}
+      run: |
+        aws ecs describe-task-definition \
+          --task-definition ${{ env.task-definition }} \
+          --query taskDefinition > task-definition.json
+        echo "::set-output name=revision::$(cat task-definition.json | jq .revision)"
+
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@97587c9d45a4930bf0e3da8dd2feb2a463cf4a3a
@@ -73,3 +83,10 @@ jobs:
       with:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
         cluster: ${{ secrets.ECS_CLUSTER }}
+    
+    - name: De-register previous revision
+      env:
+          task-definition: ${{ secrets.ECS_TASK_DEFINITION }}
+      run: |
+        aws ecs deregister-task-definition \
+          --task-definition ${{ env.task-definition }}:${{ steps.download-task.outputs.revision }}
