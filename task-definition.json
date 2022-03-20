@@ -1,5 +1,8 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:eu-west-2:254522271135:task-definition/skyhook-dtech:9",
+    "family": "skyhook-dtech",
+    "taskRoleArn": "arn:aws:iam::254522271135:role/ecsTaskExecutionRole",
+    "executionRoleArn": "arn:aws:iam::254522271135:role/ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
     "containerDefinitions": [
         {
             "name": "skyhook-dtech",
@@ -11,40 +14,20 @@
                     "hostPort": 80,
                     "protocol": "tcp"
                 }
-            ],
-            "essential": true,
-            "environment": [],
-            "mountPoints": [],
-            "volumesFrom": []
-        }
-    ],
-    "family": "skyhook-dtech",
-    "taskRoleArn": "arn:aws:iam::254522271135:role/ecsTaskExecutionRole",
-    "executionRoleArn": "arn:aws:iam::254522271135:role/ecsTaskExecutionRole",
-    "revision": 9,
-    "volumes": [],
-    "status": "ACTIVE",
-    "requiresAttributes": [
-        {
-            "name": "com.amazonaws.ecs.capability.ecr-auth"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.task-iam-role"
-        },
-        {
-            "name": "ecs.capability.execution-role-ecr-pull"
+            ]
         }
     ],
     "placementConstraints": [],
-    "compatibilities": [
-        "EXTERNAL",
-        "EC2"
-    ],
     "requiresCompatibilities": [
         "EC2"
     ],
-    "cpu": "1024",
+    "cpu": "512",
     "memory": "512",
-    "registeredAt": "2022-03-19T19:47:02+00:00",
-    "registeredBy": "arn:aws:iam::254522271135:root"
+
+    "pidMode": "host",
+    "ipcMode": "host",
+    "runtimePlatform": {
+        "cpuArchitecture": "ARM64",
+        "operatingSystemFamily": "LINUX"
+    }
 }

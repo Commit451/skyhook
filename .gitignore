@@ -44,3 +44,5 @@ jspm_packages
 dist
 .idea
 
+task-definition-old.json
+
