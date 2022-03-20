@@ -23,11 +23,6 @@
     ],
     "cpu": "512",
     "memory": "512",
-
     "pidMode": "host",
-    "ipcMode": "host",
-    "runtimePlatform": {
-        "cpuArchitecture": "ARM64",
-        "operatingSystemFamily": "LINUX"
-    }
+    "ipcMode": "host"
 }
