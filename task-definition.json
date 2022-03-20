@@ -2,7 +2,6 @@
     "family": "skyhook-dtech",
     "taskRoleArn": "arn:aws:iam::254522271135:role/ecsTaskExecutionRole",
     "executionRoleArn": "arn:aws:iam::254522271135:role/ecsTaskExecutionRole",
-    "networkMode": "awsvpc",
     "containerDefinitions": [
         {
             "name": "skyhook-dtech",
@@ -22,7 +21,5 @@
         "EC2"
     ],
     "cpu": "512",
-    "memory": "512",
-    "pidMode": "host",
-    "ipcMode": "host"
+    "memory": "512"
 }
