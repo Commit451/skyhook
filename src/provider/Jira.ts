@@ -46,13 +46,13 @@ export class Jira extends DirectParseProvider {
         const issue = this.body.issue
         const user = this.body.user || { displayName: 'Anonymous' }
         const action = this.body.webhookEvent.split('_')[1]
-        this.setEmbedColor(random.int(0,EmbedColors.length-1))
+        this.setEmbedColor(EmbedColors[random.int(0,EmbedColors.length-1)])
         // create the embed
         const embdThumbnail: EmbedThumbnail = {
-            url: `${user.avatarUrls[1]}`,
+            url: user.avatarUrls['48x48'],
             height: 48,
             width: 48
-        }
+        } || {}
         const embed: Embed = {
             title: `${issue.key} - ${issue.fields.summary}`,
             url: this.createBrowseUrl(issue),
@@ -60,7 +60,7 @@ export class Jira extends DirectParseProvider {
         }
         if (isIssue) {
             // embed.description = `${user.displayName} ${action} issue: ${embed.title}\r\n${issueHasAsignee ? ` (${issue.fields.assignee.displayName})` : ''} `
-            embed.description = `${user.displayName} ${action} issue: ${embed.title}\r\n${issueHasAsignee ? `**Assigned to:** ${issue.fields.assignee.displayName}` : ''} `
+            embed.description = `**${user.displayName} ${action} issue:** ${embed.title}\r\n${issueHasAsignee ? `**Assigned to:** ${issue.fields.assignee.displayName}` : ''} `
         } else {
             const comment = this.body.comment
             embed.description = `${comment.updateAuthor.displayName} ${action} comment: ${comment.body}`
