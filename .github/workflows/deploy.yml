@@ -1,0 +1,26 @@
+name: Publish to Google Cloud
+
+on:
+  push:
+    branches: [ main ]
+
+job:
+  job_id:
+    steps:
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v0'
+      with:
+        credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v0'
+
+    - name: 'Use gcloud CLI'
+      run: 'gcloud info'
+
+    - id: 'deploy'
+      uses: 'google-github-actions/deploy-appengine@v0'
+
+    # Example of using the output
+    - id: 'test'
+      run: 'curl "${{ steps.deploy.outputs.url }}"'
