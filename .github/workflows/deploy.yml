@@ -6,10 +6,11 @@ on:
 
 jobs:
   deploy:
-  
+
     runs-on: ubuntu-latest
 
     steps:
+    - uses: actions/checkout@v2
     - id: 'auth'
       uses: 'google-github-actions/auth@v0'
       with:
@@ -21,6 +22,13 @@ jobs:
     - name: 'Use gcloud CLI'
       run: 'gcloud info'
 
+    - uses: actions/checkout@v2
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16.x
+    - run: npm install
+    - run: npm run build
     - id: 'deploy'
       uses: 'google-github-actions/deploy-appengine@v0'
 
