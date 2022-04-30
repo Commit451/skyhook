@@ -4,8 +4,11 @@ on:
   push:
     branches: [ main ]
 
-job:
-  job_id:
+jobs:
+  deploy:
+  
+    runs-on: ubuntu-latest
+
     steps:
     - id: 'auth'
       uses: 'google-github-actions/auth@v0'
