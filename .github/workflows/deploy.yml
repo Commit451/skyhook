@@ -37,7 +37,7 @@ jobs:
       name: 'deploy'
       uses: 'google-github-actions/deploy-appengine@v0'
       with:
-        project_id: '${{ secrets.GCP_PROJECT }}'
+        project_id: 'skyhookapi'
 
     - name: 'show output'
       run: 'echo ${{ steps.deploy.outputs.url }}'

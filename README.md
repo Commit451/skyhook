@@ -9,8 +9,8 @@ You can use the [site](https://skyhookapi.com/) to create the right webhook link
 2. Copy the webhook url
 3. Turn the Discord webhook url into a skyhook webhook url like so:
 ```
-Replace discordapp.com in url with skyhookapi.com
-https://discordapp.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook
+Replace discord.com in url with skyhookapi.com
+https://discord.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook
 ->
 https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook
 ```
