@@ -26,50 +26,42 @@ export class Confluence extends DirectParseProvider {
         // extract variables from Confluence that don't depend on the event
         const user = this.body.userDisplayName || { displayName: 'Anonymous' }
         const event = this.body.eventType
-        
+
         let embed: Embed
 
         if (event.startsWith('attachment_')) {
-            embed = this.attachmentEvent(event,user)
+            embed = this.attachmentEvent(event, user)
             this.addEmbed(embed)
-        }
-        else if (event.startsWith('blog_')) {
-            embed = this.blogEvent(event,user)
+        } else if (event.startsWith('blog_')) {
+            embed = this.blogEvent(event, user)
             this.addEmbed(embed)
-        } 
-        else if (event.startsWith('comment_')) {
-            embed = this.commentEvent(event,user)
+        } else if (event.startsWith('comment_')) {
+            embed = this.commentEvent(event, user)
             this.addEmbed(embed)
-        }
-        else if (event.startsWith('group_')) {
+        } else if (event.startsWith('group_')) {
             embed = this.groupEvent(event)
             this.addEmbed(embed)
-        }
-        else if (event.startsWith('label_')) {
-            embed = this.labelEvent(event,user)
+        } else if (event.startsWith('label_')) {
+            embed = this.labelEvent(event, user)
             this.addEmbed(embed)
-        }
-        else if (event.startsWith('page_')) {
-            embed = this.pageEvent(event,user)
+        } else if (event.startsWith('page_')) {
+            embed = this.pageEvent(event, user)
             this.addEmbed(embed)
-        }
-        else if (event.startsWith('space_')) {
-            embed = this.spaceEvent(event,user)
+        } else if (event.startsWith('space_')) {
+            embed = this.spaceEvent(event, user)
             this.addEmbed(embed)
-        }
-        else if (event.startsWith('user_')) {
+        } else if (event.startsWith('user_')) {
             embed = this.userEvent(event)
             this.addEmbed(embed)
-        }
-        else{
-            //This is to nullify the payload for currently unsupported events
+        } else {
+            // This is to nullify the payload for currently unsupported events
             this.nullifyPayload()
             return
         }
 
     }
 
-    private attachmentEvent(event:string, user:string): Embed {
+    private attachmentEvent(event: string, user: string): Embed {
         /**
          *  Event	            Triggered when...
             attachment_created	a file is attached to a page or blog post
@@ -87,30 +79,25 @@ export class Confluence extends DirectParseProvider {
         const content_type = this.body.attachedTo.contentType
         const url = this.body.attachedTo.self
         let description
-        
-        if(event.startsWith('attachment_removed'))
-        {
+
+        if (event.startsWith('attachment_removed')) {
             description = user + ' ' + action + ' from ' + content_type + ' ' + content_title + ' in ' + space
-        }
-        else if(event.startsWith('attachment_created') || event.startsWith('attachment_updated'))
-        {
+        } else if (event.startsWith('attachment_created') || event.startsWith('attachment_updated')) {
             description = user + ' ' + action + ' on ' + content_type + ' ' + content_title + ' in ' + space
-        }
-        else
-        {
+        } else {
             description = user + ' ' + action
         }
 
         const embed: Embed = {
             title: title,
             url: url,
-            description : description
+            description: description
         }
 
         return embed
     }
 
-    private blogEvent(event:string, user:string): Embed {
+    private blogEvent(event: string, user: string): Embed {
         /**
          *  Event	            Triggered when...
             blog_created	a blog post is published
@@ -127,13 +114,13 @@ export class Confluence extends DirectParseProvider {
         const embed: Embed = {
             title: title,
             url: url,
-            description : user + ' ' + action + ' ' + content_title
+            description: user + ' ' + action + ' ' + content_title
         }
 
         return embed
     }
 
-    private commentEvent(event:string, user:string): Embed {
+    private commentEvent(event: string, user: string): Embed {
         /**
          *  Event	            Triggered when...
             comment_created	    a page comment, inline comment or file comment is made
@@ -151,13 +138,13 @@ export class Confluence extends DirectParseProvider {
         const embed: Embed = {
             title: title,
             url: url,
-            description : user + ' ' + action + ' on ' + content_type + ' ' + content_title + ' in ' + space
+            description: user + ' ' + action + ' on ' + content_type + ' ' + content_title + ' in ' + space
         }
 
         return embed
     }
 
-    private labelEvent(event:string, user:string): Embed {
+    private labelEvent(event: string, user: string): Embed {
         /**
          *  Event	            Triggered when...
             label_added	    an existing label is applied to a page, blog post, or space
@@ -173,20 +160,15 @@ export class Confluence extends DirectParseProvider {
         const url = this.body.label.self
         let description
         let content_title
-        let content_type 
+        let content_type
 
-        if (event.startsWith('label_created') || event.startsWith('label_deleted'))
-        {
+        if (event.startsWith('label_created') || event.startsWith('label_deleted')) {
             description = user + ' ' + action + ' ' + label_title
-        }
-        else if(event.startsWith('label_removed'))
-        {
+        } else if (event.startsWith('label_removed')) {
             content_title = this.body.labeled.title
             content_type = this.body.labeled.contentType
             description = user + ' ' + action + ' from ' + content_type + ' ' + content_title + ' in ' + space
-        }
-        else if(event.startsWith('label_added'))
-        {
+        } else if (event.startsWith('label_added')) {
             content_title = this.body.labeled.title
             content_type = this.body.labeled.contentType
             description = user + ' ' + action + ' to ' + content_type + ' ' + content_title + ' in ' + space
@@ -195,13 +177,13 @@ export class Confluence extends DirectParseProvider {
         const embed: Embed = {
             title: title,
             url: url,
-            description : description
+            description: description
         }
 
         return embed
     }
 
-    private pageEvent(event:string, user:string): Embed {
+    private pageEvent(event: string, user: string): Embed {
         /**
          *  Event	            Triggered when...
             page_children_reordered  the default ordering of pages is changed to alphabetical in the Space Tools > Reorder pages tab(is not triggered when you drag a page, or move a page, to change the page order)
@@ -221,13 +203,13 @@ export class Confluence extends DirectParseProvider {
         const embed: Embed = {
             title: title,
             url: url,
-            description : user + ' ' + action + ' ' + content_title
+            description: user + ' ' + action + ' ' + content_title
         }
 
         return embed
     }
 
-    private spaceEvent(event:string, user:string): Embed {
+    private spaceEvent(event: string, user: string): Embed {
         /**
          *  Event	            Triggered when...
             space_created	    a new space is created
@@ -246,13 +228,13 @@ export class Confluence extends DirectParseProvider {
         const embed: Embed = {
             title: title,
             url: url,
-            description : user + ' ' + action + ' ' + content_title
+            description: user + ' ' + action + ' ' + content_title
         }
 
         return embed
     }
 
-    private userEvent(event:string): Embed {
+    private userEvent(event: string): Embed {
         /**
          *  Event	            Triggered when...
             user_created        a new user account is created
@@ -267,13 +249,13 @@ export class Confluence extends DirectParseProvider {
 
         const embed: Embed = {
             title: title,
-            description :  title + ' ' + content_title
+            description: title + ' ' + content_title
         }
 
         return embed
     }
 
-    private groupEvent(event:string): Embed {
+    private groupEvent(event: string): Embed {
         /**
          *  Event	            Triggered when...
             group_created a new group is created 
@@ -285,40 +267,36 @@ export class Confluence extends DirectParseProvider {
 
         const embed: Embed = {
             title: title,
-            description :  title + ' ' + content_title
+            description: title + ' ' + content_title
         }
 
         return embed
     }
 
     //Utility Method for Capitalizing Words
-    private capitalizeFirstLetter(text:string): string {
+    private capitalizeFirstLetter(text: string): string {
         return text.charAt(0).toUpperCase() + text.slice(1)
     }
     //Utility Method for Setting Event Title
-    private setEventTitle(event:string): string {
+    private setEventTitle(event: string): string {
         const event_words = event.split('_')
-        if(event_words.length == 3)
-        {
+        if (event_words.length == 3) {
             return this.capitalizeFirstLetter(event.split('_')[2]) +
-             ' ' + this.capitalizeFirstLetter(event.split('_')[1]) +
-             ' ' + this.capitalizeFirstLetter(event.split('_')[0])
-        }
-        else{
+                ' ' + this.capitalizeFirstLetter(event.split('_')[1]) +
+                ' ' + this.capitalizeFirstLetter(event.split('_')[0])
+        } else {
             return this.capitalizeFirstLetter(event.split('_')[1]) +
-             ' ' + this.capitalizeFirstLetter(event.split('_')[0])
+                ' ' + this.capitalizeFirstLetter(event.split('_')[0])
         }
     }
     //Utility Method for Setting Event Title
-    private setActionTitle(event:string): string {
+    private setActionTitle(event: string): string {
         const event_words = event.split('_')
-        if(event_words.length == 3)
-        {
+        if (event_words.length == 3) {
             return event.split('_')[2] +
                 ' ' + (event.split('_')[1]) +
                 ' ' + (event.split('_')[0])
-        }
-        else{
+        } else {
             return event.split('_')[1] +
                 ' ' + event.split('_')[0]
         }
