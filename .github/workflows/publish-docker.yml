@@ -1,0 +1,20 @@
+name: 'Publish Docker image to Docker Hub'
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Docker login
+      run: 'docker login -u jawnnypoo -p ${{ secrets.DOCKER_HUB_PASSWORD }}'
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile
+    - name: Push the Docker image
+      run: docker push commit451/skyhook

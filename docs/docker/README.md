@@ -9,4 +9,4 @@ To run the application:
 ```
 docker run -it --rm -p 80:8080 commit451/skyhook
 ```
-Then, you can navigate to the IP of the docker in your browser and can see it is running!
+Then, you can navigate to the IP of the Docker image in your browser and can see it is running!
