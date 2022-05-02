@@ -25,6 +25,7 @@ https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/provi
 - [BitBucket Server](https://confluence.atlassian.com/bitbucketserver/event-payload-938025882.html) - `/bitbucketserver`
 - [CircleCI](https://circleci.com/docs/1.0/configuration/#notify) - `/circleci`
 - [Codacy](https://support.codacy.com/hc/en-us/articles/207280359-WebHook-Notifications) - `/codacy`
+- [Confluence](https://developer.atlassian.com/cloud/confluence/modules/webhook/) - `/confluence`
 - [Dockerhub](https://docs.docker.com/docker-hub/webhooks) - `/dockerhub`
 - [GitLab](https://gitlab.com/help/user/project/integrations/webhooks) - `/gitlab`
 - [Heroku](https://devcenter.heroku.com/articles/deploy-hooks#http-post-hook) - `/heroku`
