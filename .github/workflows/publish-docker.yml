@@ -15,6 +15,6 @@ jobs:
     - name: Docker login
       run: 'docker login -u jawnnypoo -p ${{ secrets.DOCKER_HUB_PASSWORD }}'
     - name: Build the Docker image
-      run: docker build . --file Dockerfile
+      run: docker build . --file Dockerfile --tag commit451/skyhook:latest
     - name: Push the Docker image
       run: docker push commit451/skyhook
