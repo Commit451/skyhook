@@ -1,0 +1,11 @@
+{
+  "userProfile": {
+    "userAccountId": "61ce993f125b120071a733f1",
+    "fullName": "Debug Test (Unlicensed)",
+    "email": "",
+    "userDisplayName": "Debug Test (Unlicensed)"
+  },
+  "timestamp": 1640930304591,
+  "eventType": "user_removed",
+  "transformedAt": "2021-12-31T05:58:25.138"
+}

@@ -13,6 +13,7 @@ import { BitBucket } from './provider/Bitbucket'
 import { BitBucketServer } from './provider/BitBucketServer'
 import { CircleCi } from './provider/CircleCi'
 import { Codacy } from './provider/Codacy'
+import { Confluence } from './provider/Confluence'
 import { DockerHub } from './provider/DockerHub'
 import { GitLab } from './provider/GitLab'
 import { Heroku } from './provider/Heroku'
@@ -51,6 +52,7 @@ const providers: Type<BaseProvider>[] = [
     BitBucketServer,
     CircleCi,
     Codacy,
+    Confluence,
     DockerHub,
     GitLab,
     Heroku,
