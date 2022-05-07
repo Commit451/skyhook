@@ -1,24 +1,32 @@
 # skyhook
+
 Parses webhooks and forwards them in the proper format to Discord.
 
 [![Discord](https://discordapp.com/api/guilds/303595820345851905/widget.png)](https://discord.gg/js7wD7p)
 
 ## Setup
+
 You can use the [site](https://skyhookapi.com/) to create the right webhook link. If you want to manually do it, here are the steps:
+
 1. Create a webhook in Discord (Server Settings -> Webhooks -> Create Webhook)
 2. Copy the webhook url
 3. Turn the Discord webhook url into a skyhook webhook url like so:
+
 ```
 Replace discord.com in url with skyhookapi.com
 https://discord.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook
 ->
 https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook
 ```
+
 4. Add the provider you want to the end of the url:
+
 ```
 https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/providerGoesHere
 ```
+
 ## Supported Providers
+
 - [AppVeyor](https://www.appveyor.com/docs/notifications/#webhook-payload-default) - `/appveyor`
 - [Basecamp 3](https://github.com/basecamp/bc3-api/blob/master/sections/webhooks.md) - `/basecamp`
 - [BitBucket](https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html) - `/bitbucket`
@@ -35,6 +43,7 @@ https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/provi
 - [NewRelic](https://docs.newrelic.com/docs/alerts/new-relic-alerts/managing-notification-channels/customize-your-webhook-payload) - `/newrelic`
 - [Patreon](https://www.patreon.com/platform/documentation/webhooks) - `/patreon`
 - [Pingdom](https://www.pingdom.com/resources/webhooks) - `/pingdom`
+- [Prometheus](https://prometheus.io/docs/alerting/latest/configuration/#webhook_config) - `/prometheus`
 - [Rollbar](https://docs.rollbar.com/docs/webhooks) - `/rollbar`
 - [Travis](https://docs.travis-ci.com/user/notifications/#Webhooks-Delivery-Format) - `/travis`
 - [Trello](https://developers.trello.com/apis/webhooks) - `/trello`
@@ -46,38 +55,50 @@ If you want support for a new provider, just create a pull request and add it!
 Alternatively, a new provider can also be requested by creating an [issue](https://github.com/Commit451/skyhook/issues).
 
 ## Contributing
+
 If you wish to contribute, follow our [contributing guide](CONTRIBUTING.md).
 
 ### Creating a Provider
+
 If you want to create a new provider please follow the examples shown at our small [documentation](docs/CreateNewProvider.md).
 
 ## Testing Locally
+
 To build:
+
 ```
 npm run build
 ```
+
 To run server (after building):
+
 ```
 npm start
 ```
+
 To run tests:
+
 ```
 npm test
 ```
 
 Through Docker:
+
 ```
 docker run -it --rm -p 8080:8080 commit451/skyhook
 ```
 
 ## Deploying
+
 - [Docker](docs/docker)
 - [Google Cloud](docs/gcloud)
 
 ## Thanks
+
 Special thanks to all our amazing contributors. skyhookapi.com is hosted for free for you, so if you feel so inclined, [buy a coffee!](https://ko-fi.com/jawnnypoo)
 
 ## License
+
 skyhook is available under the MIT license. See the LICENSE file for more info.
 
-\ ゜o゜)ノ
+\ ゜ o ゜)ノ
