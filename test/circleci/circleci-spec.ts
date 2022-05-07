@@ -9,3 +9,11 @@ describe('/POST circleci', () => {
         expect(res!.embeds).to.be.an('array').that.has.length(1)
     })
 })
+
+describe('/POST circleci no subject', () => {
+    it('build no subject', async () => {
+        const res = await Tester.test(new CircleCi(), 'circleci-no-subject.json', null)
+        expect(res).to.not.be.null
+        expect(res!.embeds).to.be.an('array').that.has.length(1)
+    })
+})

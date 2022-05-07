@@ -11,12 +11,33 @@ export class CircleCi extends DirectParseProvider {
     }
 
     public async parseData(): Promise<void> {
-        const subject = this.body.payload.subject.length > 48 ? `${this.body.payload.subject.substring(0, 48)}\u2026` : this.body.payload.subject
         this.setEmbedColor(0x343433)
+
+        const sha = this.body.payload.vcs_revision.slice(0, 7)
+        const compare = this.body.payload.compare
+        const subject = this.body.payload.subject
+        const committer = this.body.payload.committer_name
+        const outcome = this.body.payload.outcome
+        const buildNumber = this.body.payload.build_num
+        const buildUrl = this.body.payload.build_url
+
+        let description = `[${sha}]`
+        if (compare != null) {
+            description += `(${compare})`
+        }
+        if (subject != null) {
+            description += ' : ' + (subject.length > 48 ? `${subject.substring(0, 48)}\u2026` : subject)
+        }
+        if (outcome != null) {
+            description += '\n\n' + `**Outcome**: ${outcome}`
+        }
         const embed: Embed = {
-            title: `Build #${this.body.payload.build_num}`,
-            url: `Build #${this.body.payload.build_num}`,
-            description: `[\`${this.body.payload.vcs_revision.slice(0, 7)}\`](${this.body.payload.compare}) : ${subject} - ${this.body.payload.committer_name}\n\`Outcome\`: ${this.body.payload.outcome}`
+            title: `Build #${buildNumber}`,
+            url: buildUrl,
+            description: description,
+            author: {
+                name: committer
+            }
         }
         this.addEmbed(embed)
     }

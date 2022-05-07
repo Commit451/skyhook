@@ -1,17 +1,19 @@
 /**
- * For running quick test things in node
+ * For running quick test things in node. Just run `npm run visualtest` after modifying
  */
 import dotenv from 'dotenv'
 import axios from 'axios'
 import * as fs from 'fs'
 import { DiscordPayload } from './model/DiscordApi'
 import { BaseProvider } from './provider/BaseProvider'
-import { Heroku } from './provider/Heroku'
 import { ErrorUtil } from './util/ErrorUtil'
+import { CircleCi } from './provider/CircleCi'
 
 dotenv.config()
 
-testPayloadVisual(new Heroku(), 'heroku', 'heroku.json')
+//testPayloadVisual(new GitLab(), 'gitlab', 'gitlab.json')
+testPayloadVisual(new CircleCi(), 'circleci', 'circleci-no-subject.json')
+//testPayloadVisual(new AppVeyor(), 'appveyor', 'appveyor.json')
 
 function testPayloadVisual(provider: BaseProvider, providerName: string, jsonFileName: string): void {
     const json = fs.readFileSync(`./test/${providerName}/${jsonFileName}`, 'utf-8')
@@ -35,14 +37,22 @@ function sendPayload(discordPayload: DiscordPayload): void {
         return
     }
     const jsonString = JSON.stringify(discordPayload)
+    console.log(jsonString)
     console.log(`Sending payload to ${discordEndpoint}`)
     axios({
         data: jsonString,
         method: 'post',
-        url: discordEndpoint
+        url: discordEndpoint,
+        headers: {
+            'Content-Type': 'application/json'
+        }
     }).then(() => {
-        console.log('Sent')
+        console.log('sent')
     }).catch((err) => {
-        console.log('Error sending to discord', err)
+        if (err.response) {
+            console.log(err.response.data)
+            console.log(err.response.status)
+            console.log(err.response.headers)
+        }
     })
 }
