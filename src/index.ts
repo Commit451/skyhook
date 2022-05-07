@@ -1,6 +1,5 @@
 import dotenv from 'dotenv'
 import axios from 'axios'
-import bodyParser from 'body-parser'
 import express from 'express'
 import { DiscordPayload } from './model/DiscordApi'
 import { BaseProvider } from './provider/BaseProvider'
@@ -88,8 +87,8 @@ providers.forEach((Provider) => {
 })
 providerNames.sort()
 
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
 app.use(express.static('public'))
 app.set('view engine', 'ejs')
 
