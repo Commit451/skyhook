@@ -5,6 +5,7 @@ import { DiscordPayload } from './model/DiscordApi'
 import { BaseProvider } from './provider/BaseProvider'
 import { ErrorUtil } from './util/ErrorUtil'
 import { LoggerUtil } from './util/LoggerUtil'
+import * as Sentry from '@sentry/node'
 
 import { AppVeyor } from './provider/Appveyor'
 import { Basecamp } from './provider/Basecamp'
@@ -35,15 +36,14 @@ dotenv.config()
 LoggerUtil.init()
 
 const logger = LoggerUtil.logger()
-logger.debug('Winston setup successfully.')
+logger.debug('Logger set up successfully.')
 
 const app = express()
 
+Sentry.init({ dsn: 'https://1330d3dad32547c99c52246e3eaa1a32@o1234419.ingest.sentry.io/6383693' })
+
 const hostPath = process.env.HOST_PATH || '/'
 
-/**
- * Array of the classes
- */
 const providers: Type<BaseProvider>[] = [
     AppVeyor,
     Basecamp,
@@ -87,6 +87,7 @@ providers.forEach((Provider) => {
 })
 providerNames.sort()
 
+app.use(Sentry.Handlers.requestHandler())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(express.static('public'))
@@ -175,6 +176,9 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
         return
     }
 })
+
+// The error handler must be before any other error middleware and after all controllers
+app.use(Sentry.Handlers.errorHandler())
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((req, res, next) => {

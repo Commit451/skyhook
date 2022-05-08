@@ -11,7 +11,7 @@
     "buildstart": "npm run build && npm run start",
     "test": "mocha -r ts-node/register test/**/*.ts",
     "visualtest": "npm run build && node dist/test.js",
-    "lint": "eslint . --ext .js,.ts",
+    "lint": "eslint . --ext .js,.ts --fix",
     "deploy": "npm run build && gcloud app deploy",
     "logs": "gcloud app logs tail -s default",
     "dev": "nodemon"
@@ -36,6 +36,7 @@
     "typescript": "^4.6.3"
   },
   "dependencies": {
+    "@sentry/node": "^6.19.7",
     "axios": "^0.27.2",
     "body-parser": "^1.19.2",
     "camelcase": "^6.3.0",
