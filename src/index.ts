@@ -169,7 +169,7 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
             res.sendStatus(200)
         }).catch((err) => {
             logger.error(err)
-            res.status(502).send(err)
+            res.status(500).send(err)
         })
     } else {
         res.status(200).send(`Webhook event is either not supported or not implemented by /${providerName}.`)
