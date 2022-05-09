@@ -96,7 +96,7 @@ app.use(express.static('public'))
 app.set('view engine', 'ejs')
 
 app.get('/', (req, res) => {
-    res.render('index', { providers: providerInfos, hostPath })
+    res.redirect('https://commit451.github.io/skyhook-web');
 })
 
 app.get('/providers', (req, res) => {
