@@ -13,7 +13,7 @@ export class CircleCi extends DirectParseProvider {
     public async parseData(): Promise<void> {
         this.setEmbedColor(0x343433)
 
-        const sha = this.body.payload.vcs_revision.slice(0, 7)
+        const sha = this.body.payload.vcs_revision
         const compare = this.body.payload.compare
         const subject = this.body.payload.subject
         const committer = this.body.payload.committer_name
@@ -21,7 +21,10 @@ export class CircleCi extends DirectParseProvider {
         const buildNumber = this.body.payload.build_num
         const buildUrl = this.body.payload.build_url
 
-        let description = `[${sha}]`
+        let description = ""
+        if (sha != null) {
+            description += `[${sha.slice(0, 7)}]`
+        }
         if (compare != null) {
             description += `(${compare})`
         }
