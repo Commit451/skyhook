@@ -1,6 +1,7 @@
 import dotenv from 'dotenv'
 import axios from 'axios'
 import express from 'express'
+import cors from 'cors'
 import { DiscordPayload } from './model/DiscordApi'
 import { BaseProvider } from './provider/BaseProvider'
 import { ErrorUtil } from './util/ErrorUtil'
@@ -88,6 +89,7 @@ providers.forEach((Provider) => {
 providerNames.sort()
 
 app.use(Sentry.Handlers.requestHandler())
+app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(express.static('public'))
