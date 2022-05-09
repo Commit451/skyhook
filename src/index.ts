@@ -103,6 +103,10 @@ app.get('/providers', (req, res) => {
     res.status(200).send(providerNames)
 })
 
+app.get('/api/providers', (req, res) => {
+    res.status(200).send(providerInfos)
+})
+
 app.get('/api/webhooks/:webhookID/:webhookSecret/:from', (req, res) => {
     // Return 200 if the provider is valid to show this url is ready.
     const provider = req.params.from
