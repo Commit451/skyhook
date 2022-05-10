@@ -13,7 +13,6 @@ test/
 app.yaml
 License
 nodemon.json
-tsconfig.json
 .eslintignore
 .eslintrc.json
 .gcloudignore
