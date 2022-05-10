@@ -1,6 +1,6 @@
 import dotenv from 'dotenv'
 import axios from 'axios'
-import express from 'express'
+import express, { Response } from 'express'
 import cors from 'cors'
 import { DiscordPayload } from './model/DiscordApi'
 import { BaseProvider } from './provider/BaseProvider'
@@ -121,8 +121,8 @@ app.get('/api/webhooks/:webhookID/:webhookSecret/:from', (req, res) => {
 app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
     const webhookID = req.params.webhookID
     const webhookSecret = req.params.webhookSecret
-    const providerName = req.params.from
-    if (!webhookID || !webhookSecret || !providerName) {
+    const providerPath = req.params.from
+    if (!webhookID || !webhookSecret || !providerPath) {
         res.sendStatus(400)
         return
     }
@@ -130,7 +130,7 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
 
     let discordPayload: DiscordPayload | null = null
 
-    const Provider = providersMap.get(providerName)
+    const Provider = providersMap.get(providerPath)
     if (Provider != null) {
         const instance = new Provider()
         try {
@@ -144,66 +144,43 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
         } catch (error) {
             res.sendStatus(500)
             logger.error('Error during parse: ' + error.stack)
-            discordPayload = ErrorUtil.createErrorPayload(providerName, error)
+            discordPayload = ErrorUtil.createErrorPayload(providerPath, error)
         }
     } else {
-        const errorMessage = `Unknown provider ${providerName}`
+        const errorMessage = `Unknown provider ${providerPath}`
         logger.error(errorMessage)
         res.status(400).send(errorMessage)
         return
     }
 
-    if (discordPayload != null) {
-
-        // We could implement a more robust validation on this at some point.
-        if (Object.keys(discordPayload).length === 0) {
-            logger.error('Bad implementation, outbound payload is empty.')
-            res.status(500).send('Bad implementation.')
-            return
-        }
-
-        const jsonString = JSON.stringify(discordPayload)
-        axios({
-            data: jsonString,
-            method: 'post',
-            url: discordEndpoint,
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(() => {
-            res.sendStatus(200)
-        }).catch((err) => {
-            logger.error(err)
-            res.status(500).send(err)
-        })
-    } else {
-        res.status(200).send(`Webhook event is either not supported or not implemented by /${providerName}.`)
-        return
-    }
+    sendPayload(providerPath, discordPayload, discordEndpoint, res)
 })
 
 app.post('/api/webhooks/:webhookID/:webhookSecret/:from/test', async (req, res) => {
-    // Return 200 if the provider is valid to show this url is ready.
+    const webhookID = req.params.webhookID
+    const webhookSecret = req.params.webhookSecret
     const providerPath = req.params.from
-    const provider = providersMap.get(providerPath)
-    if (providerPath == null || provider == null) {
+    if (!webhookID || !webhookSecret || !providerPath) {
+        res.sendStatus(400)
+        return
+    }
+    const discordEndpoint = `https://discordapp.com/api/webhooks/${webhookID}/${webhookSecret}`
+    const Provider = providersMap.get(providerPath)
+    if (providerPath == null || Provider == null) {
         const errorMessage = `Unknown provider ${providerPath}`
         logger.error(errorMessage)
         res.status(400).send(errorMessage)
     } else {
+        const provider = new Provider()
         const jsonFileName = `${providerPath}.json`
-        const json = fs.readFileSync(`./test/${providerPath}/${jsonFileName}`, 'utf-8')
-        provider.parse(JSON.parse(json)).then((discordPayload) => {
-            if (discordPayload != null) {
-                sendPayload(discordPayload)
-            } else {
-                console.log('Payload is null.')
-            }
-        }).catch((err) => {
-            console.log(err)
-            const payload = ErrorUtil.createErrorPayload(provider.getName(), err)
-            sendPayload(payload)
-        })
+        try {
+            const json = fs.readFileSync(`./test/${providerPath}/${jsonFileName}`, 'utf-8')
+            const discordPayload = await provider.parse(JSON.parse(json))
+            await sendPayload(providerPath, discordPayload, discordEndpoint, res)
+        } catch (err) {
+            logger.error(err)
+            res.status(500).send(err)
+        }
     }
 })
 
@@ -236,6 +213,43 @@ function normalizePort(givenPort: string): string | number | boolean {
     }
 
     return false
+}
+
+/**
+ * Sends the correctly formatted payload to the Discord channel
+ */
+async function sendPayload(
+    providerPath: string,
+    discordPayload: DiscordPayload | null,
+    discordEndpoint: string,
+    res: Response,
+) {
+    if (discordPayload == null) {
+        logger.error('Discord payload is null')
+        res.status(200).send(`Webhook event is either not supported or not implemented by /${providerPath}.`)
+        return
+    }
+    // We could implement a more robust validation on this at some point.
+    if (Object.keys(discordPayload).length === 0) {
+        logger.error('Bad implementation, outbound payload is empty.')
+        res.status(500).send('Bad implementation.')
+        return
+    }
+    const jsonString = JSON.stringify(discordPayload)
+    try {
+        await axios({
+            data: jsonString,
+            method: 'post',
+            url: discordEndpoint,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        res.sendStatus(200)
+    } catch (err) {
+        logger.error(err)
+        res.status(500).send(err)
+    }
 }
 
 module.exports = server
