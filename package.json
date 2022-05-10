@@ -10,7 +10,6 @@
     "start": "node dist/index.js",
     "buildstart": "npm run build && npm run start",
     "test": "mocha -r ts-node/register test/**/*.ts",
-    "visualtest": "npm run build && node dist/test.js",
     "lint": "eslint . --ext .js,.ts --fix",
     "deploy": "npm run build && gcloud app deploy",
     "logs": "gcloud app logs tail -s default",
