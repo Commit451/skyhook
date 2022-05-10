@@ -3,6 +3,9 @@ import { DirectParseProvider } from '../provider/BaseProvider'
 
 import TurndownService from 'turndown'
 
+/**
+ * https://github.com/basecamp/bc3-api/blob/master/sections/webhooks.md
+ */
 export class Basecamp extends DirectParseProvider {
 
     private turndown: TurndownService
@@ -26,13 +29,6 @@ export class Basecamp extends DirectParseProvider {
     }
 
     public async parseData(): Promise<void> {
-        // console.log(this.body)
-        // fs.appendFile('bc.json', JSON.stringify(this.body) + '\n\n', function (err) {
-        //     if (err) {
-        //         return console.log(err)
-        //     }
-        // })
-        //let embed: Embed
         switch (this.body.kind) {
             case 'comment_trashed':
                 this.prepareEmbed(this.colorDeleted, 'deleted comment', ['title'], true)
