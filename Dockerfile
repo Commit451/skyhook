@@ -21,4 +21,4 @@ COPY --from=buildenv /app/dist /usr/src/app/dist
 
 EXPOSE 8080
 
-CMD [ "npm", "run", "dockerstart" ]
+CMD [ "npm", "run", "start" ]

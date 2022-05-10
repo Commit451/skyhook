@@ -1,11 +1,10 @@
 {
   "name": "skyhook",
   "version": "0.0.1",
-  "description": "Parses webhooks and forwards it in the proper format to Discord",
+  "description": "Parses webhooks and forwards them in the proper format to Discord.",
   "scripts": {
     "tsc": "tsc",
     "build": "npm run tsc",
-    "dockerstart": "node dist/index.js",
     "gcp-build": "npm run build",
     "start": "node dist/index.js",
     "buildstart": "npm run build && npm run start",
