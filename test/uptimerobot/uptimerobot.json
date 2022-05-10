@@ -1,0 +1,5 @@
+{
+    "monitorFriendlyName": "Test Monitor",
+    "monitorURL": "http://www.example.com",
+    "alertDetails": "Connection timeout"
+}

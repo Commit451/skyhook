@@ -16,10 +16,22 @@ export class UptimeRobot extends DirectParseProvider {
     }
 
     public async parseData(): Promise<void> {
+        let title = this.query.monitorFriendlyName
+        if (title == null) {
+            title = this.body.monitorFriendlyName
+        }
+        let url = this.query.monitorURL
+        if (url == null) {
+            url = this.body.monitorURL
+        }
+        let description = this.query.alertDetails
+        if (description == null) {
+            description = this.body.alertDetails
+        }
         this.addEmbed({
-            title: this.query.monitorFriendlyName,
-            url: this.query.monitorURL,
-            description: this.query.alertDetails
+            title: title,
+            url: url,
+            description: description,
         })
     }
 }
