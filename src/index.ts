@@ -7,6 +7,7 @@ import { BaseProvider } from './provider/BaseProvider'
 import { ErrorUtil } from './util/ErrorUtil'
 import { LoggerUtil } from './util/LoggerUtil'
 import * as Sentry from '@sentry/node'
+import * as fs from 'fs'
 
 import { AppVeyor } from './provider/Appveyor'
 import { Basecamp } from './provider/Basecamp'
@@ -42,8 +43,6 @@ logger.debug('Logger set up successfully.')
 const app = express()
 
 Sentry.init({ dsn: 'https://1330d3dad32547c99c52246e3eaa1a32@o1234419.ingest.sentry.io/6383693' })
-
-const hostPath = process.env.HOST_PATH || '/'
 
 const providers: Type<BaseProvider>[] = [
     AppVeyor,
@@ -182,6 +181,32 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
         return
     }
 })
+
+app.post('/api/webhooks/:webhookID/:webhookSecret/:from/test', async (req, res) => {
+    // Return 200 if the provider is valid to show this url is ready.
+    const providerPath = req.params.from
+    const provider = providersMap.get(providerPath)
+    if (providerPath == null || provider == null) {
+        const errorMessage = `Unknown provider ${providerPath}`
+        logger.error(errorMessage)
+        res.status(400).send(errorMessage)
+    } else {
+        const jsonFileName = `${providerPath}.json`
+        const json = fs.readFileSync(`./test/${providerPath}/${jsonFileName}`, 'utf-8')
+        provider.parse(JSON.parse(json)).then((discordPayload) => {
+            if (discordPayload != null) {
+                sendPayload(discordPayload)
+            } else {
+                console.log('Payload is null.')
+            }
+        }).catch((err) => {
+            console.log(err)
+            const payload = ErrorUtil.createErrorPayload(provider.getName(), err)
+            sendPayload(payload)
+        })
+    }
+})
+
 
 // The error handler must be before any other error middleware and after all controllers
 app.use(Sentry.Handlers.errorHandler())
