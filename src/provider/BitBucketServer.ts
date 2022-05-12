@@ -34,6 +34,9 @@ export class BitBucketServer extends TypeParseProvder {
     }
 
     public getType(): string | null {
+        if (this.headers == null) {
+            return null
+        }
         return this.headers['x-event-key']
     }
 
