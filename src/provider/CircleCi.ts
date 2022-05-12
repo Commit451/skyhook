@@ -2,7 +2,7 @@ import { Embed } from '../model/DiscordApi'
 import { DirectParseProvider } from '../provider/BaseProvider'
 
 /**
- * https://circleci.com/docs/1.0/configuration/#notify
+ * https://circleci.com/docs/2.0/webhooks
  */
 export class CircleCi extends DirectParseProvider {
 
@@ -13,35 +13,37 @@ export class CircleCi extends DirectParseProvider {
     public async parseData(): Promise<void> {
         this.setEmbedColor(0x343433)
 
-        const sha = this.body.payload.vcs_revision
-        const compare = this.body.payload.compare
-        const subject = this.body.payload.subject
-        const committer = this.body.payload.committer_name
-        const outcome = this.body.payload.outcome
-        const buildNumber = this.body.payload.build_num
-        const buildUrl = this.body.payload.build_url
+        const sha = this.body.pipeline.vcs.revision
+        const project = this.body.project.name
+        const subject = this.body.pipeline.vcs.commit.subject
+        const committer = this.body.pipeline.vcs.commit.author.name
+        const status = this.body.workflow.status
+        const url = this.body.workflow.url
+        const number = this.body.pipeline.number
+        console.log("sha:" + sha)
 
         let description = ""
         if (sha != null) {
             description += `[${sha.slice(0, 7)}]`
         }
-        if (compare != null) {
-            description += `(${compare})`
+        if (project != null) {
+            description += `(${project})`
         }
         if (subject != null) {
             description += ' : ' + (subject.length > 48 ? `${subject.substring(0, 48)}\u2026` : subject)
         }
-        if (outcome != null) {
-            description += '\n\n' + `**Outcome**: ${outcome}`
+        if (status != null) {
+            description += '\n\n' + `**Status**: ${status}`
         }
         const embed: Embed = {
-            title: `Build #${buildNumber}`,
-            url: buildUrl,
+            title: `Pipeline #${number}`,
+            url: url,
             description: description,
             author: {
                 name: committer
             }
         }
+
         this.addEmbed(embed)
     }
 }
