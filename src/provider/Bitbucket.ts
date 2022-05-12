@@ -91,7 +91,11 @@ export class BitBucket extends TypeParseProvder {
                     const commits = change.commits
 
                     const fields: EmbedField[] = []
-                    embed.title = '[' + this.body.repository.name + ':' + branch + '] ' + commits.length + ' commit' + (commits.length > 1 ? 's' : '')
+                    let title = `[${this.body.repository.name}]:${branch} `
+                    if (commits != null) {
+                        title += commits.length + ' commit' + (commits.length > 1 ? 's' : '')
+                    }
+                    embed.title = title
                     embed.url = change.links.html.href
                     for (let j = commits.length - 1; j >= 0; j--) {
                         const commit = commits[j]
