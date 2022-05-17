@@ -97,18 +97,18 @@ export class BitBucket extends TypeParseProvder {
                     let title = `[${this.body.repository.name}]:${branch} `
                     if (commits != null) {
                         title += commits.length + ' commit' + (commits.length > 1 ? 's' : '')
+                        for (let j = commits.length - 1; j >= 0; j--) {
+                            const commit = commits[j]
+                            const message = (commit.message.length > 256) ? commit.message.substring(0, 255) + '\u2026' : commit.message
+                            const author = (typeof commit.author.user !== 'undefined') ? commit.author.user.display_name : 'Unknown'
+                            fields.push({
+                                name: 'Commit from ' + author,
+                                value: '(' + '[`' + commit.hash.substring(0, 7) + '`](' + commit.links.html.href + ')' + ') ' + message.replace(/\n/g, ' ').replace(/\r/g, ' ')
+                            })
+                        }
                     }
                     embed.title = title
                     embed.url = change.links.html.href
-                    for (let j = commits.length - 1; j >= 0; j--) {
-                        const commit = commits[j]
-                        const message = (commit.message.length > 256) ? commit.message.substring(0, 255) + '\u2026' : commit.message
-                        const author = (typeof commit.author.user !== 'undefined') ? commit.author.user.display_name : 'Unknown'
-                        fields.push({
-                            name: 'Commit from ' + author,
-                            value: '(' + '[`' + commit.hash.substring(0, 7) + '`](' + commit.links.html.href + ')' + ') ' + message.replace(/\n/g, ' ').replace(/\r/g, ' ')
-                        })
-                    }
                     embed.fields = fields
                 }
 
