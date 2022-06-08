@@ -10,7 +10,9 @@
     "self": "https://example.atlassian.net/wiki/spaces/TES",
     "title": "test-space",
     "creationDate": 1640921127797,
-    "homePage": { "id": 108298438 },
+    "homePage": {
+      "id": 108298438
+    },
     "key": "TES",
     "creatorDisplayName": "Zaphod Beeblebrox",
     "lastModifierDisplayName": "Zaphod Beeblebrox"

@@ -44,8 +44,12 @@
                 "name": "Jordi Mallach",
                 "email": "jordi@softcatala.org"
             },
-            "added": ["CHANGELOG"],
-            "modified": ["app/controller/application.rb"],
+            "added": [
+                "CHANGELOG"
+            ],
+            "modified": [
+                "app/controller/application.rb"
+            ],
             "removed": []
         },
         {
@@ -57,8 +61,12 @@
                 "name": "GitLab dev user",
                 "email": "gitlabdev@dv6700.(none)"
             },
-            "added": ["CHANGELOG"],
-            "modified": ["app/controller/application.rb"],
+            "added": [
+                "CHANGELOG"
+            ],
+            "modified": [
+                "app/controller/application.rb"
+            ],
             "removed": []
         }
     ],

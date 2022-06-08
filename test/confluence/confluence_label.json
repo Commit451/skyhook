@@ -12,7 +12,11 @@
     "creationDate": 1640897371041,
     "contentType": "page",
     "version": 3,
-    "labels": [["Object"]],
+    "labels": [
+      [
+        "Object"
+      ]
+    ],
     "creatorDisplayName": "Zaphod Beeblebrox",
     "spaceName": "Zelda Clone",
     "lastModifierDisplayName": "Zaphod Beeblebrox"
