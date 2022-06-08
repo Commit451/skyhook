@@ -176,14 +176,9 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from/test', async (req, res) 
     } else {
         const provider = new Provider()
         const jsonFileName = `${providerPath}.json`
-        try {
-            const json = fs.readFileSync(`./test/${providerPath}/${jsonFileName}`, 'utf-8')
-            const discordPayload = await provider.parse(JSON.parse(json))
-            await sendPayload(providerPath, discordPayload, discordEndpoint, res)
-        } catch (err) {
-            logger.error(err)
-            res.status(500).send(err)
-        }
+        const json = fs.readFileSync(`./test/${providerPath}/${jsonFileName}`, 'utf-8')
+        const discordPayload = await provider.parse(JSON.parse(json))
+        sendPayload(providerPath, discordPayload, discordEndpoint, res)
     }
 })
 
