@@ -42,7 +42,12 @@ logger.debug('Logger set up successfully.')
 
 const app = express()
 
-Sentry.init({ dsn: 'https://1330d3dad32547c99c52246e3eaa1a32@o1234419.ingest.sentry.io/6383693' })
+const sentryUrl = process.env.SENTRY_URL
+const sentryEnabled = sentryUrl != null
+if (sentryEnabled) {
+    logger.debug(`Initializing Sentry`)
+    Sentry.init({ dsn: sentryUrl })
+}
 
 const providers: Type<BaseProvider>[] = [
     AppVeyor,
@@ -77,7 +82,7 @@ providers.forEach((Provider) => {
     const instance = new Provider()
     providerInstances.push(instance)
     providersMap.set(instance.getPath(), Provider)
-    logger.debug(`Adding provider name ${instance.getName()}`)
+    logger.debug(`Adding provider: ${instance.getName()}`)
     providerNames.push(instance.getName())
     const providerInfo = {
         name: instance.getName(),
@@ -87,7 +92,9 @@ providers.forEach((Provider) => {
 })
 providerNames.sort()
 
-app.use(Sentry.Handlers.requestHandler())
+if (sentryEnabled) {
+    app.use(Sentry.Handlers.requestHandler())
+}
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
@@ -104,6 +111,7 @@ app.get('/api/providers', (_req, res) => {
 const info = {
     version: process.env.GAE_VERSION,
     deployment: process.env.GAE_DEPLOYMENT_ID,
+    sentryEnabled: sentryEnabled,
 }
 app.get('/api/info', (_req, res) => {
     res.status(200).send(info)
@@ -184,7 +192,9 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from/test', async (req, res) 
 
 
 // The error handler must be before any other error middleware and after all controllers
-app.use(Sentry.Handlers.errorHandler())
+if (sentryEnabled) {
+    app.use(Sentry.Handlers.errorHandler())
+}
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((_req, res, _next) => {
