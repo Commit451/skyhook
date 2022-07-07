@@ -64,7 +64,9 @@ export class BitBucket extends TypeParseProvder {
             'pullrequestRejected',
             'pullrequestCommentCreated',
             'pullrequestCommentUpdated',
-            'pullrequestCommentDeleted'
+            'pullrequestCommentDeleted',
+            'pullrequestChangesRequestCreated',
+            'pullrequestChangesRequestRemoved'
         ]
     }
 
@@ -294,6 +296,7 @@ export class BitBucket extends TypeParseProvder {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.body.repository.full_name}] Approved pull request: #${this.body.pullrequest.id} ${this.body.pullrequest.title}`
         this.embed.url = this.extractPullRequestUrl()
+        this.setEmbedColor(0x2db83d)
         this.addEmbed(this.embed)
     }
 
@@ -339,6 +342,21 @@ export class BitBucket extends TypeParseProvder {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.body.repository.full_name}] Deleted comment on pull request: #${this.body.pullrequest.id} ${this.body.pullrequest.title}`
         this.embed.description = (this.body.comment.content.html.replace(/<.*?>/g, '').length > 1024) ? this.body.comment.content.html.replace(/<.*?>/g, '').substring(0, 1023) + '\u2026' : this.body.comment.content.html.replace(/<.*?>/g, '')
+        this.embed.url = this.extractPullRequestUrl()
+        this.addEmbed(this.embed)
+    }
+
+    public async pullrequestChangesRequestCreated(): Promise<void> {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.body.repository.full_name}] Changes requested for pull request: #${this.body.pullrequest.id} ${this.body.pullrequest.title}`
+        this.embed.url = this.extractPullRequestUrl()
+        this.setEmbedColor(0xffa500)
+        this.addEmbed(this.embed)
+    }
+
+    public async pullrequestChangesRequestRemoved(): Promise<void> {
+        this.embed.author = this.extractAuthor()
+        this.embed.title = `[${this.body.repository.full_name}] Removed changes requested for pull request: #${this.body.pullrequest.id} ${this.body.pullrequest.title}`
         this.embed.url = this.extractPullRequestUrl()
         this.addEmbed(this.embed)
     }
