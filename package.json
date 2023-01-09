@@ -29,7 +29,7 @@
     "chai-http": "^4.3.0",
     "eslint": "^8.12.0",
     "mocha": "^9.2.2",
-    "nodemon": "^2.0.15",
+    "nodemon": "^2.0.20",
     "rimraf": "^3.0.2",
     "ts-node": "^10.7.0",
     "typescript": "^4.6.3"
