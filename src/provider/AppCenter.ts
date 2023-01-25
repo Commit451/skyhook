@@ -1,10 +1,10 @@
 import { Embed } from '../model/DiscordApi'
-import { TypeParseProvder } from '../provider/BaseProvider'
+import { TypeParseProvider } from '../provider/BaseProvider'
 
 /**
  * https://learn.microsoft.com/en-us/appcenter/dashboard/webhooks/
  */
-export class AppCenter extends TypeParseProvder {
+export class AppCenter extends TypeParseProvider {
     private embed: Embed
 
     constructor() {

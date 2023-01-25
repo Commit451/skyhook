@@ -1,5 +1,5 @@
 import { Embed } from '../model/DiscordApi'
-import { TypeParseProvder } from '../provider/BaseProvider'
+import { TypeParseProvider } from '../provider/BaseProvider'
 
 enum PatreonAction {
     CREATE,
@@ -10,7 +10,7 @@ enum PatreonAction {
 /**
  * https://docs.patreon.com/#webhooks
  */
-export class Patreon extends TypeParseProvder {
+export class Patreon extends TypeParseProvider {
 
     // HTML Regular Expressions
     private static boldRegex = /<strong>(.*?)<\/strong>/

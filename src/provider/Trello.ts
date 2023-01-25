@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi'
-import { TypeParseProvder } from '../provider/BaseProvider'
+import { TypeParseProvider } from '../provider/BaseProvider'
 import { MarkdownUtil } from '../util/MarkdownUtil'
 import { URL } from 'url'
 
@@ -14,7 +14,7 @@ type Attachment = any
 /**
  * https://developers.trello.com/apis/webhooks
  */
-export class Trello extends TypeParseProvder {
+export class Trello extends TypeParseProvider {
 
     private static baseLink = 'https://trello.com/'
     private static baseAvatarUrl = 'https://trello-avatars.s3.amazonaws.com/'

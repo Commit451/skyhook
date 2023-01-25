@@ -1,5 +1,5 @@
 import { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi'
-import { TypeParseProvder } from '../provider/BaseProvider'
+import { TypeParseProvider } from '../provider/BaseProvider'
 
 interface Project {
     name: string
@@ -13,7 +13,7 @@ interface Project {
 /**
  * https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/user/project/integrations/webhooks.md
  */
-export class GitLab extends TypeParseProvder {
+export class GitLab extends TypeParseProvider {
 
     private static _formatAvatarURL(url: string): string {
         if (!/^https?:\/\/|^\/\//i.test(url)) {

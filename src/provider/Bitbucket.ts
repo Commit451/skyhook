@@ -1,11 +1,11 @@
 import { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi'
-import { TypeParseProvder } from '../provider/BaseProvider'
+import { TypeParseProvider } from '../provider/BaseProvider'
 import { MarkdownUtil } from '../util/MarkdownUtil'
 
 /**
  * https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html
  */
-export class BitBucket extends TypeParseProvder {
+export class BitBucket extends TypeParseProvider {
 
     private static _formatLargeString(str: string, limit = 256): string {
         return str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str

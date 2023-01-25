@@ -1,7 +1,7 @@
 import { Embed, EmbedField, EmbedAuthor } from '../model/DiscordApi'
-import { TypeParseProvder } from './BaseProvider'
+import { TypeParseProvider } from './BaseProvider'
 
-export class BitBucketServer extends TypeParseProvder {
+export class BitBucketServer extends TypeParseProvider {
 
     private embed: Embed
 
