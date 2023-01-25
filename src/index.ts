@@ -9,6 +9,7 @@ import { LoggerUtil } from './util/LoggerUtil'
 import * as Sentry from '@sentry/node'
 import * as fs from 'fs'
 
+import { AppCenter } from './provider/AppCenter'
 import { AppVeyor } from './provider/Appveyor'
 import { Basecamp } from './provider/Basecamp'
 import { BitBucket } from './provider/Bitbucket'
@@ -45,11 +46,12 @@ const app = express()
 const sentryUrl = process.env.SENTRY_URL
 const sentryEnabled = sentryUrl != null
 if (sentryEnabled) {
-    logger.debug(`Initializing Sentry`)
+    logger.debug('Initializing Sentry')
     Sentry.init({ dsn: sentryUrl })
 }
 
 const providers: Type<BaseProvider>[] = [
+    AppCenter,
     AppVeyor,
     Basecamp,
     BitBucket,
@@ -101,7 +103,7 @@ app.use(express.urlencoded({ extended: false }))
 app.use(express.static('public'))
 
 app.get('/', (_req, res) => {
-    res.redirect('https://commit451.github.io/skyhook-web');
+    res.redirect('https://commit451.github.io/skyhook-web')
 })
 
 app.get('/api/providers', (_req, res) => {
@@ -231,7 +233,7 @@ async function sendPayload(
     discordPayload: DiscordPayload | null,
     discordEndpoint: string,
     res: Response,
-) {
+): Promise<void> {
     if (discordPayload == null) {
         logger.error('Discord payload is null')
         res.status(200).send(`Webhook event is either not supported or not implemented by /${providerPath}.`)
