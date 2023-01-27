@@ -1,10 +1,10 @@
 import { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi'
-import { TypeParseProvder } from '../provider/BaseProvider'
+import { TypeParseProvider } from '../provider/BaseProvider'
 
 /**
  * https://docs.microsoft.com/en-us/vsts/service-hooks/create-subscription
  */
-export class VSTS extends TypeParseProvder {
+export class VSTS extends TypeParseProvider {
 
     private embed: Embed
 

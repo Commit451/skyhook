@@ -124,7 +124,7 @@ export abstract class DirectParseProvider extends BaseProvider {
  * type name will be executed. If none function matching the type name
  * is found, nothing will be executed.
  */
-export abstract class TypeParseProvder extends BaseProvider {
+export abstract class TypeParseProvider extends BaseProvider {
 
     public abstract getType(): string | null
 
@@ -146,7 +146,7 @@ export abstract class TypeParseProvder extends BaseProvider {
 
     protected async parseImpl(): Promise<void> {
 
-        const type = TypeParseProvder.formatType(this.getType())
+        const type = TypeParseProvider.formatType(this.getType())
         if (type != null) {
 
             if (this.knownTypes().includes(type)) {

@@ -1,10 +1,10 @@
 import { Embed } from '../model/DiscordApi'
-import { TypeParseProvder } from '../provider/BaseProvider'
+import { TypeParseProvider } from '../provider/BaseProvider'
 
 /**
  * https://docs.rollbar.com/docs/webhooks
  */
-export class Rollbar extends TypeParseProvder {
+export class Rollbar extends TypeParseProvider {
 
     private embed: Embed
 

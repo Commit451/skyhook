@@ -1,0 +1,15 @@
+{
+    "app_name": "AppCenterRNTestApp",
+    "branch": "main",
+    "build_status": "Succeeded",
+    "build_id": "17",
+    "build_link": "https://appcenter.ms/users/skyhook/apps/AppCenterRNTestApp/build/branches/main/builds/17",
+    "build_reason": "manual",
+    "finish_time": "2023-01-25T19:00:19.8159458Z",
+    "icon_link": null,
+    "notification_settings_link": "https://appcenter.ms/users/skyhook/apps/AppCenterRNTestApp/settings/notifications",
+    "os": "Android",
+    "start_time": "2023-01-25T18:48:14.8008937Z",
+    "source_version": "a09714bbf5cf6b1424942a12a428aa7e6c4c316f",
+    "sent_at": "2023-01-25T19:52:39.6902952Z"
+}
