@@ -1,0 +1,23 @@
+{
+    "app_name": "AppCenterRNTestApp",
+    "app_display_name": "AppCenterRNTestApp",
+    "release_id": "15",
+    "platform": "Android",
+    "uploaded_at": "2023-01-25T18:59:46.194Z",
+    "fingerprint": "bb8f3a8d33c3376b87762435db64a1c9",
+    "release_notes": "fix: status bar color to black",
+    "version": "17",
+    "short_version": "1.0.0",
+    "min_os": "5.0",
+    "mandatory_update": true,
+    "size": 7515436,
+    "provisioning_profile_name": null,
+    "provisioning_profile_type": null,
+    "bundle_identifier": "com.skyhook.apps.AppCenterRNTestApp",
+    "install_link": "https://install.appcenter.ms/users/skyhook/apps/AppCenterRNTestApp/releases/15?source=email",
+    "icon_link": null,
+    "distribution_group_id": "00000000-0000-0000-0000-000000000000",
+    "installable": true,
+    "sent_at": "2023-01-25T19:53:49.5988863Z",
+    "app_id": "01612cfc-3572-45aa-b455-1e7f1e24e69f"
+}
