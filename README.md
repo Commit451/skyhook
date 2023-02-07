@@ -61,6 +61,10 @@ To run server (after building):
 ```
 npm start
 ```
+To do both:
+```
+npm run buildstart
+```
 To run tests:
 ```
 npm test
