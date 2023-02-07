@@ -206,7 +206,7 @@ app.use((_req, res, _next) => {
 const port = normalizePort(process.env.PORT || '8080')
 
 const server = app.listen(port, () => {
-    logger.debug(`Your app is listening on port ${port}`)
+    logger.debug(`Your app is listening on port ${port}. Test out with http://localhost:${port}/api/providers`)
 })
 
 function normalizePort(givenPort: string): string | number | boolean {
