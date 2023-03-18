@@ -1,7 +1,7 @@
 import axios from 'axios'
-import { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi'
-import { TypeParseProvider } from '../provider/BaseProvider'
-import { MarkdownUtil } from '../util/MarkdownUtil'
+import { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi.js'
+import { TypeParseProvider } from '../provider/BaseProvider.js'
+import { MarkdownUtil } from '../util/MarkdownUtil.js'
 import { URL } from 'url'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

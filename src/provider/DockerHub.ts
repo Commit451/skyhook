@@ -1,4 +1,4 @@
-import { DirectParseProvider } from '../provider/BaseProvider'
+import { DirectParseProvider } from '../provider/BaseProvider.js'
 
 /**
  * https://docs.docker.com/docker-hub/webhooks/

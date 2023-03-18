@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { Jira } from '../../src/provider/Jira'
-import { Tester } from '../Tester'
+import { Jira } from '../../src/provider/Jira.js'
+import { Tester } from '../Tester.js'
 
 describe('/POST jira', () => {
     it('issue_updated', async () => {

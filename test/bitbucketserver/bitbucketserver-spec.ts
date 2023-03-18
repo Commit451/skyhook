@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { BitBucketServer } from '../../src/provider/BitBucketServer'
-import { Tester } from '../Tester'
+import { BitBucketServer } from '../../src/provider/BitBucketServer.js'
+import { Tester } from '../Tester.js'
 
 describe('/POST bitbucketserver', () => {
     it('repo:refs_changed', async () => {

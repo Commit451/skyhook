@@ -1,5 +1,5 @@
-import { Embed } from '../model/DiscordApi'
-import { DirectParseProvider } from '../provider/BaseProvider'
+import { Embed } from '../model/DiscordApi.js'
+import { DirectParseProvider } from '../provider/BaseProvider.js'
 
 /**
  * https://circleci.com/docs/2.0/webhooks
@@ -20,9 +20,9 @@ export class CircleCi extends DirectParseProvider {
         const status = this.body.workflow.status
         const url = this.body.workflow.url
         const number = this.body.pipeline.number
-        console.log("sha:" + sha)
+        console.log('sha:' + sha)
 
-        let description = ""
+        let description = ''
         if (sha != null) {
             description += `[${sha.slice(0, 7)}]`
         }

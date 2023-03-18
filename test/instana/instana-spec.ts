@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { Instana } from '../../src/provider/Instana'
-import { Tester } from '../Tester'
+import { Instana } from '../../src/provider/Instana.js'
+import { Tester } from '../Tester.js'
 
 describe('/POST instana', () => {
 

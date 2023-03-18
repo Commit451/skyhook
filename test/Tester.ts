@@ -1,8 +1,8 @@
-import * as fs from 'fs'
 import { inspect } from 'util'
-import { BaseProvider } from '../src/provider/BaseProvider'
-import { LoggerUtil } from '../src/util/LoggerUtil'
-import { DiscordPayload } from '../src/model/DiscordApi'
+import { BaseProvider } from '../src/provider/BaseProvider.js'
+import { LoggerUtil } from '../src/util/LoggerUtil.js'
+import { DiscordPayload } from '../src/model/DiscordApi.js'
+import { readFileSync } from 'fs'
 
 /**
  * Helps with testing things
@@ -33,7 +33,7 @@ class Tester {
     }
 
     public static readTestFile(provider: BaseProvider, fileName: string): string {
-        return fs.readFileSync(`./test/${provider.getPath().toLowerCase()}/${fileName}`, 'utf-8')
+        return readFileSync(`./test/${provider.getPath().toLowerCase()}/${fileName}`, 'utf-8')
     }
 }
 

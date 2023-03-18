@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { VSTS } from '../../src/provider/VSTS'
-import { Tester } from '../Tester'
+import { VSTS } from '../../src/provider/VSTS.js'
+import { Tester } from '../Tester.js'
 
 describe('/POST vsts', () => {
     it('git.push', async () => {

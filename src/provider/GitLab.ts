@@ -1,5 +1,5 @@
-import { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi'
-import { TypeParseProvider } from '../provider/BaseProvider'
+import { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi.js'
+import { TypeParseProvider } from '../provider/BaseProvider.js'
 
 interface Project {
     name: string

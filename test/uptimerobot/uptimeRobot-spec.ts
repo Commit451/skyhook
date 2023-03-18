@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { UptimeRobot } from '../../src/provider/UptimeRobot'
-import { Tester } from '../Tester'
+import { UptimeRobot } from '../../src/provider/UptimeRobot.js'
+import { Tester } from '../Tester.js'
 
 describe('/POST uptimerobot', () => {
     it('monitor', async () => {
