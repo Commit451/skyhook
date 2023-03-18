@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { AppCenter } from '../../src/provider/AppCenter'
-import { Tester } from '../Tester'
+import { AppCenter } from '../../src/provider/AppCenter.js'
+import { Tester } from '../Tester.js'
 
 describe('/POST appcenter', () => {
     it('push (event pipeline)', async () => {

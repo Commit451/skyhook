@@ -1,4 +1,4 @@
-import { DirectParseProvider } from '../provider/BaseProvider'
+import { DirectParseProvider } from '../provider/BaseProvider.js'
 
 /**
  * https://www.pingdom.com/resources/webhooks

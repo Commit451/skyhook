@@ -1,4 +1,4 @@
-import { DirectParseProvider } from '../provider/BaseProvider'
+import { DirectParseProvider } from '../provider/BaseProvider.js'
 
 /**
  * https://docs.newrelic.com/docs/alerts/new-relic-alerts/managing-notification-channels/customize-your-webhook-payload

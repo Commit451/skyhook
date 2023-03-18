@@ -1,4 +1,4 @@
-import { DirectParseProvider } from '../provider/BaseProvider'
+import { DirectParseProvider } from '../provider/BaseProvider.js'
 import gravatar from 'gravatar'
 
 /**

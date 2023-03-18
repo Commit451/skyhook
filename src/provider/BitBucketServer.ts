@@ -1,5 +1,5 @@
-import { Embed, EmbedField, EmbedAuthor } from '../model/DiscordApi'
-import { TypeParseProvider } from './BaseProvider'
+import { Embed, EmbedField, EmbedAuthor } from '../model/DiscordApi.js'
+import { TypeParseProvider } from './BaseProvider.js'
 
 export class BitBucketServer extends TypeParseProvider {
 

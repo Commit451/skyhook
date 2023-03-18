@@ -1,22 +1,16 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "Node16",
     "strict": true,
     "useUnknownInCatchVariables": false,
     "esModuleInterop": true,
-    "target": "es6",
-    "moduleResolution": "node",
+    "target": "ES2022",
+    "moduleResolution": "node16",
     "sourceMap": true,
     "outDir": "dist",
-    "baseUrl": ".",
-    "paths": {
-      "*": [
-        "node_modules/*",
-        "src/types/*"
-      ]
-    }
+    "baseUrl": "."
   },
   "include": [
-    "src/**/*"
-  ]
+    "src"
+  ],
 }

@@ -1,4 +1,4 @@
-import { Embed } from '../model/DiscordApi'
+import { Embed } from '../model/DiscordApi.js'
 
 // Regular Expressions
 const mdUL1 = /^={3,}$/

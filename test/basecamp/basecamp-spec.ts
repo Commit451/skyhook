@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { Basecamp } from '../../src/provider/Basecamp'
-import { Tester } from '../Tester'
+import { Basecamp } from '../../src/provider/Basecamp.js'
+import { Tester } from '../Tester.js'
 
 describe('/POST basecamp', () => {
     it('general', async () => {

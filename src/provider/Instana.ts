@@ -1,5 +1,5 @@
-import { Embed } from '../model/DiscordApi'
-import { DirectParseProvider } from '../provider/BaseProvider'
+import { Embed } from '../model/DiscordApi.js'
+import { DirectParseProvider } from '../provider/BaseProvider.js'
 import { DateTime } from 'luxon'
 
 enum InstanaEventType {
