@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Parses webhooks and forwards them in the proper format to Discord.",
   "type": "module",
-  "main": "./dist/index.js",
+  "exports": "./dist/index.js",
   "scripts": {
     "clean": "rimraf dist",
     "tsc": "tsc",
