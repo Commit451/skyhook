@@ -6,7 +6,6 @@ import { DiscordPayload } from './model/DiscordApi.js'
 import { BaseProvider } from './provider/BaseProvider.js'
 import { ErrorUtil } from './util/ErrorUtil.js'
 import { LoggerUtil } from './util/LoggerUtil.js'
-import * as Sentry from '@sentry/node'
 import * as fs from 'fs'
 
 import { AppCenter } from './provider/AppCenter.js'
@@ -42,13 +41,6 @@ const logger = LoggerUtil.logger()
 logger.debug('Logger set up successfully.')
 
 const app = express()
-
-const sentryUrl = process.env.SENTRY_URL
-const sentryEnabled = sentryUrl != null
-if (sentryEnabled) {
-    logger.debug('Initializing Sentry')
-    Sentry.init({ dsn: sentryUrl })
-}
 
 const providers: Type<BaseProvider>[] = [
     AppCenter,
@@ -94,9 +86,6 @@ providers.forEach((Provider) => {
 })
 providerNames.sort()
 
-if (sentryEnabled) {
-    app.use(Sentry.Handlers.requestHandler())
-}
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
@@ -112,8 +101,7 @@ app.get('/api/providers', (_req, res) => {
 
 const info = {
     version: process.env.GAE_VERSION,
-    deployment: process.env.GAE_DEPLOYMENT_ID,
-    sentryEnabled: sentryEnabled,
+    deployment: process.env.GAE_DEPLOYMENT_ID
 }
 app.get('/api/info', (_req, res) => {
     res.status(200).send(info)
@@ -191,12 +179,6 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from/test', async (req, res) 
         sendPayload(providerPath, discordPayload, discordEndpoint, res)
     }
 })
-
-
-// The error handler must be before any other error middleware and after all controllers
-if (sentryEnabled) {
-    app.use(Sentry.Handlers.errorHandler())
-}
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((_req, res, _next) => {
