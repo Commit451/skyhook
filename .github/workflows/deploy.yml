@@ -33,9 +33,6 @@ jobs:
       with:
         credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
 
-    - name: 'Enable Sentry'
-      run: 'echo ${{ secrets.SENTRY_URL }} > .env'
-
     - id: 'deploy'
       name: 'deploy'
       uses: 'google-github-actions/deploy-appengine@v0'
