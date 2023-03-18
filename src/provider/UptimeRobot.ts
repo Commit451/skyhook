@@ -1,4 +1,4 @@
-import { DirectParseProvider } from '../provider/BaseProvider'
+import { DirectParseProvider } from '../provider/BaseProvider.js'
 
 /**
  * https://blog.uptimerobot.com/web-hook-alert-contacts-new-feature/

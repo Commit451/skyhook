@@ -1,5 +1,5 @@
-import { Embed, EmbedField } from '../model/DiscordApi'
-import { DirectParseProvider } from '../provider/BaseProvider'
+import { Embed, EmbedField } from '../model/DiscordApi.js'
+import { DirectParseProvider } from '../provider/BaseProvider.js'
 
 /**
  * https://support.codacy.com/hc/en-us/articles/207280359-WebHook-Notifications

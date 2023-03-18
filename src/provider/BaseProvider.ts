@@ -1,7 +1,7 @@
 import camel from 'camelcase'
 import winston from 'winston'
-import { DiscordPayload, Embed } from '../model/DiscordApi'
-import { LoggerUtil } from '../util/LoggerUtil'
+import { DiscordPayload, Embed } from '../model/DiscordApi.js'
+import { LoggerUtil } from '../util/LoggerUtil.js'
 
 /**
  * Base provider, which all other providers will subclass. You can then

@@ -1,7 +1,6 @@
 {
   "watch": [
-    "src",
-    "public"
+    "src"
   ],
   "ext": "js,ts,json,ejs,css",
   "ignore": [

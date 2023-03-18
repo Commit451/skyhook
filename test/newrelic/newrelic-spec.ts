@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { NewRelic } from '../../src/provider/NewRelic'
-import { Tester } from '../Tester'
+import { NewRelic } from '../../src/provider/NewRelic.js'
+import { Tester } from '../Tester.js'
 
 describe('/POST newrelic', () => {
     it('deploy', async () => {

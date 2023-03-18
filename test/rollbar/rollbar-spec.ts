@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { Rollbar } from '../../src/provider/Rollbar'
-import { Tester } from '../Tester'
+import { Rollbar } from '../../src/provider/Rollbar.js'
+import { Tester } from '../Tester.js'
 
 describe('/POST rollbar', () => {
     it('new item', async () => {

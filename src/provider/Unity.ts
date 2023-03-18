@@ -1,4 +1,4 @@
-import { DirectParseProvider } from '../provider/BaseProvider'
+import { DirectParseProvider } from '../provider/BaseProvider.js'
 
 /**
  * https://build-api.cloud.unity3d.com/docs/1.0.0/index.html#operation-webhooks-intro

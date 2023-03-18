@@ -1,6 +1,6 @@
-import { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi'
-import { TypeParseProvider } from '../provider/BaseProvider'
-import { MarkdownUtil } from '../util/MarkdownUtil'
+import { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi.js'
+import { TypeParseProvider } from '../provider/BaseProvider.js'
+import { MarkdownUtil } from '../util/MarkdownUtil.js'
 
 /**
  * https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html

@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { GitLab } from '../../src/provider/GitLab'
-import { Tester } from '../Tester'
+import { GitLab } from '../../src/provider/GitLab.js'
+import { Tester } from '../Tester.js'
 
 describe('/POST gitlab', () => {
     it('push', async () => {

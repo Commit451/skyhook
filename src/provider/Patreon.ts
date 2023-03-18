@@ -1,5 +1,5 @@
-import { Embed } from '../model/DiscordApi'
-import { TypeParseProvider } from '../provider/BaseProvider'
+import { Embed } from '../model/DiscordApi.js'
+import { TypeParseProvider } from '../provider/BaseProvider.js'
 
 enum PatreonAction {
     CREATE,

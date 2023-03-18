@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { Travis } from '../../src/provider/Travis'
-import { Tester } from '../Tester'
+import { Travis } from '../../src/provider/Travis.js'
+import { Tester } from '../Tester.js'
 
 describe('/POST travis', () => {
     it('build', async () => {

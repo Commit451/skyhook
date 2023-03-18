@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { Confluence } from '../../src/provider/Confluence'
-import { Tester } from '../Tester'
+import { Confluence } from '../../src/provider/Confluence.js'
+import { Tester } from '../Tester.js'
 
 describe('/POST confluence', () => {
     it('page_', async () => {

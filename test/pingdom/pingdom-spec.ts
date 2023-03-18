@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { Pingdom } from '../../src/provider/Pingdom'
-import { Tester } from '../Tester'
+import { Pingdom } from '../../src/provider/Pingdom.js'
+import { Tester } from '../Tester.js'
 
 describe('/POST pingdom', () => {
     it('check', async () => {

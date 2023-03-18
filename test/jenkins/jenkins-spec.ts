@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { Jenkins } from '../../src/provider/Jenkins'
-import { Tester } from '../Tester'
+import { Jenkins } from '../../src/provider/Jenkins.js'
+import { Tester } from '../Tester.js'
 
 describe('/POST jenkins', () => {
     it('deploy', async () => {

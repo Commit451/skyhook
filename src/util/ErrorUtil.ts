@@ -1,4 +1,4 @@
-import { DiscordPayload } from '../model/DiscordApi'
+import { DiscordPayload } from '../model/DiscordApi.js'
 
 /**
  * Error things

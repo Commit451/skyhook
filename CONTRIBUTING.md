@@ -4,7 +4,7 @@ Skyhook happily accepts pull requests for new providers and features. To make th
 
 ### Code Style
 
-We have tslint configured for the project. If you are using VSCode (which you should, because it is awesome) and have the tslint plugin installed, you will be guided through the coding style and changes will be suggested. While writing your changes, please follow the code style maintained throughout the project. You should browse some of the existing code to get a feel of the style.
+We have eslint configured for the project. If you are using VSCode (which you should, because it is awesome) and have the eslint plugin installed, you will be guided through the coding style and changes will be suggested. While writing your changes, please follow the code style maintained throughout the project. You should browse some of the existing code to get a feel of the style.
 
 ### Working on Changes
 
