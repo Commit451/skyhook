@@ -76,7 +76,7 @@ docker run -it --rm -p 8080:8080 commit451/skyhook
 ```
 
 ## Web
-If you are looking for the frontend web version of skyhook which lets you generate a properly formatted URL, it lives [here](https://github.com/Commit451/skyhook-web).
+If you are looking for the frontend web version of skyhook which lets you generate a properly formatted URL, it lives [here](https://github.com/Commit451/skyhook-web). This repo/project just includes the backend service.
 
 ## Deploying
 - [Docker](docs/docker)
