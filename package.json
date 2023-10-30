@@ -24,7 +24,7 @@
     "@types/gravatar": "^1.8.3",
     "@types/luxon": "^3.2.0",
     "@types/mocha": "^10.0.1",
-    "@types/node": "^18.15.3",
+    "@types/node": "^20.8.9",
     "@types/turndown": "^5.0.1",
     "@typescript-eslint/eslint-plugin": "^5.55.0",
     "@typescript-eslint/parser": "^5.55.0",
@@ -32,7 +32,7 @@
     "chai-http": "^4.3.0",
     "eslint": "^8.36.0",
     "mocha": "^10.2.0",
-    "nodemon": "^2.0.21",
+    "nodemon": "^3.0.1",
     "rimraf": "^4.4.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.2"
@@ -50,8 +50,8 @@
     "winston": "^3.8.2"
   },
   "engines": {
-    "node": ">=18",
-    "npm": ">=9"
+    "node": ">=20",
+    "npm": ">=10"
   },
   "repository": {
     "url": "https://github.com/Commit451/skyhook"
