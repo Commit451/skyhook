@@ -43,7 +43,7 @@
     "camelcase": "^7.0.1",
     "cors": "^2.8.5",
     "dotenv": "16.0.3",
-    "express": "^4.21.1",
+    "express": "^4.21.2",
     "gravatar": "^1.8.2",
     "luxon": "^3.3.0",
     "turndown": "^7.1.1",
