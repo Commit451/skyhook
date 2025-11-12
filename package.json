@@ -63,6 +63,7 @@
   "keywords": [
     "node",
     "skyhook",
-    "discord"
+    "discord",
+    "webhook"
   ]
 }
