@@ -137,7 +137,7 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
         try {
             const queryString = JSON.stringify(req.query)
             const queryObject = JSON.parse(queryString)
-            console.log(queryObject)
+            logger.debug(`Query object: ${JSON.stringify(queryObject)}`)
             // seems dumb, but this is the best way I know how to format these headers in a way we can use them
             const headersString = JSON.stringify(req.headers)
             const headersObject = JSON.parse(headersString)

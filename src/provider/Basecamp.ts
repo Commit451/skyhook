@@ -167,7 +167,7 @@ export class Basecamp extends DirectParseProvider {
                 this.prepareEmbed(this.colorDeleted, 'deleted Google Document', ['title'], true)
                 break
             default:
-                console.log('unknown event ' + this.body.kind)
+                this.logger.warn('Unknown Basecamp event: ' + this.body.kind)
                 this.prepareEmbed(0xf0ff00, this.body.kind, ['title', 'type'], true)
                 break
         }

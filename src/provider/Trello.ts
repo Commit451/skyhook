@@ -69,7 +69,6 @@ export class Trello extends TypeParseProvider {
     public knownTypes(): string[] {
         return [
             'addAttachmentToCard',
-            'addBoardsPinnedToMember',
             'addChecklistToCard',
             'addLabelToCard',
             'addMemberToCard',
@@ -82,33 +81,22 @@ export class Trello extends TypeParseProvider {
             'copyCard',
             'copyChecklist',
             'createLabel',
-            'copyCommentCard',
             'createBoard',
-            'createBoardInvitation',
-            'createBoardPreference',
             'createCard',
             'createCheckItem',
-            'createChecklist',
             'createList',
             'createOrganization',
-            'createOrganizationInvitation',
             'deleteAttachmentFromCard',
-            'deleteBoardInvitation',
             'deleteCard',
             'deleteCheckItem',
             'deleteLabel',
-            'deleteOrganizationInvitation',
             'disablePlugin',
-            'disablePowerUp',
-            'emailCard',
             'enablePlugin',
-            'enablePowerUp',
             'makeAdminOfBoard',
             'makeAdminOfOrganization',
             'makeNormalMemberOfBoard',
             'makeNormalMemberOfOrganization',
             'makeObserverOfBoard',
-            'memberJoinedTrello',
             'moveCardFromBoard',
             'moveCardToBoard',
             'moveListFromBoard',
@@ -120,8 +108,6 @@ export class Trello extends TypeParseProvider {
             'removeMemberFromCard',
             'removeMemberFromBoard',
             'removeMemberFromOrganization',
-            'unconfirmedBoardInvitation',
-            'unconfirmedOrganizationInvitation',
             'updateBoard',
             'updateCard',
             'updateCheckItem',
@@ -129,7 +115,6 @@ export class Trello extends TypeParseProvider {
             'updateChecklist',
             'updateLabel',
             'updateList',
-            'updateMember',
             'updateOrganization',
             'voteOnCard'
         ]
@@ -143,12 +128,6 @@ export class Trello extends TypeParseProvider {
         embed.url = this._resolveFullCardURL(this.action.data.card)
         this._formatAttachment(this.action.data.attachment, embed)
         this.addEmbed(embed)
-    }
-
-    // How to Trigger?
-    public async addBoardsPinnedToMember(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
     }
 
     public async addChecklistToCard(): Promise<void> {
@@ -262,29 +241,11 @@ export class Trello extends TypeParseProvider {
         this.addEmbed(embed)
     }
 
-    // How to Trigger?
-    public async copyCommentCard(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
-    }
-
     public async createBoard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = 'Created Board "' + Trello._formatLargeString(this.action.data.board.name) + '"'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
         this.addEmbed(embed)
-    }
-
-    // Won't Trigger?
-    public async createBoardInvitation(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
-    }
-
-    // How to Trigger?
-    public async createBoardPreference(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
     }
 
     public async createCard(): Promise<void> {
@@ -303,12 +264,6 @@ export class Trello extends TypeParseProvider {
         this.addEmbed(embed)
     }
 
-    // How to Trigger?
-    public async createChecklist(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
-    }
-
     public async createList(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Created List'
@@ -325,24 +280,12 @@ export class Trello extends TypeParseProvider {
         this.addEmbed(embed)
     }
 
-    // Won't Trigger?
-    public async createOrganizationInvitation(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
-    }
-
     public async deleteAttachmentFromCard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Removed Attachment from "' + this.action.data.card.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
         this._formatAttachment(this.action.data.attachment, embed)
         this.addEmbed(embed)
-    }
-
-    // Won't Trigger?
-    public async deleteBoardInvitation(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
     }
 
     public async deleteCard(): Promise<void> {
@@ -368,12 +311,6 @@ export class Trello extends TypeParseProvider {
         this.addEmbed(embed)
     }
 
-    // Won't Trigger?
-    public async deleteOrganizationInvitation(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
-    }
-
     public async disablePlugin(): Promise<void> {
         const embed = this._preparePayload()
         embed.url = this._resolveFullBoardURL(this.action.data.board)
@@ -392,23 +329,10 @@ export class Trello extends TypeParseProvider {
                 url: new URL(manifest.icon.url, url).toString()
             }
         } catch (err) {
-            console.log('[Trello Provider] Error while retrieving plugin manifest.')
-            console.log(err)
+            this.logger.error('Error while retrieving plugin manifest for Trello: ' + err)
             embed.title = '[' + this.action.data.board.name + '] Disabled Plugin "' + this.action.data.plugin.name + '"'
         }
         this.addEmbed(embed)
-    }
-
-    // How to Trigger?
-    public async disablePowerUp(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
-    }
-
-    // How to Trigger?
-    public async emailCard(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
     }
 
     public async enablePlugin(): Promise<void> {
@@ -429,17 +353,10 @@ export class Trello extends TypeParseProvider {
                 url: new URL(manifest.icon.url, url).toString()
             }
         } catch (err) {
-            console.log('[Trello Provider] Error while retrieving plugin manifest.')
-            console.log(err)
+            this.logger.error('Error while retrieving plugin manifest for Trello: ' + err)
             embed.title = '[' + this.action.data.board.name + '] Enabled Plugin "' + this.action.data.plugin.name + '"'
         }
         this.addEmbed(embed)
-    }
-
-    // How to Trigger?
-    public async enablePowerUp(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
     }
 
     public async makeAdminOfBoard(): Promise<void> {
@@ -486,12 +403,6 @@ export class Trello extends TypeParseProvider {
         Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
         embed.url = this._resolveFullBoardURL(this.action.data.board)
         this.addEmbed(embed)
-    }
-
-    // How to Trigger?
-    public async memberJoinedTrello(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
     }
 
     public async moveCardFromBoard(): Promise<void> {
@@ -594,18 +505,6 @@ export class Trello extends TypeParseProvider {
         }
         embed.url = this._resolveGenericURL(this.action.data.organization.id)
         this.addEmbed(embed)
-    }
-
-    // How to Trigger?
-    public async unconfirmedBoardInvitation(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
-    }
-
-    // How to trigger?
-    public async unconfirmedOrganizationInvitation(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
     }
 
     public async updateBoard(): Promise<void> {
@@ -836,12 +735,6 @@ export class Trello extends TypeParseProvider {
         }
         embed.url = this._resolveFullBoardURL(this.action.data.board)
         this.addEmbed(embed)
-    }
-
-    // How to Trigger?
-    public async updateMember(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
     }
 
     public async updateOrganization(): Promise<void> {

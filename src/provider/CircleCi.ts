@@ -20,7 +20,6 @@ export class CircleCi extends DirectParseProvider {
         const status = this.body.workflow.status
         const url = this.body.workflow.url
         const number = this.body.pipeline.number
-        console.log('sha:' + sha)
 
         let description = ''
         if (sha != null) {
