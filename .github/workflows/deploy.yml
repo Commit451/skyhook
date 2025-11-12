@@ -35,7 +35,7 @@ jobs:
 
     - id: 'deploy'
       name: 'deploy'
-      uses: 'google-github-actions/deploy-appengine@v0'
+      uses: 'google-github-actions/deploy-appengine@v3'
       with:
         project_id: 'skyhookapi'
 
