@@ -167,7 +167,7 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from/test', async (req, res) 
     }
     const discordEndpoint = `https://discordapp.com/api/webhooks/${webhookID}/${webhookSecret}`
     const Provider = providersMap.get(providerPath)
-    if (providerPath == null || Provider == null) {
+    if (Provider == null) {
         const errorMessage = `Unknown provider ${providerPath}`
         logger.error(errorMessage)
         res.status(400).send(errorMessage)
@@ -180,7 +180,6 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from/test', async (req, res) 
     }
 })
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((_req, res, _next) => {
     res.status(404).send('Not Found')
 })
