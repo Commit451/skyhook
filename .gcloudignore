@@ -1,10 +1,11 @@
-# .gcloudignore and .dockerignore should match
+# Note: do not exclude Dockerfile here — Cloud Run needs it uploaded
+# to build the image. (.dockerignore can still exclude it from the
+# build context since it doesn't need to be copied into the image.)
 
 .dockerignore
 .git/
 .gitignore
 .vscode/
-Dockerfile
 README.md
 CONTRIBUTING.md
 docs/
