@@ -12,12 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 'Deploy to Google Cloud'
+name: 'Deploy to Google Cloud Run'
 
 on:
   push:
     branches:
     - 'main'
+
+env:
+  PROJECT_ID: 'skyhookapi'
+  SERVICE: 'skyhook'
+  REGION: 'us-central1'
 
 jobs:
   deploy:
@@ -27,17 +32,23 @@ jobs:
 
     runs-on: 'ubuntu-latest'
     steps:
-    - uses: 'actions/checkout@v3'
+    - uses: 'actions/checkout@v4'
 
-    - uses: 'google-github-actions/auth@v0'
+    - uses: 'google-github-actions/auth@v2'
       with:
         credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
 
+    - uses: 'google-github-actions/setup-gcloud@v2'
+
     - id: 'deploy'
       name: 'deploy'
-      uses: 'google-github-actions/deploy-appengine@v3'
+      uses: 'google-github-actions/deploy-cloudrun@v2'
       with:
-        project_id: 'skyhookapi'
+        service: '${{ env.SERVICE }}'
+        region: '${{ env.REGION }}'
+        project_id: '${{ env.PROJECT_ID }}'
+        source: '.'
+        flags: '--allow-unauthenticated --max-instances=1 --port=8080'
 
     - name: 'show output'
       run: 'echo ${{ steps.deploy.outputs.url }}'

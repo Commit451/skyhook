@@ -8,13 +8,12 @@
     "clean": "rimraf dist",
     "tsc": "tsc",
     "build": "npm run clean && npm run tsc",
-    "gcp-build": "npm run build",
     "start": "node dist/index.js",
     "buildstart": "npm run build && npm run start",
     "test": "mocha -r ts-node/register test/**/*.ts",
     "lint": "eslint . --ext .js,.ts --fix",
-    "deploy": "npm run build && gcloud app deploy",
-    "logs": "gcloud app logs tail -s default",
+    "deploy": "gcloud run deploy skyhook --source . --region us-central1 --allow-unauthenticated --max-instances 1 --port 8080",
+    "logs": "gcloud run services logs tail skyhook --region us-central1",
     "dev": "nodemon"
   },
   "devDependencies": {

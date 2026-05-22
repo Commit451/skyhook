@@ -100,8 +100,8 @@ app.get('/api/providers', (_req, res) => {
 })
 
 const info = {
-    version: process.env.GAE_VERSION,
-    deployment: process.env.GAE_DEPLOYMENT_ID
+    version: process.env.K_REVISION,
+    deployment: process.env.K_SERVICE
 }
 app.get('/api/info', (_req, res) => {
     res.status(200).send(info)
