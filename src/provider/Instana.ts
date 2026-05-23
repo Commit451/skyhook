@@ -1,6 +1,10 @@
-import { DateTime } from 'luxon'
 import type { Embed } from '../model/DiscordApi.ts'
 import { DirectParseProvider } from '../provider/BaseProvider.ts'
+
+const dateFormatter = new Intl.DateTimeFormat('en-US', {
+    dateStyle: 'medium',
+    timeStyle: 'medium',
+})
 
 const InstanaEventType = {
     OPEN: 'OPEN',
@@ -34,9 +38,7 @@ export class Instana extends DirectParseProvider {
 
         embed.fields!.push({
             name,
-            value: isValueDate
-                ? DateTime.fromMillis(fieldValue as number).toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS)
-                : (fieldValue as string),
+            value: isValueDate ? dateFormatter.format(new Date(fieldValue as number)) : (fieldValue as string),
             inline,
         })
     }

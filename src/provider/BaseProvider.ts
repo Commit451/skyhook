@@ -1,7 +1,16 @@
-import camel from 'camelcase'
-import type winston from 'winston'
 import type { DiscordPayload, Embed } from '../model/DiscordApi.ts'
-import { LoggerUtil } from '../util/LoggerUtil.ts'
+import { type Logger, logger } from '../util/logger.ts'
+
+function camelCase(s: string): string {
+    const parts = s.split(/[._\-\s]+/).filter((p) => p.length > 0)
+    if (parts.length === 0) return ''
+    const [first, ...rest] = parts
+    return (
+        first.charAt(0).toLowerCase() +
+        first.slice(1) +
+        rest.map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join('')
+    )
+}
 
 /**
  * Base provider, which all other providers will subclass. You can then
@@ -9,7 +18,7 @@ import { LoggerUtil } from '../util/LoggerUtil.ts'
  */
 export abstract class BaseProvider {
     protected payload: DiscordPayload
-    protected logger: winston.Logger
+    protected logger: Logger = logger
     protected headers: any
     protected body: any
     protected query: any
@@ -19,7 +28,6 @@ export abstract class BaseProvider {
     constructor() {
         this.payload = {}
         this.embedColor = null
-        this.logger = LoggerUtil.logger()
     }
 
     /**
@@ -134,7 +142,7 @@ export abstract class TypeParseProvider extends BaseProvider {
             return null
         }
         type = type.replace(/:/g, '_') // needed because of BitBucket
-        return camel(type)
+        return camelCase(type)
     }
 
     protected async parseImpl(): Promise<void> {

@@ -1,5 +1,10 @@
-import gravatar from 'gravatar'
+import { createHash } from 'node:crypto'
 import { DirectParseProvider } from '../provider/BaseProvider.ts'
+
+function gravatarUrl(email: string, size = 100): string {
+    const hash = createHash('md5').update(email.trim().toLowerCase()).digest('hex')
+    return `https://secure.gravatar.com/avatar/${hash}?s=${size}&r=x&d=retro`
+}
 
 /**
  * https://devcenter.heroku.com/articles/app-webhooks
@@ -24,7 +29,7 @@ export class Heroku extends DirectParseProvider {
             url: this.body.data.web_url,
             author: {
                 name: authorName,
-                icon_url: gravatar.url(this.body.actor.email, { s: '100', r: 'x', d: 'retro' }, true),
+                icon_url: gravatarUrl(this.body.actor.email),
             },
         })
     }

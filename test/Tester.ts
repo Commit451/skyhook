@@ -2,7 +2,6 @@ import { readFileSync } from 'node:fs'
 import { inspect } from 'node:util'
 import type { DiscordPayload } from '../src/model/DiscordApi.ts'
 import type { BaseProvider } from '../src/provider/BaseProvider.ts'
-import { LoggerUtil } from '../src/util/LoggerUtil.ts'
 
 /**
  * Helps with testing things
@@ -14,7 +13,6 @@ class Tester {
         headers: any = null,
         query: any = null,
     ): Promise<DiscordPayload | null> {
-        LoggerUtil.init()
         let requestBody = null
         if (jsonFileName != null) {
             requestBody = JSON.parse(Tester.readTestFile(provider, jsonFileName))
@@ -28,7 +26,6 @@ class Tester {
         headers: any = null,
         query: any = null,
     ): Promise<DiscordPayload | null> {
-        LoggerUtil.init()
         try {
             const res = await provider.parse(body, headers, query)
             console.log(inspect(res, false, null, true))

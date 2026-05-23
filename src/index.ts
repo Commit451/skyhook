@@ -30,17 +30,15 @@ import { Unity } from './provider/Unity.ts'
 import { UptimeRobot } from './provider/UptimeRobot.ts'
 import { VSTS } from './provider/VSTS.ts'
 import { ErrorUtil } from './util/ErrorUtil.ts'
-import { LoggerUtil } from './util/LoggerUtil.ts'
-import type { Type } from './util/TSUtility.ts'
+import { logger } from './util/logger.ts'
 
-LoggerUtil.init()
-
-const logger = LoggerUtil.logger()
 logger.debug('Logger set up successfully.')
 
 const app = new Hono()
 
-const providers: Type<BaseProvider>[] = [
+type ProviderClass = new () => BaseProvider
+
+const providers: ProviderClass[] = [
     AppCenter,
     AppVeyor,
     Basecamp,
@@ -66,23 +64,17 @@ const providers: Type<BaseProvider>[] = [
     VSTS,
 ]
 
-const providersMap = new Map<string, Type<BaseProvider>>()
-const providerNames: string[] = []
-const providerInstances: BaseProvider[] = []
+const providersMap = new Map<string, ProviderClass>()
 const providerInfos: { name: string; path: string }[] = []
-providers.forEach((Provider) => {
+for (const Provider of providers) {
     const instance = new Provider()
-    providerInstances.push(instance)
     providersMap.set(instance.getPath(), Provider)
     logger.debug(`Adding provider: ${instance.getName()}`)
-    providerNames.push(instance.getName())
-    const providerInfo = {
+    providerInfos.push({
         name: instance.getName(),
         path: instance.getPath(),
-    }
-    providerInfos.push(providerInfo)
-})
-providerNames.sort()
+    })
+}
 
 app.use('*', cors())
 app.use('/*', serveStatic({ root: './public' }))
