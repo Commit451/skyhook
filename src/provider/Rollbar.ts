@@ -1,16 +1,15 @@
-import { Embed } from '../model/DiscordApi.js'
-import { TypeParseProvider } from '../provider/BaseProvider.js'
+import type { Embed } from '../model/DiscordApi.ts'
+import { TypeParseProvider } from '../provider/BaseProvider.ts'
 
 /**
  * https://docs.rollbar.com/docs/webhooks
  */
 export class Rollbar extends TypeParseProvider {
-
     private embed: Embed
 
     constructor() {
         super()
-        this.setEmbedColor(0x3884CB)
+        this.setEmbedColor(0x3884cb)
         this.embed = {}
     }
 
@@ -31,7 +30,7 @@ export class Rollbar extends TypeParseProvider {
             'occurrence',
             'reactivatedItem',
             'reopenedItem',
-            'resolvedItem'
+            'resolvedItem',
         ]
     }
 

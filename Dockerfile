@@ -1,24 +1,24 @@
-FROM node:24 as buildenv
+FROM node:24 AS build
 
 WORKDIR /app
-COPY . .
-RUN npm install && npm run build
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY tsconfig.json ./
+COPY src ./src
+RUN npm run build
 
-FROM node:24
+FROM node:24-slim
 
-RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-ARG NODE_ENV
-ENV NODE_ENV $NODE_ENV
-COPY package.json /usr/src/app/
-COPY package-lock.json /usr/src/app/
-RUN npm install && npm cache clean --force
-COPY . /usr/src/app
+ARG NODE_ENV=production
+ENV NODE_ENV=$NODE_ENV
 
-RUN mkdir dist
-COPY --from=buildenv /app/dist /usr/src/app/dist
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+
+COPY --from=build /app/dist ./dist
+COPY public ./public
 
 EXPOSE 8080
-
-CMD [ "npm", "run", "start" ]
+CMD ["node", "dist/index.js"]

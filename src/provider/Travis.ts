@@ -1,17 +1,16 @@
-import { Embed } from '../model/DiscordApi.js'
-import { DirectParseProvider } from '../provider/BaseProvider.js'
+import type { Embed } from '../model/DiscordApi.ts'
+import { DirectParseProvider } from '../provider/BaseProvider.ts'
 
 /**
  * https://docs.travis-ci.com/user/notifications/#Configuring-webhook-notifications
  */
 export class Travis extends DirectParseProvider {
-
     // States https://github.com/travis-ci/travis-api/blob/master/lib/travis/model/build/states.rb#L25
     private static STATUS_COLORS: Record<string, number> = {
         passed: 0x39aa56,
         failed: 0xdb4545,
         errored: 0xdb4545,
-        canceled: 0x9d9d9d
+        canceled: 0x9d9d9d,
     }
 
     public getName(): string {
@@ -36,7 +35,7 @@ export class Travis extends DirectParseProvider {
         embed.title = `[${targetBody.repository.name}:${targetBody.branch}] Build #${targetBody.number}: ${targetBody.status_message}`
         embed.url = targetBody.build_url
         const msg = targetBody.message.substring(0, targetBody.message.indexOf('\n'))
-        embed.description = `[\`${targetBody.commit.substring(0, 7)}\`](${targetBody.compare_url}) ${(msg.length > 50) ? msg.substring(0, 47) + '...' : msg}`
+        embed.description = `[\`${targetBody.commit.substring(0, 7)}\`](${targetBody.compare_url}) ${msg.length > 50 ? msg.substring(0, 47) + '...' : msg}`
 
         if (targetBody.state != null) {
             if (Travis.STATUS_COLORS[targetBody.state] != null) {

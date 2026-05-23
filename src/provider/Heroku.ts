@@ -1,17 +1,16 @@
-import { DirectParseProvider } from '../provider/BaseProvider.js'
 import gravatar from 'gravatar'
+import { DirectParseProvider } from '../provider/BaseProvider.ts'
 
 /**
  * https://devcenter.heroku.com/articles/app-webhooks
  */
 export class Heroku extends DirectParseProvider {
-
     public getName(): string {
         return 'Heroku'
     }
 
     public async parseData(): Promise<void> {
-        this.setEmbedColor(0xC9C3E6)
+        this.setEmbedColor(0xc9c3e6)
         const action: string = this.actionAsPastTense(this.body.action)
         const type: string = this.typeAsReadable(this.body.webhook_metadata.event.include)
         const authorName: string = this.body.actor.email
@@ -25,7 +24,7 @@ export class Heroku extends DirectParseProvider {
             url: this.body.data.web_url,
             author: {
                 name: authorName,
-                icon_url: gravatar.url(this.body.actor.email, { s: '100', r: 'x', d: 'retro' }, true)
+                icon_url: gravatar.url(this.body.actor.email, { s: '100', r: 'x', d: 'retro' }, true),
             },
         })
     }

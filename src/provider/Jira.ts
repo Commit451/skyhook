@@ -1,5 +1,5 @@
-import { Embed } from '../model/DiscordApi.js'
-import { DirectParseProvider } from '../provider/BaseProvider.js'
+import type { Embed } from '../model/DiscordApi.ts'
+import { DirectParseProvider } from '../provider/BaseProvider.ts'
 
 /**
  * https://developer.atlassian.com/server/jira/platform/webhooks/
@@ -49,7 +49,7 @@ export class Jira extends DirectParseProvider {
         // create the embed
         const embed: Embed = {
             title: `${issue.key} - ${issue.fields.summary}`,
-            url: this.createBrowseUrl(issue)
+            url: this.createBrowseUrl(issue),
         }
         if (isIssue) {
             embed.description = `${user.displayName} ${action} issue: ${embed.title}${issueHasAsignee ? ` (${issue.fields.assignee.displayName})` : ''} `
@@ -60,7 +60,7 @@ export class Jira extends DirectParseProvider {
         this.addEmbed(embed)
     }
 
-    private createBrowseUrl(issue: { self: string, key: string }): string {
+    private createBrowseUrl(issue: { self: string; key: string }): string {
         const url: URL = new URL(issue.self)
         const path: string | RegExpMatchArray = url.pathname.match(/.+?(?=\/rest\/api)/) ?? ''
         url.pathname = `${path}/browse/${issue.key}`

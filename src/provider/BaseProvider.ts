@@ -1,21 +1,17 @@
 import camel from 'camelcase'
-import winston from 'winston'
-import { DiscordPayload, Embed } from '../model/DiscordApi.js'
-import { LoggerUtil } from '../util/LoggerUtil.js'
+import type winston from 'winston'
+import type { DiscordPayload, Embed } from '../model/DiscordApi.ts'
+import { LoggerUtil } from '../util/LoggerUtil.ts'
 
 /**
  * Base provider, which all other providers will subclass. You can then
  * use the provided methods to format the data to Discord
  */
 export abstract class BaseProvider {
-
     protected payload: DiscordPayload
     protected logger: winston.Logger
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     protected headers: any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     protected body: any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     protected query: any
     // all embeds will use this color
     protected embedColor: number | null
@@ -40,12 +36,11 @@ export abstract class BaseProvider {
 
     /**
      * Parse the request and respond with a DiscordPayload
-     * 
+     *
      * @param body the request body
      * @param headers the request headers
      * @param query the query
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-module-boundary-types
     public async parse(body: any, headers: any = null, query: any = null): Promise<DiscordPayload | null> {
         this.body = body
         this.headers = headers
@@ -88,7 +83,7 @@ export abstract class BaseProvider {
         // add the footer to all embeds added
         embed.footer = {
             text: 'Powered by skyhookapi.com',
-            icon_url: 'https://skyhookapi.com/images/skyhook-tiny.png'
+            icon_url: 'https://skyhookapi.com/images/skyhook-tiny.png',
         }
         if (this.embedColor != null) {
             embed.color = this.embedColor
@@ -109,7 +104,6 @@ export abstract class BaseProvider {
  * Subclasses should implement parse logic in the parseData method.
  */
 export abstract class DirectParseProvider extends BaseProvider {
-
     public abstract parseData(): Promise<void>
 
     protected async parseImpl(): Promise<void> {
@@ -125,7 +119,6 @@ export abstract class DirectParseProvider extends BaseProvider {
  * is found, nothing will be executed.
  */
 export abstract class TypeParseProvider extends BaseProvider {
-
     public abstract getType(): string | null
 
     public abstract knownTypes(): string[]
@@ -133,7 +126,7 @@ export abstract class TypeParseProvider extends BaseProvider {
     /**
      * Formats the type passed to make it work as a method reference. This means removing underscores
      * and camel casing.
-     * 
+     *
      * @param type the event type
      */
     public static formatType(type: string | null): string | null {
@@ -145,12 +138,9 @@ export abstract class TypeParseProvider extends BaseProvider {
     }
 
     protected async parseImpl(): Promise<void> {
-
         const type = TypeParseProvider.formatType(this.getType())
         if (type != null) {
-
             if (this.knownTypes().includes(type)) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const method: () => Promise<void> | null = (this as any)[type]
                 if (method != null && typeof method === 'function') {
                     this.logger.info(`Calling ${type}() in ${this.constructor.name} provider.`)
@@ -162,5 +152,4 @@ export abstract class TypeParseProvider extends BaseProvider {
         // If we didn't succeed, dont send anything.
         this.nullifyPayload()
     }
-
 }

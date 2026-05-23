@@ -1,11 +1,13 @@
-import { expect } from 'chai'
-import { Trello } from '../../src/provider/Trello.js'
-import { Tester } from '../Tester.js'
+import assert from 'node:assert/strict'
+import { describe, it } from 'node:test'
+import { Trello } from '../../src/provider/Trello.ts'
+import { Tester } from '../Tester.ts'
 
 describe('/POST trello', () => {
     it('commentCard', async () => {
         const res = await Tester.test(new Trello(), 'trello.json', null)
-        expect(res).to.not.be.null
-        expect(res!.embeds).to.be.an('array').that.has.length(1)
+        assert.notStrictEqual(res, null)
+        assert.ok(Array.isArray(res!.embeds))
+        assert.strictEqual(res!.embeds.length, 1)
     })
 })

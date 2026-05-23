@@ -1,36 +1,43 @@
-import { Embed } from '../model/DiscordApi.js'
-import { DirectParseProvider } from '../provider/BaseProvider.js'
 import { DateTime } from 'luxon'
+import type { Embed } from '../model/DiscordApi.ts'
+import { DirectParseProvider } from '../provider/BaseProvider.ts'
 
-enum InstanaEventType {
-    OPEN = 'OPEN',
-    CLOSED = 'CLOSED',
-    CHANGE_EVENT = 'CHANGE EVENT'
-}
+const InstanaEventType = {
+    OPEN: 'OPEN',
+    CLOSED: 'CLOSED',
+    CHANGE_EVENT: 'CHANGE EVENT',
+} as const
 
 /**
  * https://www.instana.com/docs/ecosystem/webhook/
  */
 export class Instana extends DirectParseProvider {
-
     constructor() {
         super()
-        this.setEmbedColor(0x54C0DE)
+        this.setEmbedColor(0x54c0de)
     }
 
     private getEventType(): string {
         return this.body.issue.state || InstanaEventType.CHANGE_EVENT
     }
 
-    private addField(embed: Embed, inline: boolean, name: string, fieldValue: string | number, isValueDate: boolean): void {
+    private addField(
+        embed: Embed,
+        inline: boolean,
+        name: string,
+        fieldValue: string | number,
+        isValueDate: boolean,
+    ): void {
         if (!fieldValue) {
             return
         }
 
         embed.fields!.push({
             name,
-            value: isValueDate ? DateTime.fromMillis(fieldValue as number).toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS) : fieldValue as string,
-            inline
+            value: isValueDate
+                ? DateTime.fromMillis(fieldValue as number).toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS)
+                : (fieldValue as string),
+            inline,
         })
     }
 

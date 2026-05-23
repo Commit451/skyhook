@@ -1,17 +1,18 @@
 {
   "compilerOptions": {
-    "module": "Node16",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2023",
     "strict": true,
     "useUnknownInCatchVariables": false,
     "esModuleInterop": true,
-    "target": "ES2022",
-    "moduleResolution": "node16",
+    "skipLibCheck": true,
     "sourceMap": true,
     "outDir": "dist",
-    "baseUrl": ".",
-    "skipLibCheck": true
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true
   },
-  "include": [
-    "src"
-  ],
+  "include": ["src"]
 }

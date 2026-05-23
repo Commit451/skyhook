@@ -1,16 +1,19 @@
-import { inspect } from 'util'
-import { BaseProvider } from '../src/provider/BaseProvider.js'
-import { LoggerUtil } from '../src/util/LoggerUtil.js'
-import { DiscordPayload } from '../src/model/DiscordApi.js'
-import { readFileSync } from 'fs'
+import { readFileSync } from 'node:fs'
+import { inspect } from 'node:util'
+import type { DiscordPayload } from '../src/model/DiscordApi.ts'
+import type { BaseProvider } from '../src/provider/BaseProvider.ts'
+import { LoggerUtil } from '../src/util/LoggerUtil.ts'
 
 /**
  * Helps with testing things
  */
 class Tester {
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public static async test(provider: BaseProvider, jsonFileName: string | null = null, headers: any = null, query: any = null): Promise<DiscordPayload | null> {
+    public static async test(
+        provider: BaseProvider,
+        jsonFileName: string | null = null,
+        headers: any = null,
+        query: any = null,
+    ): Promise<DiscordPayload | null> {
         LoggerUtil.init()
         let requestBody = null
         if (jsonFileName != null) {
@@ -19,8 +22,12 @@ class Tester {
         return Tester.testWithBody(provider, requestBody, headers, query)
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public static async testWithBody(provider: BaseProvider, body: Record<string, any> | null = null, headers: any = null, query: any = null): Promise<DiscordPayload | null> {
+    public static async testWithBody(
+        provider: BaseProvider,
+        body: Record<string, any> | null = null,
+        headers: any = null,
+        query: any = null,
+    ): Promise<DiscordPayload | null> {
         LoggerUtil.init()
         try {
             const res = await provider.parse(body, headers, query)

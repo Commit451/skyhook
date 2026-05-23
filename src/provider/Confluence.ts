@@ -1,5 +1,5 @@
-import { Embed } from '../model/DiscordApi.js'
-import { DirectParseProvider } from '../provider/BaseProvider.js'
+import type { Embed } from '../model/DiscordApi.ts'
+import { DirectParseProvider } from '../provider/BaseProvider.ts'
 
 /**
  * https://developer.atlassian.com/server/jira/platform/webhooks/
@@ -58,7 +58,6 @@ export class Confluence extends DirectParseProvider {
             this.nullifyPayload()
             return
         }
-
     }
 
     private attachmentEvent(event: string, user: string): Embed {
@@ -78,7 +77,7 @@ export class Confluence extends DirectParseProvider {
         const space = this.body.attachedTo.spaceName
         const content_type = this.body.attachedTo.contentType
         const url = this.body.attachedTo.self
-        let description
+        let description: string
 
         if (event.startsWith('attachment_removed')) {
             description = user + ' ' + action + ' from ' + content_type + ' ' + content_title + ' in ' + space
@@ -91,7 +90,7 @@ export class Confluence extends DirectParseProvider {
         const embed: Embed = {
             title: title,
             url: url,
-            description: description
+            description: description,
         }
 
         return embed
@@ -114,7 +113,7 @@ export class Confluence extends DirectParseProvider {
         const embed: Embed = {
             title: title,
             url: url,
-            description: user + ' ' + action + ' ' + content_title
+            description: user + ' ' + action + ' ' + content_title,
         }
 
         return embed
@@ -138,7 +137,7 @@ export class Confluence extends DirectParseProvider {
         const embed: Embed = {
             title: title,
             url: url,
-            description: user + ' ' + action + ' on ' + content_type + ' ' + content_title + ' in ' + space
+            description: user + ' ' + action + ' on ' + content_type + ' ' + content_title + ' in ' + space,
         }
 
         return embed
@@ -158,9 +157,9 @@ export class Confluence extends DirectParseProvider {
         const label_title = this.body.label.name
         const space = this.body.labeled.spaceName
         const url = this.body.label.self
-        let description
-        let content_title
-        let content_type
+        let description: string | undefined
+        let content_title: string | undefined
+        let content_type: string | undefined
 
         if (event.startsWith('label_created') || event.startsWith('label_deleted')) {
             description = user + ' ' + action + ' ' + label_title
@@ -177,7 +176,7 @@ export class Confluence extends DirectParseProvider {
         const embed: Embed = {
             title: title,
             url: url,
-            description: description
+            description: description,
         }
 
         return embed
@@ -203,7 +202,7 @@ export class Confluence extends DirectParseProvider {
         const embed: Embed = {
             title: title,
             url: url,
-            description: user + ' ' + action + ' ' + content_title
+            description: user + ' ' + action + ' ' + content_title,
         }
 
         return embed
@@ -228,7 +227,7 @@ export class Confluence extends DirectParseProvider {
         const embed: Embed = {
             title: title,
             url: url,
-            description: user + ' ' + action + ' ' + content_title
+            description: user + ' ' + action + ' ' + content_title,
         }
 
         return embed
@@ -249,7 +248,7 @@ export class Confluence extends DirectParseProvider {
 
         const embed: Embed = {
             title: title,
-            description: title + ' ' + content_title
+            description: title + ' ' + content_title,
         }
 
         return embed
@@ -267,7 +266,7 @@ export class Confluence extends DirectParseProvider {
 
         const embed: Embed = {
             title: title,
-            description: title + ' ' + content_title
+            description: title + ' ' + content_title,
         }
 
         return embed
@@ -280,25 +279,27 @@ export class Confluence extends DirectParseProvider {
     //Utility Method for Setting Event Title
     private setEventTitle(event: string): string {
         const event_words = event.split('_')
-        if (event_words.length == 3) {
-            return this.capitalizeFirstLetter(event.split('_')[2]) +
-                ' ' + this.capitalizeFirstLetter(event.split('_')[1]) +
-                ' ' + this.capitalizeFirstLetter(event.split('_')[0])
+        if (event_words.length === 3) {
+            return (
+                this.capitalizeFirstLetter(event.split('_')[2]) +
+                ' ' +
+                this.capitalizeFirstLetter(event.split('_')[1]) +
+                ' ' +
+                this.capitalizeFirstLetter(event.split('_')[0])
+            )
         } else {
-            return this.capitalizeFirstLetter(event.split('_')[1]) +
-                ' ' + this.capitalizeFirstLetter(event.split('_')[0])
+            return (
+                this.capitalizeFirstLetter(event.split('_')[1]) + ' ' + this.capitalizeFirstLetter(event.split('_')[0])
+            )
         }
     }
     //Utility Method for Setting Event Title
     private setActionTitle(event: string): string {
         const event_words = event.split('_')
-        if (event_words.length == 3) {
-            return event.split('_')[2] +
-                ' ' + (event.split('_')[1]) +
-                ' ' + (event.split('_')[0])
+        if (event_words.length === 3) {
+            return event.split('_')[2] + ' ' + event.split('_')[1] + ' ' + event.split('_')[0]
         } else {
-            return event.split('_')[1] +
-                ' ' + event.split('_')[0]
+            return event.split('_')[1] + ' ' + event.split('_')[0]
         }
     }
-}   
+}

@@ -1,4 +1,4 @@
-import { Embed } from '../model/DiscordApi.js'
+import type { Embed } from '../model/DiscordApi.ts'
 
 // Regular Expressions
 const mdUL1 = /^={3,}$/
@@ -9,7 +9,6 @@ const italicRegex = /\*([^\\]*)\*/
 const imageRegex = /!\[.*\]\((.*)\)/
 
 export class MarkdownUtil {
-
     public static _formatMarkdownHeader(str: string): string {
         const lines = str.split('\n')
         for (let i = 0; i < lines.length; i++) {
@@ -51,27 +50,24 @@ export class MarkdownUtil {
     }
 
     public static _formatMarkdownBold(str: string): string {
-        let match
         while (boldRegex.test(str)) {
-            match = boldRegex.exec(str)!
+            const match = boldRegex.exec(str)!
             str = str.replace(boldRegex, '__' + match[1] + '__')
         }
         return str
     }
 
     public static _cleanupMarkdownBold(str: string): string {
-        let match
         while (cleanupRegex.test(str)) {
-            match = cleanupRegex.exec(str)!
+            const match = cleanupRegex.exec(str)!
             str = str.replace(cleanupRegex, '**' + match[1] + '**')
         }
         return str
     }
 
     public static _formatMarkdownItalic(str: string): string {
-        let match
         while (italicRegex.test(str)) {
-            match = italicRegex.exec(str)!
+            const match = italicRegex.exec(str)!
             str = str.replace(italicRegex, '_' + match[1] + '_')
         }
         return str
@@ -81,7 +77,7 @@ export class MarkdownUtil {
         if (imageRegex.test(str)) {
             const match = imageRegex.exec(str)!
             embed.image = {
-                url: match[1]
+                url: match[1],
             }
             str = str.replace(imageRegex, '')
         }
@@ -113,5 +109,4 @@ export class MarkdownUtil {
 
         return str
     }
-
 }

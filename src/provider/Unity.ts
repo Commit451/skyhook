@@ -1,10 +1,9 @@
-import { DirectParseProvider } from '../provider/BaseProvider.js'
+import { DirectParseProvider } from '../provider/BaseProvider.ts'
 
 /**
  * https://build-api.cloud.unity3d.com/docs/1.0.0/index.html#operation-webhooks-intro
  */
 export class Unity extends DirectParseProvider {
-
     public getName(): string {
         return 'Unity Cloud'
     }
@@ -14,13 +13,13 @@ export class Unity extends DirectParseProvider {
     }
 
     public async parseData(): Promise<void> {
-        this.setEmbedColor(0x222C37)
+        this.setEmbedColor(0x222c37)
         const projectName = this.body.projectName
         const projectVersion = this.body.buildNumber
         let share = null
         try {
             share = this.body.links.artifacts[0].files.href
-        } catch (err) {
+        } catch (_err) {
             // Artifact not present
         }
         const type = this.body.buildStatus
@@ -44,12 +43,11 @@ export class Unity extends DirectParseProvider {
             case 'failed':
                 content = '**Build failed**\n' + 'Latest version is still  #' + (projectVersion - 1) + '\n'
                 break
-
         }
         this.addEmbed({
             title: '[' + projectName + '] ' + ' version #' + projectVersion,
             url: download,
-            description: content
+            description: content,
         })
     }
 }

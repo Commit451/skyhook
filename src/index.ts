@@ -1,41 +1,37 @@
-import dotenv from 'dotenv'
-import { Hono, type Context } from 'hono'
-import type { ContentfulStatusCode } from 'hono/utils/http-status'
-import { cors } from 'hono/cors'
+import * as fs from 'node:fs'
 import { serve } from '@hono/node-server'
 import { serveStatic } from '@hono/node-server/serve-static'
-import { DiscordPayload } from './model/DiscordApi.js'
-import { BaseProvider } from './provider/BaseProvider.js'
-import { ErrorUtil } from './util/ErrorUtil.js'
-import { LoggerUtil } from './util/LoggerUtil.js'
-import * as fs from 'fs'
-
-import { AppCenter } from './provider/AppCenter.js'
-import { AppVeyor } from './provider/Appveyor.js'
-import { Basecamp } from './provider/Basecamp.js'
-import { BitBucket } from './provider/Bitbucket.js'
-import { BitBucketServer } from './provider/BitBucketServer.js'
-import { CircleCi } from './provider/CircleCi.js'
-import { Codacy } from './provider/Codacy.js'
-import { Confluence } from './provider/Confluence.js'
-import { DockerHub } from './provider/DockerHub.js'
-import { GitLab } from './provider/GitLab.js'
-import { Heroku } from './provider/Heroku.js'
-import { Instana } from './provider/Instana.js'
-import { Jenkins } from './provider/Jenkins.js'
-import { Jira } from './provider/Jira.js'
-import { NewRelic } from './provider/NewRelic.js'
-import { Patreon } from './provider/Patreon.js'
-import { Pingdom } from './provider/Pingdom.js'
-import { Rollbar } from './provider/Rollbar.js'
-import { Travis } from './provider/Travis.js'
-import { Trello } from './provider/Trello.js'
-import { Unity } from './provider/Unity.js'
-import { UptimeRobot } from './provider/UptimeRobot.js'
-import { VSTS } from './provider/VSTS.js'
-import { Type } from './util/TSUtility.js'
-
-dotenv.config()
+import { type Context, Hono } from 'hono'
+import { cors } from 'hono/cors'
+import type { ContentfulStatusCode } from 'hono/utils/http-status'
+import type { DiscordPayload } from './model/DiscordApi.ts'
+import { AppCenter } from './provider/AppCenter.ts'
+import { AppVeyor } from './provider/Appveyor.ts'
+import { Basecamp } from './provider/Basecamp.ts'
+import type { BaseProvider } from './provider/BaseProvider.ts'
+import { BitBucketServer } from './provider/BitBucketServer.ts'
+import { BitBucket } from './provider/Bitbucket.ts'
+import { CircleCi } from './provider/CircleCi.ts'
+import { Codacy } from './provider/Codacy.ts'
+import { Confluence } from './provider/Confluence.ts'
+import { DockerHub } from './provider/DockerHub.ts'
+import { GitLab } from './provider/GitLab.ts'
+import { Heroku } from './provider/Heroku.ts'
+import { Instana } from './provider/Instana.ts'
+import { Jenkins } from './provider/Jenkins.ts'
+import { Jira } from './provider/Jira.ts'
+import { NewRelic } from './provider/NewRelic.ts'
+import { Patreon } from './provider/Patreon.ts'
+import { Pingdom } from './provider/Pingdom.ts'
+import { Rollbar } from './provider/Rollbar.ts'
+import { Travis } from './provider/Travis.ts'
+import { Trello } from './provider/Trello.ts'
+import { Unity } from './provider/Unity.ts'
+import { UptimeRobot } from './provider/UptimeRobot.ts'
+import { VSTS } from './provider/VSTS.ts'
+import { ErrorUtil } from './util/ErrorUtil.ts'
+import { LoggerUtil } from './util/LoggerUtil.ts'
+import type { Type } from './util/TSUtility.ts'
 
 LoggerUtil.init()
 
@@ -67,13 +63,13 @@ const providers: Type<BaseProvider>[] = [
     Trello,
     Unity,
     UptimeRobot,
-    VSTS
+    VSTS,
 ]
 
 const providersMap = new Map<string, Type<BaseProvider>>()
 const providerNames: string[] = []
 const providerInstances: BaseProvider[] = []
-const providerInfos: { name: string, path: string }[] = []
+const providerInfos: { name: string; path: string }[] = []
 providers.forEach((Provider) => {
     const instance = new Provider()
     providerInstances.push(instance)
@@ -82,7 +78,7 @@ providers.forEach((Provider) => {
     providerNames.push(instance.getName())
     const providerInfo = {
         name: instance.getName(),
-        path: instance.getPath()
+        path: instance.getPath(),
     }
     providerInfos.push(providerInfo)
 })
@@ -97,7 +93,7 @@ app.get('/api/providers', (c) => c.json(providerInfos, 200))
 
 const info = {
     version: process.env.K_REVISION,
-    deployment: process.env.K_SERVICE
+    deployment: process.env.K_SERVICE,
 }
 app.get('/api/info', (c) => c.json(info, 200))
 
@@ -174,17 +170,22 @@ app.notFound((c) => c.text('Not Found', 404))
 
 const port = normalizePort(process.env.PORT || '8080')
 
-const server = serve({
-    fetch: app.fetch,
-    port: typeof port === 'number' ? port : 8080
-}, (addressInfo) => {
-    logger.debug(`Your app is listening on port ${addressInfo.port}. Test out with http://localhost:${addressInfo.port}/api/providers`)
-})
+const server = serve(
+    {
+        fetch: app.fetch,
+        port: typeof port === 'number' ? port : 8080,
+    },
+    (addressInfo) => {
+        logger.debug(
+            `Your app is listening on port ${addressInfo.port}. Test out with http://localhost:${addressInfo.port}/api/providers`,
+        )
+    },
+)
 
 function normalizePort(givenPort: string): string | number | boolean {
     const normalizedPort = parseInt(givenPort, 10)
 
-    if (isNaN(normalizedPort)) {
+    if (Number.isNaN(normalizedPort)) {
         // named pipe
         return givenPort
     }
@@ -201,7 +202,6 @@ function normalizePort(givenPort: string): string | number | boolean {
  * Parses the request body based on its Content-Type. Falls back to JSON if the
  * Content-Type is missing or unrecognized so providers that omit headers still work.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function parseRequestBody(c: Context): Promise<any> {
     const contentType = (c.req.header('content-type') || '').toLowerCase()
     if (contentType.includes('application/json')) {
@@ -241,9 +241,9 @@ async function sendPayload(
         const response = await fetch(discordEndpoint, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: jsonString
+            body: jsonString,
         })
         if (!response.ok) {
             const errorBody = await response.text()

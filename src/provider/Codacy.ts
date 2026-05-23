@@ -1,11 +1,10 @@
-import { Embed, EmbedField } from '../model/DiscordApi.js'
-import { DirectParseProvider } from '../provider/BaseProvider.js'
+import type { Embed, EmbedField } from '../model/DiscordApi.ts'
+import { DirectParseProvider } from '../provider/BaseProvider.ts'
 
 /**
  * https://support.codacy.com/hc/en-us/articles/207280359-WebHook-Notifications
  */
 export class Codacy extends DirectParseProvider {
-
     public getName(): string {
         return 'Codacy'
     }
@@ -22,13 +21,13 @@ export class Codacy extends DirectParseProvider {
             fields.push({
                 name: 'Fixed Issues',
                 value: this.body.commit.results.fixed_count || 0,
-                inline: true
+                inline: true,
             })
 
             fields.push({
                 name: 'New Issues',
                 value: this.body.commit.results.new_count || 0,
-                inline: true
+                inline: true,
             })
         }
         embed.fields = fields

@@ -1,10 +1,9 @@
-import { DirectParseProvider } from '../provider/BaseProvider.js'
+import { DirectParseProvider } from '../provider/BaseProvider.ts'
 
 /**
  * https://docs.newrelic.com/docs/alerts/new-relic-alerts/managing-notification-channels/customize-your-webhook-payload
  */
 export class NewRelic extends DirectParseProvider {
-
     public getName(): string {
         return 'New Relic'
     }
@@ -17,7 +16,7 @@ export class NewRelic extends DirectParseProvider {
         this.addEmbed({
             title: `${this.body.condition_name} ${this.body.current_state}`,
             url: this.body.incident_url,
-            description: this.body.details
+            description: this.body.details,
         })
     }
 }

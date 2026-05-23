@@ -1,13 +1,11 @@
-import { Embed } from '../model/DiscordApi.js'
-import { DirectParseProvider } from '../provider/BaseProvider.js'
-
 import TurndownService from 'turndown'
+import type { Embed } from '../model/DiscordApi.ts'
+import { DirectParseProvider } from '../provider/BaseProvider.ts'
 
 /**
  * https://github.com/basecamp/bc3-api/blob/master/sections/webhooks.md
  */
 export class Basecamp extends DirectParseProvider {
-
     private turndown: TurndownService
     private colorCreated = 0x00ff00
     private colorDeleted = 0xff0000
@@ -55,7 +53,7 @@ export class Basecamp extends DirectParseProvider {
                 this.prepareEmbed(this.colorEdited, 'changed comment', ['title'], true)
                 break
             case 'todolist_description_changed':
-                this.prepareEmbed(this.colorEdited, 'changed todolist\'s description', ['title'], true)
+                this.prepareEmbed(this.colorEdited, "changed todolist's description", ['title'], true)
                 break
             case 'todolist_created':
                 this.prepareEmbed(this.colorCreated, 'created todolist', ['title'], true)
@@ -89,16 +87,16 @@ export class Basecamp extends DirectParseProvider {
                 this.prepareEmbed(this.colorUnarchived, 'unarchived comment', ['title'], true)
                 break
             case 'vault_created':
-                this.prepareEmbed(this.colorCreated, 'created doc\'s folder', ['title'],)
+                this.prepareEmbed(this.colorCreated, "created doc's folder", ['title'])
                 break
             case 'vault_copied':
-                this.prepareEmbed(this.colorCreated, 'copied doc\'s folder', ['title'],)
+                this.prepareEmbed(this.colorCreated, "copied doc's folder", ['title'])
                 break
             case 'vault_inserted':
-                this.prepareEmbed(this.colorCreated, 'added doc\'s folder', ['title'],)
+                this.prepareEmbed(this.colorCreated, "added doc's folder", ['title'])
                 break
             case 'vault_title_changed':
-                this.prepareEmbed(this.colorEdited, 'changed folder\'s title', ['title'],)
+                this.prepareEmbed(this.colorEdited, "changed folder's title", ['title'])
                 break
             case 'vault_trashed':
                 this.prepareEmbed(this.colorDeleted, 'deleted folder', ['title'], true)
@@ -187,9 +185,9 @@ export class Basecamp extends DirectParseProvider {
             color: color,
             author: {
                 name: this.body.recording.creator.name,
-                icon_url: this.body.recording.creator.avatar_url
+                icon_url: this.body.recording.creator.avatar_url,
             },
-            fields: []
+            fields: [],
         }
 
         if (content) {

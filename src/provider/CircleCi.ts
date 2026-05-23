@@ -1,11 +1,10 @@
-import { Embed } from '../model/DiscordApi.js'
-import { DirectParseProvider } from '../provider/BaseProvider.js'
+import type { Embed } from '../model/DiscordApi.ts'
+import { DirectParseProvider } from '../provider/BaseProvider.ts'
 
 /**
  * https://circleci.com/docs/2.0/webhooks
  */
 export class CircleCi extends DirectParseProvider {
-
     public getName(): string {
         return 'CircleCi'
     }
@@ -40,8 +39,8 @@ export class CircleCi extends DirectParseProvider {
             url: url,
             description: description,
             author: {
-                name: committer
-            }
+                name: committer,
+            },
         }
 
         this.addEmbed(embed)

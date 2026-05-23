@@ -1,12 +1,11 @@
-import { Embed, EmbedField, EmbedAuthor } from '../model/DiscordApi.js'
-import { TypeParseProvider } from './BaseProvider.js'
+import type { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi.ts'
+import { TypeParseProvider } from './BaseProvider.ts'
 
 export class BitBucketServer extends TypeParseProvider {
-
     private embed: Embed
 
     private static _formatLargeString(str: string, limit = 256): string {
-        return (str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str)
+        return str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str
     }
 
     private static _titleCase(str: string, ifNull = 'None'): string {
@@ -62,17 +61,19 @@ export class BitBucketServer extends TypeParseProvider {
             'prCommentAdded',
             'prCommentEdited',
             'prCommentDeleted',
-            'mirrorRepoSynchronized'
+            'mirrorRepoSynchronized',
         ]
     }
 
     public async diagnosticsPing(): Promise<void> {
         this.embed.title = 'Test Connection'
         this.embed.description = 'You have successfully configured Skyhook with your BitBucket Server instance.'
-        this.embed.fields = [{
-            name: 'Test',
-            value: this.body.test
-        }]
+        this.embed.fields = [
+            {
+                name: 'Test',
+                value: this.body.test,
+            },
+        ]
 
         this.addEmbed(this.embed)
     }
@@ -89,7 +90,13 @@ export class BitBucketServer extends TypeParseProvider {
     public async repoModified(): Promise<void> {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.body.old.name}] Repository has been updated`
-        this.embed.url = this.extractBaseLink() + '/projects/' + this.body.new.project.key + '/repos/' + this.body.new.slug + '/browse'
+        this.embed.url =
+            this.extractBaseLink() +
+            '/projects/' +
+            this.body.new.project.key +
+            '/repos/' +
+            this.body.new.slug +
+            '/browse'
         this.addEmbed(this.embed)
     }
 
@@ -140,7 +147,7 @@ export class BitBucketServer extends TypeParseProvider {
     }
 
     public async prReviewerUnapproved(): Promise<void> {
-        this.formatPrPayload(('Removed approval for pull request'))
+        this.formatPrPayload('Removed approval for pull request')
         this.addEmbed(this.embed)
     }
 
@@ -208,13 +215,21 @@ export class BitBucketServer extends TypeParseProvider {
     private extractAuthor(): EmbedAuthor {
         return {
             name: this.body.actor.displayName,
-            icon_url: 'https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/44_Bitbucket_logo_logos-512.png'
+            icon_url: 'https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/44_Bitbucket_logo_logos-512.png',
         }
     }
 
     private extractPullRequestUrl(): string {
-        return this.extractBaseLink() + '/projects/' + this.body.pullRequest.fromRef.repository.project.key + '/repos/'
-            + this.body.pullRequest.fromRef.repository.slug + '/pull-requests/' + this.body.pullRequest.id + '/overview'
+        return (
+            this.extractBaseLink() +
+            '/projects/' +
+            this.body.pullRequest.fromRef.repository.project.key +
+            '/repos/' +
+            this.body.pullRequest.fromRef.repository.slug +
+            '/pull-requests/' +
+            this.body.pullRequest.id +
+            '/overview'
+        )
     }
 
     private extractPullRequestFields(): EmbedField[] {
@@ -222,13 +237,13 @@ export class BitBucketServer extends TypeParseProvider {
 
         fieldArray.push({
             name: 'From --> To',
-            value: `**Source branch:** ${this.body.pullRequest.fromRef.displayId} \n **Destination branch:** ${this.body.pullRequest.toRef.displayId} \n **State:** ${this.body.pullRequest.state}`
+            value: `**Source branch:** ${this.body.pullRequest.fromRef.displayId} \n **Destination branch:** ${this.body.pullRequest.toRef.displayId} \n **State:** ${this.body.pullRequest.state}`,
         })
 
         for (let i = 0; i < Math.min(this.body.pullRequest.reviewers.length, 18); i++) {
             fieldArray.push({
                 name: 'Reviewer',
-                value: this.body.pullRequest.reviewers[i].user.displayName
+                value: this.body.pullRequest.reviewers[i].user.displayName,
             })
         }
 
@@ -244,7 +259,14 @@ export class BitBucketServer extends TypeParseProvider {
     }
 
     private extractRepoUrl(): string {
-        return this.extractBaseLink() + '/projects/' + this.body.repository.project.key + '/repos/' + this.body.repository.slug + '/browse'
+        return (
+            this.extractBaseLink() +
+            '/projects/' +
+            this.body.repository.project.key +
+            '/repos/' +
+            this.body.repository.slug +
+            '/browse'
+        )
     }
 
     private extractRepoChangesField(): EmbedField[] {
@@ -253,7 +275,7 @@ export class BitBucketServer extends TypeParseProvider {
         for (let i = 0; i < Math.min(this.body.changes.length, 18); i++) {
             fieldArray.push({
                 name: 'Change',
-                value: `**Branch:** ${this.body.changes[i].ref.displayId} \n **Old Hash:** ${this.body.changes[i].fromHash.slice(0, 10)} \n **New Hash:** ${this.body.changes[i].toHash.slice(0, 10)} \n **Type:** ${this.body.changes[i].type}`
+                value: `**Branch:** ${this.body.changes[i].ref.displayId} \n **Old Hash:** ${this.body.changes[i].fromHash.slice(0, 10)} \n **New Hash:** ${this.body.changes[i].toHash.slice(0, 10)} \n **Type:** ${this.body.changes[i].type}`,
             })
         }
 
@@ -261,7 +283,15 @@ export class BitBucketServer extends TypeParseProvider {
     }
 
     private extractCommitCommentUrl(): string {
-        return this.extractBaseLink() + '/projects/' + this.body.repository.project.key + '/repos/' + this.body.repository.slug + '/commits/' + this.body.commit
+        return (
+            this.extractBaseLink() +
+            '/projects/' +
+            this.body.repository.project.key +
+            '/repos/' +
+            this.body.repository.slug +
+            '/commits/' +
+            this.body.commit
+        )
     }
 
     private extractBaseLink(): string {

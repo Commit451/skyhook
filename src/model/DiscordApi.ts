@@ -1,12 +1,12 @@
 /**
  * The data format needed for executing a webhook on Discord
- * 
+ *
  * @see https://discordapp.com/developers/docs/resources/webhook#execute-webhook
  */
 export interface DiscordPayload {
     /**
      * The message contents (up to 2000 characters).
-     * 
+     *
      * One of content, file, embeds are required.
      */
     content?: string
@@ -24,7 +24,7 @@ export interface DiscordPayload {
     tts?: boolean
     /**
      * Embedded rich content. Array can contain up to 10 embed objects.
-     * 
+     *
      * One of content, file, embeds are required.
      */
     embeds?: Embed[]
@@ -48,7 +48,7 @@ export interface Embed {
      * Type of embed (always "rich" for webhook embeds).
      * @deprecated Embed types should be considered deprecated and might be removed in a future API version.
      */
-    type?: EmbedType.RICH
+    type?: typeof EmbedType.RICH
     /**
      * Description of embed.
      */
@@ -98,40 +98,29 @@ export interface Embed {
 /**
  * Embed types are "loosely defined" and, for the most part, are not used
  * by our clients for rendering. Embed attributes power what is rendered.
- * 
+ *
  * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-types
  * @deprecated Embed types should be considered deprecated and might be removed in a future API version.
  */
-export enum EmbedType {
-    /**
-     * Generic embed rendered from embed attributes
-     */
-    RICH = 'rich',
-    /**
-     * Image embed
-     */
-    IMAGE = 'image',
-    /**
-     * Video embed.
-     */
-    VIDEO = 'video',
-    /**
-     * Animated gif image embed rendered as a video embed.
-     */
-    GIFV = 'gifv',
-    /**
-     * Article embed.
-     */
-    ARTICLE = 'article',
-    /**
-     * Link embed.
-     */
-    LINK = 'link'
-}
+export const EmbedType = {
+    /** Generic embed rendered from embed attributes */
+    RICH: 'rich',
+    /** Image embed */
+    IMAGE: 'image',
+    /** Video embed */
+    VIDEO: 'video',
+    /** Animated gif image embed rendered as a video embed */
+    GIFV: 'gifv',
+    /** Article embed */
+    ARTICLE: 'article',
+    /** Link embed */
+    LINK: 'link',
+} as const
+export type EmbedType = (typeof EmbedType)[keyof typeof EmbedType]
 
 /**
  * Embed Footer
- * 
+ *
  * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-footer-structure
  */
 export interface EmbedFooter {
@@ -151,7 +140,7 @@ export interface EmbedFooter {
 
 /**
  * Embed Image
- * 
+ *
  * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure
  */
 export interface EmbedImage {
@@ -175,7 +164,7 @@ export interface EmbedImage {
 
 /**
  * Embed Thumbnail
- * 
+ *
  * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-thumbnail-structure
  */
 export interface EmbedThumbnail {
@@ -199,7 +188,7 @@ export interface EmbedThumbnail {
 
 /**
  * Embed Video
- * 
+ *
  * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-video-structure
  */
 export interface EmbedVideo {
@@ -223,7 +212,7 @@ export interface EmbedVideo {
 
 /**
  * Embed Provider
- * 
+ *
  * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-provider-structure
  */
 export interface EmbedProvider {
@@ -239,7 +228,7 @@ export interface EmbedProvider {
 
 /**
  * Embed Author
- * 
+ *
  * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure
  */
 export interface EmbedAuthor {
@@ -263,7 +252,7 @@ export interface EmbedAuthor {
 
 /**
  * Embed Field
- * 
+ *
  * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
  */
 export interface EmbedField {
@@ -287,13 +276,13 @@ export interface EmbedField {
  * against message content to avoid phantom pings (e.g. to ping everyone,
  * you must still have @everyone in the message content), and check against
  * user/bot permissions.
- * 
+ *
  * @see https://discord.com/developers/docs/resources/channel#allowed-mentions-object-allowed-mentions-structure
  */
 export interface AllowedMentions {
     /**
      * An array of allowed mention types to parse from the content.
-     * 
+     *
      * The parse field is mutually exclusive with the other fields. If parse is
      * defined, the other fields must be undefined or falsy (ie [], null), and
      * vice-versa.
@@ -315,20 +304,15 @@ export interface AllowedMentions {
 
 /**
  * Allowed Mention Types
- * 
+ *
  * @see https://discord.com/developers/docs/resources/channel#allowed-mentions-object-allowed-mention-types
  */
-export enum AllowedMentionType {
-    /**
-     * Controls role mentions.
-     */
-    ROLES = 'roles',
-    /**
-     * Controls user mentions.
-     */
-    USERS = 'users',
-    /**
-     * Controls @everyone and @here mentions.
-     */
-    EVERYONE = 'everyone'
-}
+export const AllowedMentionType = {
+    /** Controls role mentions */
+    ROLES: 'roles',
+    /** Controls user mentions */
+    USERS: 'users',
+    /** Controls @everyone and @here mentions */
+    EVERYONE: 'everyone',
+} as const
+export type AllowedMentionType = (typeof AllowedMentionType)[keyof typeof AllowedMentionType]

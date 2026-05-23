@@ -5,14 +5,13 @@
 .dockerignore
 .git/
 .gitignore
+.github/
 .vscode/
+.idea/
 README.md
 CONTRIBUTING.md
 docs/
 images/
 License
-nodemon.json
-.eslintignore
-.eslintrc.json
 .gcloudignore
 .nvmrc

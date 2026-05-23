@@ -1,11 +1,10 @@
-import { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi.js'
-import { TypeParseProvider } from '../provider/BaseProvider.js'
+import type { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi.ts'
+import { TypeParseProvider } from '../provider/BaseProvider.ts'
 
 /**
  * https://docs.microsoft.com/en-us/vsts/service-hooks/create-subscription
  */
 export class VSTS extends TypeParseProvider {
-
     private embed: Embed
 
     constructor() {
@@ -40,68 +39,108 @@ export class VSTS extends TypeParseProvider {
             'msVssReleaseDeploymentApprovalCompleted',
             'msVssReleaseDeploymentApprovalPendingEvent',
             'msVssReleaseDeploymentCompletedEvent',
-            'msVssReleaseDeplyomentStartedEvent'
+            'msVssReleaseDeplyomentStartedEvent',
         ]
     }
 
     // PUSH
     public async gitPush(): Promise<void> {
         const fields: EmbedField[] = []
-        this.body.resource.commits.forEach((commit: { commitId: string, comment: string }) => {
+        this.body.resource.commits.forEach((commit: { commitId: string; comment: string }) => {
             fields.push({
                 name: 'Commit from ' + this.body.resource.pushedBy.displayName,
-                value: '([`' + commit.commitId.substring(0, 7) + '`](' + this.body.resource.repository.remoteUrl + '/commit/' + commit.commitId + ')) ' + commit.comment,
-                inline: false
+                value:
+                    '([`' +
+                    commit.commitId.substring(0, 7) +
+                    '`](' +
+                    this.body.resource.repository.remoteUrl +
+                    '/commit/' +
+                    commit.commitId +
+                    ')) ' +
+                    commit.comment,
+                inline: false,
             })
         })
         this.embed.fields = fields
         this.embed.author = {
             name: this.body.resource.pushedBy.displayName,
-            icon_url: this.body.resource.pushedBy.imageUrl
+            icon_url: this.body.resource.pushedBy.imageUrl,
         }
         this.addMinimalMessage()
     }
 
     // CHECK IN
     public async tfvcCheckin(): Promise<void> {
-        this.embed.fields = [{
-            name: 'Check in from ' + this.body.resource.checkedInBy.displayName,
-            value: '([`' + this.body.resource.changesetId + '`](' + this.body.resource.url + ')) ' + this.body.resource.comment,
-            inline: false
-        }]
+        this.embed.fields = [
+            {
+                name: 'Check in from ' + this.body.resource.checkedInBy.displayName,
+                value:
+                    '([`' +
+                    this.body.resource.changesetId +
+                    '`](' +
+                    this.body.resource.url +
+                    ')) ' +
+                    this.body.resource.comment,
+                inline: false,
+            },
+        ]
         this.addMinimalMessage()
     }
 
     // PULL REQUEST
     public async gitPullrequestCreated(): Promise<void> {
         this.embed.author = this.extractCreatedByAuthor()
-        this.embed.fields = [{
-            name: 'Pull Request from ' + this.body.resource.createdBy.displayName,
-            value: '([`' + this.body.resource.title + '`](' + this.body.resource.repository.remoteUrl + ')) ' + this.body.resource.description,
-            inline: false
-        }]
+        this.embed.fields = [
+            {
+                name: 'Pull Request from ' + this.body.resource.createdBy.displayName,
+                value:
+                    '([`' +
+                    this.body.resource.title +
+                    '`](' +
+                    this.body.resource.repository.remoteUrl +
+                    ')) ' +
+                    this.body.resource.description,
+                inline: false,
+            },
+        ]
         this.addMinimalMessage()
     }
 
     // PULL REQUEST MERGE COMMIT
     public async gitPullrequestMerged(): Promise<void> {
         this.embed.author = this.extractCreatedByAuthor()
-        this.embed.fields = [{
-            name: 'Pull Request Merge Commit from ' + this.body.resource.createdBy.displayName,
-            value: '([`' + this.body.resource.title + '`](' + this.body.resource.repository.remoteUrl + ')) ' + this.body.resource.description,
-            inline: false
-        }]
+        this.embed.fields = [
+            {
+                name: 'Pull Request Merge Commit from ' + this.body.resource.createdBy.displayName,
+                value:
+                    '([`' +
+                    this.body.resource.title +
+                    '`](' +
+                    this.body.resource.repository.remoteUrl +
+                    ')) ' +
+                    this.body.resource.description,
+                inline: false,
+            },
+        ]
         this.addMinimalMessage()
     }
 
     // PULL REQUEST UPDATED
     public async gitPullrequestUpdated(): Promise<void> {
         this.embed.author = this.extractCreatedByAuthor()
-        this.embed.fields = [{
-            name: 'Pull Request Updated by ' + this.body.resource.createdBy.displayName,
-            value: '([`' + this.body.resource.title + '`](' + this.body.resource.repository.remoteUrl + ')) ' + this.body.resource.description,
-            inline: false
-        }]
+        this.embed.fields = [
+            {
+                name: 'Pull Request Updated by ' + this.body.resource.createdBy.displayName,
+                value:
+                    '([`' +
+                    this.body.resource.title +
+                    '`](' +
+                    this.body.resource.repository.remoteUrl +
+                    ')) ' +
+                    this.body.resource.description,
+                inline: false,
+            },
+        ]
         this.addMinimalMessage()
     }
 
@@ -179,7 +218,7 @@ export class VSTS extends TypeParseProvider {
     private extractCreatedByAuthor(): EmbedAuthor {
         return {
             name: this.body.resource.createdBy.displayName,
-            icon_url: this.body.resource.createdBy.imageUrl
+            icon_url: this.body.resource.createdBy.imageUrl,
         }
     }
 }

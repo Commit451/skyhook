@@ -5,18 +5,18 @@ import winston from 'winston'
  * Helps with logging things. Basically a Winston helper
  */
 export class LoggerUtil {
-
     public static init(): void {
-        if (!this.isInitialized) {
+        if (!LoggerUtil.isInitialized) {
             winston.loggers.add('logger', {
                 format: winston.format.combine(
                     winston.format.colorize(),
-                    winston.format.printf((info) => `[${DateTime.local().toFormat('yyyy-MM-dd TT').trim()}] [${info.level}]: ${info.message}`)
+                    winston.format.printf(
+                        (info) =>
+                            `[${DateTime.local().toFormat('yyyy-MM-dd TT').trim()}] [${info.level}]: ${info.message}`,
+                    ),
                 ),
                 level: process.env.PRODUCTION ? 'info' : 'debug',
-                transports: [
-                    new winston.transports.Console()
-                ]
+                transports: [new winston.transports.Console()],
             })
         }
     }

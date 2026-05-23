@@ -1,11 +1,13 @@
-import { expect } from 'chai'
-import { Pingdom } from '../../src/provider/Pingdom.js'
-import { Tester } from '../Tester.js'
+import assert from 'node:assert/strict'
+import { describe, it } from 'node:test'
+import { Pingdom } from '../../src/provider/Pingdom.ts'
+import { Tester } from '../Tester.ts'
 
 describe('/POST pingdom', () => {
     it('check', async () => {
         const res = await Tester.test(new Pingdom(), 'pingdom.json', null)
-        expect(res).to.not.be.null
-        expect(res!.embeds).to.be.an('array').that.has.length(1)
+        assert.notStrictEqual(res, null)
+        assert.ok(Array.isArray(res!.embeds))
+        assert.strictEqual(res!.embeds.length, 1)
     })
 })

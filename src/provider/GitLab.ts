@@ -1,11 +1,10 @@
-import { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi.js'
-import { TypeParseProvider } from '../provider/BaseProvider.js'
+import type { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi.ts'
+import { TypeParseProvider } from '../provider/BaseProvider.ts'
 
 interface Project {
     name: string
     url: string
     branch: string
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     commits: any[]
     totalCommitsCount: number
 }
@@ -14,7 +13,6 @@ interface Project {
  * https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/user/project/integrations/webhooks.md
  */
 export class GitLab extends TypeParseProvider {
-
     private static _formatAvatarURL(url: string): string {
         if (!/^https?:\/\/|^\/\//i.test(url)) {
             return 'https://gitlab.com' + url
@@ -26,7 +24,7 @@ export class GitLab extends TypeParseProvider {
 
     constructor() {
         super()
-        this.setEmbedColor(0xFCA326)
+        this.setEmbedColor(0xfca326)
         this.embed = {}
     }
 
@@ -39,16 +37,7 @@ export class GitLab extends TypeParseProvider {
     }
 
     public knownTypes(): string[] {
-        return [
-            'push',
-            'tagPush',
-            'issue',
-            'note',
-            'mergeRequest',
-            'wikiPage',
-            'pipeline',
-            'build'
-        ]
+        return ['push', 'tagPush', 'issue', 'note', 'mergeRequest', 'wikiPage', 'pipeline', 'build']
     }
 
     public async push(): Promise<void> {
@@ -62,15 +51,32 @@ export class GitLab extends TypeParseProvider {
             const fields: EmbedField[] = []
 
             for (const commit of project.commits) {
-                const message = (commit.message.length > 256) ? commit.message.substring(0, 255) + '\u2026' : commit.message
+                const message =
+                    commit.message.length > 256 ? commit.message.substring(0, 255) + '\u2026' : commit.message
                 fields.push({
                     name: 'Commit from ' + commit.author.name,
-                    value: '(' + '[`' + commit.id.substring(0, 7) + '`](' + commit.url + ')' + ') ' + (message == null ? '' : message.replace(/\n/g, ' ').replace(/\r/g, ' ')),
-                    inline: false
+                    value:
+                        '(' +
+                        '[`' +
+                        commit.id.substring(0, 7) +
+                        '`](' +
+                        commit.url +
+                        ')' +
+                        ') ' +
+                        (message == null ? '' : message.replace(/\n/g, ' ').replace(/\r/g, ' ')),
+                    inline: false,
                 })
             }
 
-            this.embed.title = '[' + project.name + ':' + project.branch + '] ' + project.totalCommitsCount + ' commit' + ((project.totalCommitsCount > 1) ? 's' : '')
+            this.embed.title =
+                '[' +
+                project.name +
+                ':' +
+                project.branch +
+                '] ' +
+                project.totalCommitsCount +
+                ' commit' +
+                (project.totalCommitsCount > 1 ? 's' : '')
             this.embed.url = project.url + '/tree/' + project.branch
             this.embed.fields = fields
         } else {
@@ -97,7 +103,12 @@ export class GitLab extends TypeParseProvider {
 
         this.embed.url = project.url + '/tags/' + tag
         this.embed.author = this.authorFromBodyPush()
-        this.embed.description = (this.body.message != null) ? ((this.body.message.length > 1024) ? this.body.message.substring(0, 1023) + '\u2026' : this.body.message) : ''
+        this.embed.description =
+            this.body.message != null
+                ? this.body.message.length > 1024
+                    ? this.body.message.substring(0, 1023) + '\u2026'
+                    : this.body.message
+                : ''
         if (this.body.after !== '0000000000000000000000000000000000000000') {
             this.embed.title = `Pushed tag "${tag}" to ${project.name}`
         } else {
@@ -111,17 +122,27 @@ export class GitLab extends TypeParseProvider {
             open: 'Opened',
             close: 'Closed',
             reopen: 'Reopened',
-            update: 'Updated'
+            update: 'Updated',
         }
 
-        this.embed.title = actions[this.body.object_attributes.action] + ' issue #' + this.body.object_attributes.iid + ' on ' + this.body.project.name
+        this.embed.title =
+            actions[this.body.object_attributes.action] +
+            ' issue #' +
+            this.body.object_attributes.iid +
+            ' on ' +
+            this.body.project.name
         this.embed.url = this.body.object_attributes.url
         this.embed.author = this.authorFromBody()
         if (this.body.object_attributes.description !== '') {
-            this.embed.fields = [{
-                name: this.body.object_attributes.title,
-                value: (this.body.object_attributes.description.length > 1024) ? this.body.object_attributes.description.substring(0, 1023) + '\u2026' : this.body.object_attributes.description
-            }]
+            this.embed.fields = [
+                {
+                    name: this.body.object_attributes.title,
+                    value:
+                        this.body.object_attributes.description.length > 1024
+                            ? this.body.object_attributes.description.substring(0, 1023) + '\u2026'
+                            : this.body.object_attributes.description,
+                },
+            ]
         } else {
             this.embed.description = `**${this.body.object_attributes.title}**`
         }
@@ -150,7 +171,10 @@ export class GitLab extends TypeParseProvider {
         this.embed.title = 'Wrote a comment on ' + type + ' on ' + this.body.project.name
         this.embed.url = this.body.object_attributes.url
         this.embed.author = this.authorFromBody()
-        this.embed.description = (this.body.object_attributes.note.length > 2048) ? this.body.object_attributes.note.substring(0, 2047) + '\u2026' : this.body.object_attributes.note
+        this.embed.description =
+            this.body.object_attributes.note.length > 2048
+                ? this.body.object_attributes.note.substring(0, 2047) + '\u2026'
+                : this.body.object_attributes.note
         this.addEmbed(this.embed)
     }
 
@@ -162,16 +186,26 @@ export class GitLab extends TypeParseProvider {
             update: 'Updated',
             merge: 'Merged',
             approved: 'Approved',
-            unapproved: 'Unapproved'
+            unapproved: 'Unapproved',
         }
-        this.embed.title = actions[this.body.object_attributes.action] + ' merge request #' + this.body.object_attributes.iid + ' on ' + this.body.project.name
+        this.embed.title =
+            actions[this.body.object_attributes.action] +
+            ' merge request #' +
+            this.body.object_attributes.iid +
+            ' on ' +
+            this.body.project.name
         this.embed.url = this.body.object_attributes.url
         this.embed.author = this.authorFromBody()
         if (this.body.object_attributes.description !== '') {
-            this.embed.fields = [{
-                name: this.body.object_attributes.title,
-                value: (this.body.object_attributes.description.length > 1024) ? this.body.object_attributes.description.substring(0, 1023) + '\u2026' : this.body.object_attributes.description
-            }]
+            this.embed.fields = [
+                {
+                    name: this.body.object_attributes.title,
+                    value:
+                        this.body.object_attributes.description.length > 1024
+                            ? this.body.object_attributes.description.substring(0, 1023) + '\u2026'
+                            : this.body.object_attributes.description,
+                },
+            ]
         } else {
             this.embed.description = `**${this.body.object_attributes.title}**`
         }
@@ -182,13 +216,23 @@ export class GitLab extends TypeParseProvider {
         const actions: Record<string, string> = {
             create: 'Created',
             delete: 'Deleted',
-            update: 'Updated'
+            update: 'Updated',
         }
 
-        this.embed.title = actions[this.body.object_attributes.action] + ' wiki page ' + this.body.object_attributes.title + ' on ' + this.body.project.name
+        this.embed.title =
+            actions[this.body.object_attributes.action] +
+            ' wiki page ' +
+            this.body.object_attributes.title +
+            ' on ' +
+            this.body.project.name
         this.embed.url = this.body.object_attributes.url
         this.embed.author = this.authorFromBody()
-        this.embed.description = (this.body.object_attributes.message != null) ? (this.body.object_attributes.message.length > 2048) ? this.body.object_attributes.message.substring(0, 2047) + '\u2026' : this.body.object_attributes.message : ''
+        this.embed.description =
+            this.body.object_attributes.message != null
+                ? this.body.object_attributes.message.length > 2048
+                    ? this.body.object_attributes.message.substring(0, 2047) + '\u2026'
+                    : this.body.object_attributes.message
+                : ''
         this.addEmbed(this.embed)
     }
 
@@ -213,14 +257,14 @@ export class GitLab extends TypeParseProvider {
     private authorFromBody(): EmbedAuthor {
         return {
             name: this.body.user.name,
-            icon_url: GitLab._formatAvatarURL(this.body.user.avatar_url)
+            icon_url: GitLab._formatAvatarURL(this.body.user.avatar_url),
         }
     }
 
     private authorFromBodyPush(): EmbedAuthor {
         return {
             name: this.body.user_name,
-            icon_url: GitLab._formatAvatarURL(this.body.user_avatar)
+            icon_url: GitLab._formatAvatarURL(this.body.user_avatar),
         }
     }
 
@@ -237,17 +281,16 @@ export class GitLab extends TypeParseProvider {
                 commits: this.body.commits || [],
                 totalCommitsCount: this.body.total_commits_count || 0,
             }
-
         } else if (this.body.repository != null) {
             return {
                 name: this.body.repository.name,
                 url: this.body.repository.homepage,
                 branch: branch.join('/'),
                 commits: this.body.commits || [],
-                totalCommitsCount: this.body.total_commits_count || 0
+                totalCommitsCount: this.body.total_commits_count || 0,
             }
         }
 
-        throw new Error('Failed to resolve project from body! Did GitLab\'s webhook format change?')
+        throw new Error("Failed to resolve project from body! Did GitLab's webhook format change?")
     }
 }

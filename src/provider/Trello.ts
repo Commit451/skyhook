@@ -1,20 +1,16 @@
-import { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi.js'
-import { TypeParseProvider } from '../provider/BaseProvider.js'
-import { MarkdownUtil } from '../util/MarkdownUtil.js'
-import { URL } from 'url'
+import { URL } from 'node:url'
+import type { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi.ts'
+import { TypeParseProvider } from '../provider/BaseProvider.ts'
+import { MarkdownUtil } from '../util/MarkdownUtil.ts'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Card = any
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Board = any
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Attachment = any
 
 /**
  * https://developers.trello.com/apis/webhooks
  */
 export class Trello extends TypeParseProvider {
-
     private static baseLink = 'https://trello.com/'
     private static baseAvatarUrl = 'https://trello-avatars.s3.amazonaws.com/'
     private static defTrelloColors: Record<string, number> = {
@@ -29,7 +25,7 @@ export class Trello extends TypeParseProvider {
         sky: 0x00aecc,
         grey: 0x838c91,
         trello: 0x026aa7,
-        nocolor: 0xb6bbbf
+        nocolor: 0xb6bbbf,
     }
 
     // Utility Functions
@@ -37,7 +33,7 @@ export class Trello extends TypeParseProvider {
     private static _addMemberThumbnail(avatarHash: string, embed: Embed): void {
         if (avatarHash != null && avatarHash !== 'null') {
             embed.thumbnail = {
-                url: this.baseAvatarUrl + avatarHash + '/170.png'
+                url: Trello.baseAvatarUrl + avatarHash + '/170.png',
             }
         }
     }
@@ -47,9 +43,7 @@ export class Trello extends TypeParseProvider {
     }
 
     private embed: Embed
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private action: any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private model: any
 
     constructor() {
@@ -130,7 +124,7 @@ export class Trello extends TypeParseProvider {
             'updateList',
             'updateMember',
             'updateOrganization',
-            'voteOnCard'
+            'voteOnCard',
         ]
     }
 
@@ -173,7 +167,14 @@ export class Trello extends TypeParseProvider {
         } else {
             embed.title = '[' + this.action.data.board.name + '] Added User to "' + this.action.data.card.name + '"'
             Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
-            embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + Trello.baseLink + this.action.member.username + '))'
+            embed.description =
+                this.action.member.fullName +
+                ' ([`' +
+                this.action.member.username +
+                '`](' +
+                Trello.baseLink +
+                this.action.member.username +
+                '))'
         }
         embed.url = this._resolveFullCardURL(this.action.data.card)
         this.addEmbed(embed)
@@ -186,7 +187,14 @@ export class Trello extends TypeParseProvider {
         } else {
             embed.title = 'Added User to Board "' + this.action.data.board.name + '"'
             Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
-            embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + Trello.baseLink + this.action.member.username + '))'
+            embed.description =
+                this.action.member.fullName +
+                ' ([`' +
+                this.action.member.username +
+                '`](' +
+                Trello.baseLink +
+                this.action.member.username +
+                '))'
         }
         embed.url = this._resolveFullBoardURL(this.action.data.board)
         this.addEmbed(embed)
@@ -199,7 +207,14 @@ export class Trello extends TypeParseProvider {
         } else {
             embed.title = 'Added User to Organization "' + this.action.data.organization.name + '"'
             Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
-            embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + Trello.baseLink + this.action.member.username + '))'
+            embed.description =
+                this.action.member.fullName +
+                ' ([`' +
+                this.action.member.username +
+                '`](' +
+                Trello.baseLink +
+                this.action.member.username +
+                '))'
         }
         embed.url = this._resolveGenericURL(this.action.data.organization.id)
         this.addEmbed(embed)
@@ -208,7 +223,12 @@ export class Trello extends TypeParseProvider {
     public async addToOrganizationBoard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = 'Created Board in "' + this.action.data.organization.name + '"'
-        embed.description = '[`' + this.action.data.board.name + '`](' + this._resolveFullBoardURL(this.action.data.board) + ') has been created.'
+        embed.description =
+            '[`' +
+            this.action.data.board.name +
+            '`](' +
+            this._resolveFullBoardURL(this.action.data.board) +
+            ') has been created.'
         embed.url = this._resolveGenericURL(this.action.data.organization.id)
         this.addEmbed(embed)
     }
@@ -225,7 +245,14 @@ export class Trello extends TypeParseProvider {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Converted Check Item to Card'
         embed.url = this._resolveFullCardURL(this.action.data.card)
-        embed.description = '`' + this.action.data.card.name + '` from card [`' + this.action.data.cardSource.name + '`](' + this._resolveFullCardURL(this.action.data.cardSource) + ') has been converted to a card.'
+        embed.description =
+            '`' +
+            this.action.data.card.name +
+            '` from card [`' +
+            this.action.data.cardSource.name +
+            '`](' +
+            this._resolveFullCardURL(this.action.data.cardSource) +
+            ') has been converted to a card.'
         this.addEmbed(embed)
     }
 
@@ -233,14 +260,28 @@ export class Trello extends TypeParseProvider {
         const embed = this._preparePayload()
         embed.title = 'Copied Board'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        embed.description = '`' + this.action.data.board.name + '` has been copied from [another board](' + this._resolveBoardURL(this.action.data.boardSource.id) + ').'
+        embed.description =
+            '`' +
+            this.action.data.board.name +
+            '` has been copied from [another board](' +
+            this._resolveBoardURL(this.action.data.boardSource.id) +
+            ').'
         this.addEmbed(embed)
     }
 
     public async copyCard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = 'Copied Card'
-        embed.description = '[`' + this.action.data.cardSource.name + '`](' + this._resolveFullCardURL(this.action.data.cardSource) + ') \uD83E\uDC6A [`' + this.action.data.card.name + '``](' + this._resolveFullCardURL(this.action.data.card) + ')'
+        embed.description =
+            '[`' +
+            this.action.data.cardSource.name +
+            '`](' +
+            this._resolveFullCardURL(this.action.data.cardSource) +
+            ') \uD83E\uDC6A [`' +
+            this.action.data.card.name +
+            '``](' +
+            this._resolveFullCardURL(this.action.data.card) +
+            ')'
         embed.url = this._resolveFullCardURL(this.action.data.card)
         this.addEmbed(embed)
     }
@@ -248,7 +289,8 @@ export class Trello extends TypeParseProvider {
     public async copyChecklist(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Copied Checklist'
-        embed.description = '`' + this.action.data.checklistSource.name + '` \uD83E\uDC6A `' + this.action.data.checklist.name + '`'
+        embed.description =
+            '`' + this.action.data.checklistSource.name + '` \uD83E\uDC6A `' + this.action.data.checklist.name + '`'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
         this.addEmbed(embed)
     }
@@ -290,7 +332,8 @@ export class Trello extends TypeParseProvider {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Created Card'
         embed.url = this._resolveFullCardURL(this.action.data.card)
-        embed.description = '`' + this.action.data.card.name + '` has been created in list `' + this.action.data.list.name + '`.'
+        embed.description =
+            '`' + this.action.data.card.name + '` has been created in list `' + this.action.data.list.name + '`.'
         this.addEmbed(embed)
     }
 
@@ -298,7 +341,12 @@ export class Trello extends TypeParseProvider {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Created Check Item in "' + this.action.data.card.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
-        embed.description = '`' + this.action.data.checkItem.name + '` was added to checklist `' + this.action.data.checklist.name + '`.'
+        embed.description =
+            '`' +
+            this.action.data.checkItem.name +
+            '` was added to checklist `' +
+            this.action.data.checklist.name +
+            '`.'
         this.addEmbed(embed)
     }
 
@@ -332,7 +380,8 @@ export class Trello extends TypeParseProvider {
 
     public async deleteAttachmentFromCard(): Promise<void> {
         const embed = this._preparePayload()
-        embed.title = '[' + this.action.data.board.name + '] Removed Attachment from "' + this.action.data.card.name + '"'
+        embed.title =
+            '[' + this.action.data.board.name + '] Removed Attachment from "' + this.action.data.card.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
         this._formatAttachment(this.action.data.attachment, embed)
         this.addEmbed(embed)
@@ -354,9 +403,15 @@ export class Trello extends TypeParseProvider {
 
     public async deleteCheckItem(): Promise<void> {
         const embed = this._preparePayload()
-        embed.title = '[' + this.action.data.board.name + '] Deleted Check Item from "' + this.action.data.card.name + '"'
+        embed.title =
+            '[' + this.action.data.board.name + '] Deleted Check Item from "' + this.action.data.card.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
-        embed.description = '`' + this.action.data.checkItem.name + '` was removed from checklist `' + this.action.data.checklist.name + '`.'
+        embed.description =
+            '`' +
+            this.action.data.checkItem.name +
+            '` was removed from checklist `' +
+            this.action.data.checklist.name +
+            '`.'
         this.addEmbed(embed)
     }
 
@@ -385,13 +440,15 @@ export class Trello extends TypeParseProvider {
             const manifest = await response.json()
             const desc = MarkdownUtil._formatMarkdown(manifest.details, embed)
             embed.title = '[' + this.action.data.board.name + '] Disabled Plugin \u2717'
-            embed.fields = [{
-                name: manifest.name,
-                value: desc,
-                inline: false
-            }]
+            embed.fields = [
+                {
+                    name: manifest.name,
+                    value: desc,
+                    inline: false,
+                },
+            ]
             embed.image = {
-                url: new URL(manifest.icon.url, url).toString()
+                url: new URL(manifest.icon.url, url).toString(),
             }
         } catch (err) {
             console.log('[Trello Provider] Error while retrieving plugin manifest.')
@@ -425,13 +482,15 @@ export class Trello extends TypeParseProvider {
             const manifest = await response.json()
             const desc = MarkdownUtil._formatMarkdown(manifest.details, embed)
             embed.title = '[' + this.action.data.board.name + '] Enabled Plugin \u2713'
-            embed.fields = [{
-                name: manifest.name,
-                value: desc,
-                inline: false
-            }]
+            embed.fields = [
+                {
+                    name: manifest.name,
+                    value: desc,
+                    inline: false,
+                },
+            ]
             embed.image = {
-                url: new URL(manifest.icon.url, url).toString()
+                url: new URL(manifest.icon.url, url).toString(),
             }
         } catch (err) {
             console.log('[Trello Provider] Error while retrieving plugin manifest.')
@@ -450,7 +509,14 @@ export class Trello extends TypeParseProvider {
     public async makeAdminOfBoard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Set User to Admin'
-        embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + Trello.baseLink + this.action.member.username + '))'
+        embed.description =
+            this.action.member.fullName +
+            ' ([`' +
+            this.action.member.username +
+            '`](' +
+            Trello.baseLink +
+            this.action.member.username +
+            '))'
         Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
         embed.url = this._resolveFullBoardURL(this.action.data.board)
         this.addEmbed(embed)
@@ -459,7 +525,14 @@ export class Trello extends TypeParseProvider {
     public async makeAdminOfOrganization(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.organization.name + '] Set User to Admin'
-        embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + Trello.baseLink + this.action.member.username + '))'
+        embed.description =
+            this.action.member.fullName +
+            ' ([`' +
+            this.action.member.username +
+            '`](' +
+            Trello.baseLink +
+            this.action.member.username +
+            '))'
         Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
         embed.url = this._resolveGenericURL(this.action.data.organization.id)
         this.addEmbed(embed)
@@ -468,7 +541,14 @@ export class Trello extends TypeParseProvider {
     public async makeNormalMemberOfBoard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Set User to Member'
-        embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + Trello.baseLink + this.action.member.username + '))'
+        embed.description =
+            this.action.member.fullName +
+            ' ([`' +
+            this.action.member.username +
+            '`](' +
+            Trello.baseLink +
+            this.action.member.username +
+            '))'
         Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
         embed.url = this._resolveFullBoardURL(this.action.data.board)
         this.addEmbed(embed)
@@ -477,7 +557,14 @@ export class Trello extends TypeParseProvider {
     public async makeNormalMemberOfOrganization(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.organization.name + '] Set User to Member'
-        embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + Trello.baseLink + this.action.member.username + '))'
+        embed.description =
+            this.action.member.fullName +
+            ' ([`' +
+            this.action.member.username +
+            '`](' +
+            Trello.baseLink +
+            this.action.member.username +
+            '))'
         Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
         embed.url = this._resolveGenericURL(this.action.data.organization.id)
         this.addEmbed(embed)
@@ -487,7 +574,14 @@ export class Trello extends TypeParseProvider {
     public async makeObserverOfBoard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Set User to Observer'
-        embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + Trello.baseLink + this.action.member.username + '))'
+        embed.description =
+            this.action.member.fullName +
+            ' ([`' +
+            this.action.member.username +
+            '`](' +
+            Trello.baseLink +
+            this.action.member.username +
+            '))'
         Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
         embed.url = this._resolveFullBoardURL(this.action.data.board)
         this.addEmbed(embed)
@@ -502,7 +596,16 @@ export class Trello extends TypeParseProvider {
     public async moveCardFromBoard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Moved Card to Another Board'
-        embed.description = '[`' + this.action.data.card.name + '`](' + this._resolveCardURL(this.action.data.card.id) + ') has been moved from list `' + this.action.data.list.name + '` to [another board](' + this._resolveBoardURL(this.action.data.boardTarget.id) + ').'
+        embed.description =
+            '[`' +
+            this.action.data.card.name +
+            '`](' +
+            this._resolveCardURL(this.action.data.card.id) +
+            ') has been moved from list `' +
+            this.action.data.list.name +
+            '` to [another board](' +
+            this._resolveBoardURL(this.action.data.boardTarget.id) +
+            ').'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
         this.addEmbed(embed)
     }
@@ -510,7 +613,16 @@ export class Trello extends TypeParseProvider {
     public async moveCardToBoard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Moved Card to Board'
-        embed.description = '[`' + this.action.data.card.name + '`](' + this._resolveFullCardURL(this.action.data.card) + ') has been moved to list `' + this.action.data.list.name + '` from [another board](' + this._resolveBoardURL(this.action.data.boardSource.id) + ').'
+        embed.description =
+            '[`' +
+            this.action.data.card.name +
+            '`](' +
+            this._resolveFullCardURL(this.action.data.card) +
+            ') has been moved to list `' +
+            this.action.data.list.name +
+            '` from [another board](' +
+            this._resolveBoardURL(this.action.data.boardSource.id) +
+            ').'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
         this.addEmbed(embed)
     }
@@ -518,7 +630,12 @@ export class Trello extends TypeParseProvider {
     public async moveListFromBoard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Moved List to Another Board'
-        embed.description = '`' + this.action.data.list.name + '` has been moved to [another board](' + this._resolveBoardURL(this.action.data.boardTarget.id) + ').'
+        embed.description =
+            '`' +
+            this.action.data.list.name +
+            '` has been moved to [another board](' +
+            this._resolveBoardURL(this.action.data.boardTarget.id) +
+            ').'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
         this.addEmbed(embed)
     }
@@ -526,7 +643,12 @@ export class Trello extends TypeParseProvider {
     public async moveListToBoard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Moved List to Board'
-        embed.description = '`' + this.action.data.list.name + '` has been moved from [another board](' + this._resolveBoardURL(this.action.data.boardSource.id) + ').'
+        embed.description =
+            '`' +
+            this.action.data.list.name +
+            '` has been moved from [another board](' +
+            this._resolveBoardURL(this.action.data.boardSource.id) +
+            ').'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
         this.addEmbed(embed)
     }
@@ -540,7 +662,8 @@ export class Trello extends TypeParseProvider {
 
     public async removeChecklistFromCard(): Promise<void> {
         const embed = this._preparePayload()
-        embed.title = '[' + this.action.data.board.name + '] Removed Checklist from "' + this.action.data.card.name + '"'
+        embed.title =
+            '[' + this.action.data.board.name + '] Removed Checklist from "' + this.action.data.card.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
         embed.description = '`' + this.action.data.checklist.name + '` has been removed.'
         this.addEmbed(embed)
@@ -569,7 +692,14 @@ export class Trello extends TypeParseProvider {
         } else {
             embed.title = '[' + this.action.data.board.name + '] Removed User from "' + this.action.data.card.name + '"'
             Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
-            embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + Trello.baseLink + this.action.member.username + '))'
+            embed.description =
+                this.action.member.fullName +
+                ' ([`' +
+                this.action.member.username +
+                '`](' +
+                Trello.baseLink +
+                this.action.member.username +
+                '))'
         }
         embed.url = this._resolveFullCardURL(this.action.data.card)
         this.addEmbed(embed)
@@ -581,7 +711,14 @@ export class Trello extends TypeParseProvider {
             embed.title = 'Left Board "' + this.action.data.board.name + '"'
         } else {
             embed.title = 'Removed User from Board "' + this.action.data.board.name + '"'
-            embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + Trello.baseLink + this.action.member.username + '))'
+            embed.description =
+                this.action.member.fullName +
+                ' ([`' +
+                this.action.member.username +
+                '`](' +
+                Trello.baseLink +
+                this.action.member.username +
+                '))'
             Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
         }
         embed.url = this._resolveFullBoardURL(this.action.data.board)
@@ -595,7 +732,14 @@ export class Trello extends TypeParseProvider {
         } else {
             embed.title = 'Removed User from Organization "' + this.action.data.organization.name + '"'
             Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
-            embed.description = this.action.member.fullName + ' ([`' + this.action.member.username + '`](' + Trello.baseLink + this.action.member.username + '))'
+            embed.description =
+                this.action.member.fullName +
+                ' ([`' +
+                this.action.member.username +
+                '`](' +
+                Trello.baseLink +
+                this.action.member.username +
+                '))'
         }
         embed.url = this._resolveGenericURL(this.action.data.organization.id)
         this.addEmbed(embed)
@@ -634,40 +778,60 @@ export class Trello extends TypeParseProvider {
                 if (old.prefs.permissionLevel != null) {
                     field = {
                         name: 'Permission Level',
-                        value: '`' + old.prefs.permissionLevel + '` \uD83E\uDC6A `' + this.action.data.board.prefs.permissionLevel + '`',
-                        inline: false
+                        value:
+                            '`' +
+                            old.prefs.permissionLevel +
+                            '` \uD83E\uDC6A `' +
+                            this.action.data.board.prefs.permissionLevel +
+                            '`',
+                        inline: false,
                     }
                 } else if (old.prefs.selfJoin != null) {
                     field = {
                         name: 'Allow Team Members to Join',
-                        value: '`' + old.prefs.selfJoin + '` \uD83E\uDC6A `' + this.action.data.board.prefs.selfJoin + '`',
-                        inline: false
+                        value:
+                            '`' + old.prefs.selfJoin + '` \uD83E\uDC6A `' + this.action.data.board.prefs.selfJoin + '`',
+                        inline: false,
                     }
                 } else if (old.prefs.invitations != null) {
                     field = {
                         name: 'Add/Remove Permissions',
-                        value: '`' + old.prefs.invitations + '` \uD83E\uDC6A `' + this.action.data.board.prefs.invitations + '`',
-                        inline: false
+                        value:
+                            '`' +
+                            old.prefs.invitations +
+                            '` \uD83E\uDC6A `' +
+                            this.action.data.board.prefs.invitations +
+                            '`',
+                        inline: false,
                     }
                 } else if (old.prefs.comments != null) {
                     field = {
                         name: 'Commenting Permissions',
-                        value: '`' + old.prefs.comments + '` \uD83E\uDC6A `' + this.action.data.board.prefs.comments + '`',
-                        inline: false
+                        value:
+                            '`' + old.prefs.comments + '` \uD83E\uDC6A `' + this.action.data.board.prefs.comments + '`',
+                        inline: false,
                     }
                 } else if (old.prefs.cardCovers != null) {
                     field = {
                         name: 'Enable Card Cover Images',
-                        value: '`' + old.prefs.cardCovers + '` \uD83E\uDC6A `' + this.action.data.board.prefs.cardCovers + '`',
-                        inline: false
+                        value:
+                            '`' +
+                            old.prefs.cardCovers +
+                            '` \uD83E\uDC6A `' +
+                            this.action.data.board.prefs.cardCovers +
+                            '`',
+                        inline: false,
                     }
                 } else if (old.prefs.background != null) {
-                    const val = Trello.defTrelloColors[this.action.data.board.prefs.background] == null ? 'image' : this.action.data.board.prefs.background
+                    const val =
+                        Trello.defTrelloColors[this.action.data.board.prefs.background] == null
+                            ? 'image'
+                            : this.action.data.board.prefs.background
                     const oldVal = Trello.defTrelloColors[old.prefs.background] == null ? 'image' : old.prefs.background
                     field = {
                         name: 'Background',
                         value: '`' + oldVal + '` \uD83E\uDC6A `' + val + '`',
-                        inline: false
+                        inline: false,
                     }
                 }
             }
@@ -691,17 +855,21 @@ export class Trello extends TypeParseProvider {
             } else if (old.desc != null) {
                 if (!old.desc) {
                     embed.title = embed.title + 'Added Description to Card "' + this.action.data.card.name + '"'
-                    embed.description = Trello._formatLargeString(MarkdownUtil._formatMarkdown(this.action.data.card.desc, embed))
+                    embed.description = Trello._formatLargeString(
+                        MarkdownUtil._formatMarkdown(this.action.data.card.desc, embed),
+                    )
                 } else if (!this.action.data.card.desc) {
                     embed.title = embed.title + 'Removed Description from Card "' + this.action.data.card.name + '"'
                     field = {
                         name: 'Old Value',
                         value: Trello._formatLargeString(MarkdownUtil._formatMarkdown(old.desc, embed)),
-                        inline: false
+                        inline: false,
                     }
                 } else {
                     embed.title = embed.title + 'Updated Description of Card "' + this.action.data.card.name + '"'
-                    embed.description = Trello._formatLargeString(MarkdownUtil._formatMarkdown(this.action.data.card.desc, embed))
+                    embed.description = Trello._formatLargeString(
+                        MarkdownUtil._formatMarkdown(this.action.data.card.desc, embed),
+                    )
                 }
             } else if (old.due != null || this.action.data.card.due != null) {
                 if (old.due == null) {
@@ -710,11 +878,12 @@ export class Trello extends TypeParseProvider {
                     embed.description = '`' + d.toUTCString() + '`'
                 } else if (this.action.data.card.due == null) {
                     const d = new Date(old.due)
-                    embed.title = embed.title + 'Removed Due Date from "' + this.action.data.card.name + '" \uD83D\uDDD3'
+                    embed.title =
+                        embed.title + 'Removed Due Date from "' + this.action.data.card.name + '" \uD83D\uDDD3'
                     field = {
                         name: 'Old Value',
                         value: '`' + d.toUTCString() + '`',
-                        inline: false
+                        inline: false,
                     }
                 } else {
                     const d = new Date(this.action.data.card.due)
@@ -730,7 +899,8 @@ export class Trello extends TypeParseProvider {
                 }
             } else if (old.idList != null) {
                 embed.title = embed.title + 'Moved Card "' + this.action.data.card.name + '" to Another List'
-                embed.description = '`' + this.action.data.listBefore.name + '` \uD83E\uDC6A `' + this.action.data.listAfter.name + '`'
+                embed.description =
+                    '`' + this.action.data.listBefore.name + '` \uD83E\uDC6A `' + this.action.data.listAfter.name + '`'
             } else if (old.pos != null) {
                 embed.title = embed.title + 'Updated Position of Card "' + this.action.data.card.name + '"'
             }
@@ -743,7 +913,8 @@ export class Trello extends TypeParseProvider {
 
     public async updateCheckItem(): Promise<void> {
         const embed = this._preparePayload()
-        embed.title = '[' + this.action.data.board.name + '] Renamed Item in Checklist "' + this.action.data.checklist.name + '"'
+        embed.title =
+            '[' + this.action.data.board.name + '] Renamed Item in Checklist "' + this.action.data.checklist.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
         embed.description = '`' + this.action.data.old.name + '` \uD83E\uDC6A `' + this.action.data.checkItem.name + '`'
         this.addEmbed(embed)
@@ -751,14 +922,22 @@ export class Trello extends TypeParseProvider {
 
     public async updateCheckItemStateOnCard(): Promise<void> {
         const embed = this._preparePayload()
-        const capitalized = this.action.data.checkItem.state.charAt(0).toUpperCase() + this.action.data.checkItem.state.slice(1)
+        const capitalized =
+            this.action.data.checkItem.state.charAt(0).toUpperCase() + this.action.data.checkItem.state.slice(1)
         embed.title = '[' + this.action.data.board.name + '] Marked Item as ' + capitalized
         if (this.action.data.checkItem.state === 'complete') {
             embed.title = embed.title + ' `\u2714`'
         } else if (this.action.data.checkItem.state === 'incomplete') {
             embed.title = embed.title + ' `\u2718`'
         }
-        embed.description = 'Item `' + this.action.data.checkItem.name + '` in `' + this.action.data.checklist.name + '` has been marked as `' + this.action.data.checkItem.state + '`.'
+        embed.description =
+            'Item `' +
+            this.action.data.checkItem.name +
+            '` in `' +
+            this.action.data.checklist.name +
+            '` has been marked as `' +
+            this.action.data.checkItem.state +
+            '`.'
         embed.url = this._resolveFullCardURL(this.action.data.card)
         this.addEmbed(embed)
     }
@@ -766,7 +945,12 @@ export class Trello extends TypeParseProvider {
     public async updateChecklist(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Renamed Checklist'
-        embed.description = '`' + Trello._formatLargeString(this.action.data.old.name) + '` \uD83E\uDC6A `' + Trello._formatLargeString(this.action.data.checklist.name) + '`'
+        embed.description =
+            '`' +
+            Trello._formatLargeString(this.action.data.old.name) +
+            '` \uD83E\uDC6A `' +
+            Trello._formatLargeString(this.action.data.checklist.name) +
+            '`'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
         this.addEmbed(embed)
     }
@@ -781,14 +965,15 @@ export class Trello extends TypeParseProvider {
                 if (this.action.data.label.color) {
                     field = {
                         name: 'Changed Color',
-                        value: '`' + this.action.data.old.color + '` \uD83E\uDC6A `' + this.action.data.label.color + '`',
-                        inline: false
+                        value:
+                            '`' + this.action.data.old.color + '` \uD83E\uDC6A `' + this.action.data.label.color + '`',
+                        inline: false,
                     }
                 } else {
                     field = {
                         name: 'Removed Color',
                         value: 'Old color - `' + this.action.data.old.color + '`',
-                        inline: false
+                        inline: false,
                     }
                 }
             } else if (this.action.data.old.name != null) {
@@ -796,21 +981,26 @@ export class Trello extends TypeParseProvider {
                     if (this.action.data.label.name) {
                         field = {
                             name: 'Changed Name',
-                            value: '`' + this.action.data.old.name + '` \uD83E\uDC6A `' + this.action.data.label.name + '`',
-                            inline: false
+                            value:
+                                '`' +
+                                this.action.data.old.name +
+                                '` \uD83E\uDC6A `' +
+                                this.action.data.label.name +
+                                '`',
+                            inline: false,
                         }
                     } else {
                         field = {
                             name: 'Removed Name',
                             value: 'Old name - `' + this.action.data.old.name + '`',
-                            inline: false
+                            inline: false,
                         }
                     }
                 } else {
                     field = {
                         name: 'Added Name',
                         value: '`' + this.action.data.label.name + '`',
-                        inline: false
+                        inline: false,
                     }
                 }
             }
@@ -818,7 +1008,7 @@ export class Trello extends TypeParseProvider {
             field = {
                 name: 'Added Color',
                 value: '`' + this.action.data.label.color + '`',
-                inline: false
+                inline: false,
             }
         }
         if (field != null) {
@@ -833,7 +1023,8 @@ export class Trello extends TypeParseProvider {
             if (this.action.data.list.closed) {
                 embed.title = '[' + this.action.data.board.name + '] Archived List "' + this.action.data.list.name + '"'
             } else {
-                embed.title = '[' + this.action.data.board.name + '] Unarchived List "' + this.action.data.list.name + '"'
+                embed.title =
+                    '[' + this.action.data.board.name + '] Unarchived List "' + this.action.data.list.name + '"'
             }
         } else {
             embed.title = '[' + this.action.data.board.name + '] Renamed List'
@@ -863,8 +1054,13 @@ export class Trello extends TypeParseProvider {
                 if (old.prefs.permissionLevel != null) {
                     field = {
                         name: 'Permission Level',
-                        value: '`' + old.prefs.permissionLevel + '` \uD83E\uDC6A `' + organization.prefs.permissionLevel + '`',
-                        inline: false
+                        value:
+                            '`' +
+                            old.prefs.permissionLevel +
+                            '` \uD83E\uDC6A `' +
+                            organization.prefs.permissionLevel +
+                            '`',
+                        inline: false,
                     }
                 }
             } else if (old.displayName != null) {
@@ -880,7 +1076,7 @@ export class Trello extends TypeParseProvider {
                     field = {
                         name: 'Old Value',
                         value: old.website,
-                        inline: false
+                        inline: false,
                     }
                 } else {
                     embed.title = embed.title + 'Changed Website of Organization'
@@ -889,17 +1085,22 @@ export class Trello extends TypeParseProvider {
             } else if (old.desc != null) {
                 if (!old.desc) {
                     embed.title = embed.title + 'Added Description to Organization'
-                    embed.description = Trello._formatLargeString(MarkdownUtil._formatMarkdown(organization.desc, embed))
+                    embed.description = Trello._formatLargeString(
+                        MarkdownUtil._formatMarkdown(organization.desc, embed),
+                    )
                 } else if (!organization.desc) {
                     embed.title = embed.title + 'Removed Description from Organization'
                     field = {
                         name: 'Old Value',
                         value: Trello._formatLargeString(MarkdownUtil._formatMarkdown(old.desc, embed)),
-                        inline: false
+                        inline: false,
                     }
                 } else {
                     embed.title = embed.title + 'Changed Description of Organization'
-                    embed.description = Trello._formatLargeString(MarkdownUtil._formatMarkdown(old.desc, embed)) + '\n`\uD83E\uDC6B`\n' + Trello._formatLargeString(MarkdownUtil._formatMarkdown(organization.desc, embed))
+                    embed.description =
+                        Trello._formatLargeString(MarkdownUtil._formatMarkdown(old.desc, embed)) +
+                        '\n`\uD83E\uDC6B`\n' +
+                        Trello._formatLargeString(MarkdownUtil._formatMarkdown(organization.desc, embed))
                 }
             }
         } else {
@@ -916,16 +1117,26 @@ export class Trello extends TypeParseProvider {
     public async voteOnCard(): Promise<void> {
         const embed = this._preparePayload()
         if (this.action.data.voted) {
-            embed.title = '[' + this.action.data.board.name + '] Voted on Card "' + this.action.data.card.name + '" \u2705'
+            embed.title =
+                '[' + this.action.data.board.name + '] Voted on Card "' + this.action.data.card.name + '" \u2705'
         } else {
-            embed.title = '[' + this.action.data.board.name + '] Removed Vote on Card "' + this.action.data.card.name + '"'
+            embed.title =
+                '[' + this.action.data.board.name + '] Removed Vote on Card "' + this.action.data.card.name + '"'
         }
         embed.url = this._resolveFullCardURL(this.action.data.card)
         this.addEmbed(embed)
     }
 
     private _resolveFullCardURL(card: Card): string {
-        return Trello.baseLink + 'c/' + card.shortLink + '/' + card.idShort + '-' + card.name.replace(/\s/g, '-').toLowerCase()
+        return (
+            Trello.baseLink +
+            'c/' +
+            card.shortLink +
+            '/' +
+            card.idShort +
+            '-' +
+            card.name.replace(/\s/g, '-').toLowerCase()
+        )
     }
 
     private _resolveFullBoardURL(board: Board): string {
@@ -958,10 +1169,12 @@ export class Trello extends TypeParseProvider {
         }
         if (attachment.url != null) {
             if (attachment.name !== attachment.url) {
-                embed.fields = [{
-                    name: attachment.name,
-                    value: attachment.url
-                }]
+                embed.fields = [
+                    {
+                        name: attachment.name,
+                        value: attachment.url,
+                    },
+                ]
             } else {
                 embed.description = attachment.url
             }
@@ -986,7 +1199,7 @@ export class Trello extends TypeParseProvider {
         return {
             name: memberCreator.fullName,
             icon_url: Trello.baseAvatarUrl + memberCreator.avatarHash + '/170.png',
-            url: Trello.baseLink + memberCreator.username
+            url: Trello.baseLink + memberCreator.username,
         }
     }
 
@@ -999,11 +1212,15 @@ export class Trello extends TypeParseProvider {
         // console.info(this.action.data);
 
         const embed: Embed = {
-            author: this._resolveUser()
+            author: this._resolveUser(),
         }
 
         // Use the background color of the board if applicable. Otherwise, use the default trello color.
-        if (this.model.prefs != null && this.model.prefs.background != null && Trello.defTrelloColors[this.model.prefs.background] != null) {
+        if (
+            this.model.prefs != null &&
+            this.model.prefs.background != null &&
+            Trello.defTrelloColors[this.model.prefs.background] != null
+        ) {
             embed.color = Trello.defTrelloColors[this.model.prefs.background]
         } else {
             embed.color = Trello.defTrelloColors.trello
