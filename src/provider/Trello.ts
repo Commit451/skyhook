@@ -1,4 +1,3 @@
-import axios from 'axios'
 import { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi.js'
 import { TypeParseProvider } from '../provider/BaseProvider.js'
 import { MarkdownUtil } from '../util/MarkdownUtil.js'
@@ -379,8 +378,11 @@ export class Trello extends TypeParseProvider {
         embed.url = this._resolveFullBoardURL(this.action.data.board)
         const url = this.action.data.plugin.url
         try {
-            const response = await axios.get(url)
-            const manifest = response.data
+            const response = await fetch(url)
+            if (!response.ok) {
+                throw new Error(`Request failed with status ${response.status}`)
+            }
+            const manifest = await response.json()
             const desc = MarkdownUtil._formatMarkdown(manifest.details, embed)
             embed.title = '[' + this.action.data.board.name + '] Disabled Plugin \u2717'
             embed.fields = [{
@@ -416,8 +418,11 @@ export class Trello extends TypeParseProvider {
         embed.url = this._resolveFullBoardURL(this.action.data.board)
         const url = this.action.data.plugin.url
         try {
-            const response = await axios.get(url)
-            const manifest = response.data
+            const response = await fetch(url)
+            if (!response.ok) {
+                throw new Error(`Request failed with status ${response.status}`)
+            }
+            const manifest = await response.json()
             const desc = MarkdownUtil._formatMarkdown(manifest.details, embed)
             embed.title = '[' + this.action.data.board.name + '] Enabled Plugin \u2713'
             embed.fields = [{

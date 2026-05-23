@@ -1,7 +1,9 @@
 import dotenv from 'dotenv'
-import axios from 'axios'
-import express, { Response } from 'express'
-import cors from 'cors'
+import { Hono, type Context } from 'hono'
+import type { ContentfulStatusCode } from 'hono/utils/http-status'
+import { cors } from 'hono/cors'
+import { serve } from '@hono/node-server'
+import { serveStatic } from '@hono/node-server/serve-static'
 import { DiscordPayload } from './model/DiscordApi.js'
 import { BaseProvider } from './provider/BaseProvider.js'
 import { ErrorUtil } from './util/ErrorUtil.js'
@@ -40,7 +42,7 @@ LoggerUtil.init()
 const logger = LoggerUtil.logger()
 logger.debug('Logger set up successfully.')
 
-const app = express()
+const app = new Hono()
 
 const providers: Type<BaseProvider>[] = [
     AppCenter,
@@ -86,108 +88,97 @@ providers.forEach((Provider) => {
 })
 providerNames.sort()
 
-app.use(cors())
-app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
-app.use(express.static('public'))
+app.use('*', cors())
+app.use('/*', serveStatic({ root: './public' }))
 
-app.get('/', (_req, res) => {
-    res.redirect('https://commit451.github.io/skyhook-web')
-})
+app.get('/', (c) => c.redirect('https://commit451.github.io/skyhook-web'))
 
-app.get('/api/providers', (_req, res) => {
-    res.status(200).send(providerInfos)
-})
+app.get('/api/providers', (c) => c.json(providerInfos, 200))
 
 const info = {
     version: process.env.K_REVISION,
     deployment: process.env.K_SERVICE
 }
-app.get('/api/info', (_req, res) => {
-    res.status(200).send(info)
-})
+app.get('/api/info', (c) => c.json(info, 200))
 
-app.get('/api/webhooks/:webhookID/:webhookSecret/:from', (req, res) => {
+app.get('/api/webhooks/:webhookID/:webhookSecret/:from', (c) => {
     // Return 200 if the provider is valid to show this url is ready.
-    const provider = req.params.from
+    const provider = c.req.param('from')
     if (provider == null || providersMap.get(provider) == null) {
         const errorMessage = `Unknown provider ${provider}`
         logger.error(errorMessage)
-        res.status(400).send(errorMessage)
-    } else {
-        res.sendStatus(200)
+        return c.text(errorMessage, 400)
     }
+    return c.body(null, 200)
 })
 
-app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (req, res) => {
-    const webhookID = req.params.webhookID
-    const webhookSecret = req.params.webhookSecret
-    const providerPath = req.params.from
+app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (c) => {
+    const webhookID = c.req.param('webhookID')
+    const webhookSecret = c.req.param('webhookSecret')
+    const providerPath = c.req.param('from')
     if (!webhookID || !webhookSecret || !providerPath) {
-        res.sendStatus(400)
-        return
+        return c.body(null, 400)
     }
     const discordEndpoint = `https://discordapp.com/api/webhooks/${webhookID}/${webhookSecret}`
 
     let discordPayload: DiscordPayload | null = null
 
     const Provider = providersMap.get(providerPath)
-    if (Provider != null) {
-        const instance = new Provider()
-        try {
-            const queryString = JSON.stringify(req.query)
-            const queryObject = JSON.parse(queryString)
-            console.log(queryObject)
-            // seems dumb, but this is the best way I know how to format these headers in a way we can use them
-            const headersString = JSON.stringify(req.headers)
-            const headersObject = JSON.parse(headersString)
-            discordPayload = await instance.parse(req.body, headersObject, queryObject)
-        } catch (error) {
-            res.sendStatus(500)
-            logger.error('Error during parse: ' + error.stack)
-            discordPayload = ErrorUtil.createErrorPayload(providerPath, error)
-        }
-    } else {
+    if (Provider == null) {
         const errorMessage = `Unknown provider ${providerPath}`
         logger.error(errorMessage)
-        res.status(400).send(errorMessage)
-        return
+        return c.text(errorMessage, 400)
     }
 
-    sendPayload(providerPath, discordPayload, discordEndpoint, res)
+    const instance = new Provider()
+    try {
+        const queryObject = c.req.query()
+        console.log(queryObject)
+        const headersObject: Record<string, string> = {}
+        c.req.raw.headers.forEach((value, key) => {
+            headersObject[key] = value
+        })
+        const body = await parseRequestBody(c)
+        discordPayload = await instance.parse(body, headersObject, queryObject)
+    } catch (error) {
+        logger.error('Error during parse: ' + error.stack)
+        discordPayload = ErrorUtil.createErrorPayload(providerPath, error)
+        return sendPayload(providerPath, discordPayload, discordEndpoint, c, 500)
+    }
+
+    return sendPayload(providerPath, discordPayload, discordEndpoint, c)
 })
 
-app.post('/api/webhooks/:webhookID/:webhookSecret/:from/test', async (req, res) => {
-    const webhookID = req.params.webhookID
-    const webhookSecret = req.params.webhookSecret
-    const providerPath = req.params.from
+app.post('/api/webhooks/:webhookID/:webhookSecret/:from/test', async (c) => {
+    const webhookID = c.req.param('webhookID')
+    const webhookSecret = c.req.param('webhookSecret')
+    const providerPath = c.req.param('from')
     if (!webhookID || !webhookSecret || !providerPath) {
-        res.sendStatus(400)
-        return
+        return c.body(null, 400)
     }
     const discordEndpoint = `https://discordapp.com/api/webhooks/${webhookID}/${webhookSecret}`
     const Provider = providersMap.get(providerPath)
     if (Provider == null) {
         const errorMessage = `Unknown provider ${providerPath}`
         logger.error(errorMessage)
-        res.status(400).send(errorMessage)
-    } else {
-        const provider = new Provider()
-        const jsonFileName = `${providerPath}.json`
-        const json = fs.readFileSync(`./test/${providerPath}/${jsonFileName}`, 'utf-8')
-        const discordPayload = await provider.parse(JSON.parse(json))
-        sendPayload(providerPath, discordPayload, discordEndpoint, res)
+        return c.text(errorMessage, 400)
     }
+    const provider = new Provider()
+    const jsonFileName = `${providerPath}.json`
+    const json = fs.readFileSync(`./test/${providerPath}/${jsonFileName}`, 'utf-8')
+    const discordPayload = await provider.parse(JSON.parse(json))
+    return sendPayload(providerPath, discordPayload, discordEndpoint, c)
 })
 
-app.use((_req, res, _next) => {
-    res.status(404).send('Not Found')
-})
+app.notFound((c) => c.text('Not Found', 404))
 
 const port = normalizePort(process.env.PORT || '8080')
 
-const server = app.listen(port, () => {
-    logger.debug(`Your app is listening on port ${port}. Test out with http://localhost:${port}/api/providers`)
+const server = serve({
+    fetch: app.fetch,
+    port: typeof port === 'number' ? port : 8080
+}, (addressInfo) => {
+    logger.debug(`Your app is listening on port ${addressInfo.port}. Test out with http://localhost:${addressInfo.port}/api/providers`)
 })
 
 function normalizePort(givenPort: string): string | number | boolean {
@@ -207,39 +198,61 @@ function normalizePort(givenPort: string): string | number | boolean {
 }
 
 /**
+ * Parses the request body based on its Content-Type. Falls back to JSON if the
+ * Content-Type is missing or unrecognized so providers that omit headers still work.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function parseRequestBody(c: Context): Promise<any> {
+    const contentType = (c.req.header('content-type') || '').toLowerCase()
+    if (contentType.includes('application/json')) {
+        return c.req.json()
+    }
+    if (contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {
+        return c.req.parseBody()
+    }
+    try {
+        return await c.req.json()
+    } catch {
+        return {}
+    }
+}
+
+/**
  * Sends the correctly formatted payload to the Discord channel
  */
 async function sendPayload(
     providerPath: string,
     discordPayload: DiscordPayload | null,
     discordEndpoint: string,
-    res: Response,
-): Promise<void> {
+    c: Context,
+    upstreamStatusOverride?: ContentfulStatusCode,
+): Promise<Response> {
     if (discordPayload == null) {
         logger.error('Discord payload is null')
-        res.status(200).send(`Webhook event is either not supported or not implemented by /${providerPath}.`)
-        return
+        return c.text(`Webhook event is either not supported or not implemented by /${providerPath}.`, 200)
     }
     // We could implement a more robust validation on this at some point.
     if (Object.keys(discordPayload).length === 0) {
         logger.error('Bad implementation, outbound payload is empty.')
-        res.status(500).send('Bad implementation.')
-        return
+        return c.text('Bad implementation.', 500)
     }
     const jsonString = JSON.stringify(discordPayload)
     try {
-        await axios({
-            data: jsonString,
-            method: 'post',
-            url: discordEndpoint,
+        const response = await fetch(discordEndpoint, {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
-            }
+            },
+            body: jsonString
         })
-        res.sendStatus(200)
+        if (!response.ok) {
+            const errorBody = await response.text()
+            throw new Error(`Discord webhook responded with ${response.status}: ${errorBody}`)
+        }
+        return c.body(null, upstreamStatusOverride ?? 200)
     } catch (err) {
         logger.error(err)
-        res.status(500).send(err)
+        return c.text(String(err), 500)
     }
 }
 
