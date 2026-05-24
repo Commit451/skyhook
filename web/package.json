@@ -1,7 +1,6 @@
 {
     "name": "skyhook-web",
-    "version": "0.1.0",
-    "private": true,
+    "version": "1.0.0",
     "type": "module",
     "description": "Static frontend for skyhook — lets users generate Discord webhook URLs for supported providers.",
     "scripts": {
