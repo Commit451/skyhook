@@ -6,7 +6,7 @@ Parses webhooks and forwards them in the proper format to Discord.
 
 ## Setup
 
-You can use the [site](https://commit451.github.io/skyhook-web) to create the right webhook link. If you want to
+You can use the [site](https://skyhookapi.com) to create the right webhook link. If you want to
 manually do it, here are the steps:
 
 1. Create a webhook in Discord (Server Settings -> Webhooks -> Create Webhook)
@@ -97,11 +97,6 @@ Through Docker:
 ```
 docker run -it --rm -p 8080:8080 commit451/skyhook
 ```
-
-## Web
-
-If you are looking for the frontend web version of skyhook which lets you generate a properly formatted URL, it
-lives [here](https://github.com/Commit451/skyhook-web). This repo/project just includes the backend service.
 
 ## Deploying
 
