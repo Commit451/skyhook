@@ -1,5 +1,96 @@
 ---
 import '../styles/global.css'
+
+const base = import.meta.env.BASE_URL
+
+type Provider = { name: string; slug: string; color: string; monogram?: string }
+
+// Display name, webhook slug (the `/path` you append to your URL), and an
+// on-brand accent color tuned to read on the dark background.
+const providers: Provider[] = [
+    { name: 'AppCenter', slug: 'appcenter', color: '#2e9be6', monogram: 'AC' },
+    { name: 'AppVeyor', slug: 'appveyor', color: '#00b3e0' },
+    { name: 'Basecamp', slug: 'basecamp', color: '#e8e8e8' },
+    { name: 'Bitbucket', slug: 'bitbucket', color: '#2684ff' },
+    { name: 'Bitbucket Server', slug: 'bitbucketserver', color: '#2684ff' },
+    { name: 'CircleCI', slug: 'circleci', color: '#e8e8e8' },
+    { name: 'Codacy', slug: 'codacy', color: '#21cc9a' },
+    { name: 'Confluence', slug: 'confluence', color: '#2684ff' },
+    { name: 'Docker Hub', slug: 'dockerhub', color: '#2496ed' },
+    { name: 'GitLab', slug: 'gitlab', color: '#fc6d26' },
+    { name: 'Heroku', slug: 'heroku', color: '#9b72d4' },
+    { name: 'Instana', slug: 'instana', color: '#e0218a', monogram: 'in' },
+    { name: 'Jenkins', slug: 'jenkins', color: '#e2603f' },
+    { name: 'Jira', slug: 'jira', color: '#2684ff' },
+    { name: 'New Relic', slug: 'newrelic', color: '#1ce783' },
+    { name: 'Patreon', slug: 'patreon', color: '#ff5a45' },
+    { name: 'Pingdom', slug: 'pingdom', color: '#fce000' },
+    { name: 'Rollbar', slug: 'rollbar', color: '#5c7cf5' },
+    { name: 'Travis CI', slug: 'travis', color: '#3eaaaf' },
+    { name: 'Trello', slug: 'trello', color: '#2684ff' },
+    { name: 'Unity Cloud', slug: 'unity', color: '#e8e8e8' },
+    { name: 'Uptime Robot', slug: 'uptimerobot', color: '#3bd671', monogram: 'UR' },
+    { name: 'Azure DevOps', slug: 'vsts', color: '#2f9be6' },
+]
+
+const footerIcon = `${base}images/skyhook-tiny.png`
+const logoUrl = (slug: string) => `url(${base}providers/${slug}.svg)`
+const year = new Date().getFullYear()
+
+// ----- SEO / social -----
+const SITE = Astro.site ?? new URL('https://www.skyhookapi.com')
+const canonical = new URL(base, SITE).href
+const ogImage = new URL(`${base}og.png`, SITE).href
+const pageTitle = 'Discord Notifications for GitLab, Jira & 20+ Tools — skyhook'
+const pageDescription =
+    'skyhook turns webhooks from GitLab, Jira, Docker Hub, CI tools and 20+ other services into clean, native Discord notifications — no bot to host, no code to write.'
+
+const faqs = [
+    {
+        q: 'How do I get GitLab notifications in Discord?',
+        a: "Create a Discord webhook in your server settings, paste its URL into the generator above and choose GitLab, then add the generated skyhook URL to your GitLab project's webhook settings. skyhook formats every push, merge request, and pipeline event into a native Discord message.",
+    },
+    {
+        q: 'Which services does skyhook support?',
+        a: `${providers.length} and counting — including GitLab, Jira, Confluence, Bitbucket, Docker Hub, Travis CI, CircleCI, Jenkins, Heroku, New Relic, Rollbar, Pingdom, Uptime Robot, Trello, Patreon and Azure DevOps.`,
+    },
+    {
+        q: 'Do I need to host a bot or write any code?',
+        a: 'No. skyhook is a hosted service, so there is no Discord bot to run and no code to write. You generate a URL, paste it into your provider, and notifications start arriving in your channel.',
+    },
+    {
+        q: 'Does skyhook work with GitHub?',
+        a: 'GitHub can already post to Discord natively — just add /github to the end of your Discord webhook URL. skyhook focuses on the many services that do not have built-in Discord support.',
+    },
+    {
+        q: 'Is skyhook free?',
+        a: 'Yes. skyhook is free and open source under the MIT license, and skyhookapi.com is hosted for you.',
+    },
+]
+
+const structuredData = [
+    {
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareApplication',
+        name: 'skyhook',
+        applicationCategory: 'DeveloperApplication',
+        operatingSystem: 'Web',
+        url: canonical,
+        description: pageDescription,
+        image: ogImage,
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+        author: { '@type': 'Organization', name: 'Commit451', url: 'https://github.com/Commit451' },
+    },
+    {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faqs.map((f) => ({
+            '@type': 'Question',
+            name: f.q,
+            acceptedAnswer: { '@type': 'Answer', text: f.a },
+        })),
+    },
+]
 ---
 
 <!doctype html>
@@ -7,19 +98,48 @@ import '../styles/global.css'
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta
-            name="description"
-            content="skyhook parses webhooks from various services and forwards them in the proper format to Discord."
-        />
-        <link rel="icon" type="image/png" href={`${import.meta.env.BASE_URL}favicon.png`} />
-        <title>skyhook</title>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <link rel="canonical" href={canonical} />
+        <meta name="theme-color" content="#111114" />
+        <meta name="author" content="Commit451" />
+
+        <!-- Open Graph -->
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="skyhook" />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:image:width" content="2400" />
+        <meta property="og:image:height" content="1260" />
+        <meta property="og:image:alt" content="skyhook — Discord notifications for your dev tools" />
+        <meta property="og:locale" content="en_US" />
+
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        <meta name="twitter:image" content={ogImage} />
+        <meta name="twitter:image:alt" content="skyhook — Discord notifications for your dev tools" />
+
+        <link rel="icon" type="image/png" href={`${base}favicon.png`} />
+        <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
     </head>
     <body>
         <header>
-            <h1>skyhook</h1>
+            <a class="brand" href="/" aria-label="skyhook home">
+                <img src={`${base}images/skyhook.png`} alt="" width="30" height="30" />
+                <span class="wordmark">skyhook</span>
+            </a>
             <nav>
+                <a href="https://discord.gg/js7wD7p" aria-label="Join the Discord" target="_blank" rel="noopener">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M20.317 4.369A19.79 19.79 0 0 0 15.432 3a13.6 13.6 0 0 0-.617 1.265 18.27 18.27 0 0 0-5.487 0A12.6 12.6 0 0 0 8.71 3a19.7 19.7 0 0 0-4.885 1.37C.732 8.95-.087 13.41.31 17.81a19.9 19.9 0 0 0 6.064 3.06c.49-.665.927-1.37 1.302-2.11a12.9 12.9 0 0 1-2.05-.984c.172-.126.34-.257.503-.392a14.2 14.2 0 0 0 12.142 0c.165.14.333.27.503.392-.654.388-1.343.72-2.053.985.375.74.81 1.444 1.3 2.11a19.8 19.8 0 0 0 6.067-3.06c.466-5.1-.796-9.52-3.343-13.44ZM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.42 0-1.333.955-2.42 2.157-2.42 1.21 0 2.176 1.096 2.157 2.42 0 1.335-.956 2.42-2.157 2.42Zm7.975 0c-1.183 0-2.157-1.085-2.157-2.42 0-1.333.955-2.42 2.157-2.42 1.21 0 2.176 1.096 2.157 2.42 0 1.335-.946 2.42-2.157 2.42Z"></path>
+                    </svg>
+                </a>
                 <a href="https://github.com/Commit451/skyhook" aria-label="Source on GitHub" target="_blank" rel="noopener">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                         <path
                             d="M12 .5C5.73.5.65 5.58.65 11.85c0 5.02 3.25 9.27 7.76 10.77.57.1.78-.25.78-.55v-1.93c-3.16.69-3.83-1.52-3.83-1.52-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.69.08-.69 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.24 3.34.95.1-.74.4-1.24.72-1.52-2.52-.29-5.17-1.26-5.17-5.6 0-1.24.45-2.25 1.18-3.05-.12-.29-.51-1.45.11-3.02 0 0 .96-.3 3.14 1.17a10.94 10.94 0 0 1 5.72 0c2.18-1.48 3.14-1.17 3.14-1.17.62 1.57.23 2.73.11 3.02.74.8 1.18 1.81 1.18 3.05 0 4.36-2.65 5.31-5.18 5.59.41.36.78 1.06.78 2.15v3.19c0 .31.21.66.79.55 4.5-1.5 7.75-5.75 7.75-10.77C23.35 5.58 18.27.5 12 .5z"
                         ></path>
@@ -28,32 +148,249 @@ import '../styles/global.css'
             </nav>
         </header>
 
-        <main>
-            <div class="card">
-                <p class="intro">
-                    skyhook parses webhooks from various services and forwards them in the proper format to Discord.
+        <!-- ===== Hero ===== -->
+        <section class="hero">
+            <div class="hero-copy">
+                <h1>Turn webhooks into <span class="accent">beautiful Discord notifications</span>.</h1>
+                <p class="lead">
+                    skyhook translates webhooks from GitLab, Jira, Docker Hub and 20+ other services into clean, native
+                    Discord notifications. No bot to host, no code to write — generate a URL, paste it into your
+                    provider, and you're done.
                 </p>
-                <p>
-                    In order to have skyhook parse your webhooks properly, you must first generate a webhook URL.
-                    Once you have the URL generated, you can pass it along to the provider you selected.
-                </p>
-
-                <div id="url-field" class="field">
-                    <label for="discord-url">Discord Webhook URL</label>
-                    <input id="discord-url" type="url" autocomplete="off" spellcheck="false" />
-                    <div id="url-error" class="error" aria-live="polite"></div>
+                <div class="hero-actions">
+                    <a class="btn btn-primary" href="#generate">Generate your URL</a>
+                    <a class="btn btn-ghost" href="#providers">See supported providers</a>
                 </div>
-
-                <div class="field">
-                    <label for="provider">Provider</label>
-                    <select id="provider" disabled>
-                        <option value="">Loading…</option>
-                    </select>
+                <div class="hero-meta">
+                    <span class="dot"></span>
+                    Free &amp; open source · hosted for you at skyhookapi.com
                 </div>
-
-                <button id="generate" class="primary" type="button">Generate URL</button>
             </div>
-        </main>
+
+            <div class="demo">
+                <div class="demo-tabs" role="tablist" aria-label="Example messages">
+                    <button class="demo-tab active" style="--c:#fc6d26" data-target="ex-gitlab" type="button">
+                        <span class="swatch"></span>GitLab
+                    </button>
+                    <button class="demo-tab" style="--c:#39aa56" data-target="ex-travis" type="button">
+                        <span class="swatch"></span>Travis CI
+                    </button>
+                    <button class="demo-tab" style="--c:#d32f2f" data-target="ex-pingdom" type="button">
+                        <span class="swatch"></span>Pingdom
+                    </button>
+                </div>
+
+                <div class="discord">
+                    <!-- GitLab: push -->
+                    <div class="demo-msg active" id="ex-gitlab">
+                        <div class="dc-msg">
+                            <div class="dc-avatar" style={`--c:#fc6d26;--logo:${logoUrl('gitlab')}`}>
+                                <span class="glyph"></span>
+                            </div>
+                            <div>
+                                <div class="dc-head">
+                                    <span class="dc-username">GitLab</span>
+                                    <span class="dc-badge">App</span>
+                                    <span class="dc-time">Today at 9:41 AM</span>
+                                </div>
+                                <div class="dc-embed" style="--c:#fc6d26">
+                                    <div class="dc-embed-author">
+                                        <span class="a-icon">JC</span>
+                                        <span>John Carlson</span>
+                                    </div>
+                                    <div class="dc-embed-title">[skyhook:main] 2 commits</div>
+                                    <div class="dc-field">
+                                        <div class="dc-field-name">Commit from John Carlson</div>
+                                        <div class="dc-field-val">
+                                            (<code class="link">a1b2c3d</code>) Add provider grid to the marketing site
+                                        </div>
+                                    </div>
+                                    <div class="dc-field">
+                                        <div class="dc-field-name">Commit from John Carlson</div>
+                                        <div class="dc-field-val">
+                                            (<code class="link">e4f5a6b</code>) Fix embed footer icon URL
+                                        </div>
+                                    </div>
+                                    <div class="dc-embed-footer">
+                                        <img src={footerIcon} alt="" />
+                                        Powered by skyhookapi.com
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Travis CI: build passed -->
+                    <div class="demo-msg" id="ex-travis">
+                        <div class="dc-msg">
+                            <div class="dc-avatar" style={`--c:#3eaaaf;--logo:${logoUrl('travis')}`}>
+                                <span class="glyph"></span>
+                            </div>
+                            <div>
+                                <div class="dc-head">
+                                    <span class="dc-username">Travis CI</span>
+                                    <span class="dc-badge">App</span>
+                                    <span class="dc-time">Today at 9:43 AM</span>
+                                </div>
+                                <div class="dc-embed" style="--c:#39aa56">
+                                    <div class="dc-embed-title">[skyhook:main] Build #142: Passed</div>
+                                    <div class="dc-embed-desc">
+                                        (<code class="link">a1b2c3d</code>) Add provider grid to the marketing site
+                                    </div>
+                                    <div class="dc-embed-footer">
+                                        <img src={footerIcon} alt="" />
+                                        Powered by skyhookapi.com
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pingdom: uptime alert -->
+                    <div class="demo-msg" id="ex-pingdom">
+                        <div class="dc-msg">
+                            <div class="dc-avatar" style={`--c:#2a2a30;--glyph:#fce000;--logo:${logoUrl('pingdom')}`}>
+                                <span class="glyph"></span>
+                            </div>
+                            <div>
+                                <div class="dc-head">
+                                    <span class="dc-username">Pingdom</span>
+                                    <span class="dc-badge">App</span>
+                                    <span class="dc-time">Today at 9:52 AM</span>
+                                </div>
+                                <div class="dc-embed" style="--c:#d32f2f">
+                                    <div class="dc-embed-title plain">API Health Check - State changed</div>
+                                    <div class="dc-embed-desc">State change from UP to DOWN</div>
+                                    <div class="dc-embed-footer">
+                                        <img src={footerIcon} alt="" />
+                                        Powered by skyhookapi.com
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Providers ===== -->
+        <section class="providers" id="providers">
+            <div class="section">
+                <div class="section-head">
+                    <span class="eyebrow">Supported providers</span>
+                    <h2>Discord notifications for the tools you already use</h2>
+                    <p>
+                        From GitLab pushes and Jira issues to Docker Hub builds, CI results, and Pingdom or Uptime
+                        Robot alerts — skyhook delivers a clean Discord notification for every event, across {providers.length}
+                        {' '}services and counting.
+                    </p>
+                </div>
+
+                <div class="provider-grid">
+                    {
+                        providers.map((p) => (
+                            <div
+                                class="provider-tile"
+                                style={`--c:${p.color}${p.monogram ? '' : `;--logo:${logoUrl(p.slug)}`}`}
+                                title={`/${p.slug}`}
+                            >
+                                <div class="provider-mark">
+                                    {p.monogram ? (
+                                        <span class="monogram">{p.monogram}</span>
+                                    ) : (
+                                        <span class="glyph" />
+                                    )}
+                                </div>
+                                <span class="provider-name">{p.name}</span>
+                            </div>
+                        ))
+                    }
+                </div>
+
+                <p class="provider-note">
+                    Missing one? skyhook is open source —
+                    <a href="https://github.com/Commit451/skyhook/issues" target="_blank" rel="noopener">request a provider</a>
+                    or open a pull request.
+                </p>
+            </div>
+        </section>
+
+        <!-- ===== How it works + generator ===== -->
+        <section class="section" id="generate">
+            <div class="section-head">
+                <span class="eyebrow">Get started</span>
+                <h2>Up and running in three steps</h2>
+                <p>It takes about a minute. No account, no install.</p>
+            </div>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <h3>Create a Discord webhook</h3>
+                    <p>In your server: Settings → Integrations → Webhooks → New Webhook. Copy its URL.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <h3>Generate your skyhook URL</h3>
+                    <p>Paste the Discord URL below and pick your provider. We'll build the URL and copy it for you.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <h3>Paste it into your provider</h3>
+                    <p>Add the generated URL as a webhook in your service. Messages start flowing into Discord.</p>
+                </div>
+            </div>
+
+            <div class="generator">
+                <div class="card">
+                    <div id="url-field" class="field">
+                        <label for="discord-url">Discord Webhook URL</label>
+                        <input id="discord-url" type="url" autocomplete="off" spellcheck="false" placeholder="https://discord.com/api/webhooks/…" />
+                        <div id="url-error" class="error" aria-live="polite"></div>
+                    </div>
+
+                    <div class="field">
+                        <label for="provider">Provider</label>
+                        <select id="provider" disabled>
+                            <option value="">Loading…</option>
+                        </select>
+                    </div>
+
+                    <button id="generate" class="primary" type="button">Generate URL</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== FAQ ===== -->
+        <section class="section faq-section">
+            <div class="section-head">
+                <span class="eyebrow">FAQ</span>
+                <h2>Questions, answered</h2>
+            </div>
+            <div class="faq">
+                {
+                    faqs.map((f) => (
+                        <div class="faq-item">
+                            <h3>{f.q}</h3>
+                            <p>{f.a}</p>
+                        </div>
+                    ))
+                }
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <img src={`${base}images/skyhook.png`} alt="" />
+                    <span>© {year} Commit451 · skyhook is MIT licensed</span>
+                </div>
+                <div class="footer-links">
+                    <a href="https://github.com/Commit451/skyhook" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://discord.gg/js7wD7p" target="_blank" rel="noopener">Discord</a>
+                </div>
+            </div>
+        </footer>
 
         <div id="toast" role="status" aria-live="polite">
             <span id="toast-message"></span>
@@ -62,6 +399,17 @@ import '../styles/global.css'
 
         <script>
             import '../scripts/form.ts'
+
+            // Example-message tab switcher
+            const tabs = document.querySelectorAll<HTMLButtonElement>('.demo-tab')
+            const messages = document.querySelectorAll<HTMLElement>('.demo-msg')
+            for (const tab of tabs) {
+                tab.addEventListener('click', () => {
+                    const target = tab.dataset.target
+                    for (const t of tabs) t.classList.toggle('active', t === tab)
+                    for (const m of messages) m.classList.toggle('active', m.id === target)
+                })
+            }
         </script>
     </body>
 </html>

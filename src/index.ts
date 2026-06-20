@@ -79,7 +79,7 @@ for (const Provider of providers) {
 app.use('*', cors())
 app.use('/*', serveStatic({ root: './public' }))
 
-app.get('/', (c) => c.redirect('https://commit451.github.io/skyhook/'))
+app.get('/', (c) => c.redirect('https://www.skyhookapi.com/'))
 
 app.get('/api/providers', (c) => c.json(providerInfos, 200))
 
