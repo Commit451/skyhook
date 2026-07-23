@@ -2,6 +2,7 @@ import * as fs from 'node:fs'
 import { serve } from '@hono/node-server'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { type Context, Hono } from 'hono'
+import { bodyLimit } from 'hono/body-limit'
 import { cors } from 'hono/cors'
 import type { ContentfulStatusCode } from 'hono/utils/http-status'
 import type { DiscordPayload } from './model/DiscordApi.ts'
@@ -79,6 +80,13 @@ for (const Provider of providers) {
 }
 
 app.use('*', cors())
+app.use(
+    '*',
+    bodyLimit({
+        maxSize: 2 * 1024 * 1024, // 2MB
+        onError: (c) => c.text('Request body too large. Maximum size is 2MB.', 413),
+    }),
+)
 app.use('/*', serveStatic({ root: './public' }))
 
 app.get('/', (c) => c.redirect('https://www.skyhookapi.com/'))
