@@ -189,7 +189,23 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from/test', async (c) => {
     return sendPayload(providerPath, discordPayload, discordEndpoint, c)
 })
 
-app.notFound((c) => c.text('Not Found', 404))
+app.notFound((c) => {
+    const acceptsHtml = c.req.header('accept')?.toLowerCase().includes('text/html') ?? false
+    const isBrowserNavigation = (c.req.method === 'GET' || c.req.method === 'HEAD') && acceptsHtml
+    const requestUrl = new URL(c.req.url)
+    const isPotentialWebhookUrl = requestUrl.pathname.startsWith('/api/webhooks')
+
+    if (isBrowserNavigation && !isPotentialWebhookUrl) {
+        // The apex domain serves the API while the website lives on www. Send browser
+        // navigations to the same path there so GitHub Pages can render its custom 404.
+        // Do not forward query strings or malformed webhook paths, which may contain secrets.
+        const websiteUrl = new URL('https://www.skyhookapi.com/')
+        websiteUrl.pathname = requestUrl.pathname
+        return c.redirect(websiteUrl.href)
+    }
+
+    return c.text('Not Found', 404)
+})
 
 const port = normalizePort(process.env.PORT || '8080')
 
