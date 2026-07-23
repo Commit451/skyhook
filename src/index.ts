@@ -27,6 +27,7 @@ import { NewRelic } from './provider/NewRelic.ts'
 import { Patreon } from './provider/Patreon.ts'
 import { Pingdom } from './provider/Pingdom.ts'
 import { Rollbar } from './provider/Rollbar.ts'
+import { Shopify } from './provider/Shopify.ts'
 import { Travis } from './provider/Travis.ts'
 import { Trello } from './provider/Trello.ts'
 import { Unity } from './provider/Unity.ts'
@@ -61,6 +62,7 @@ const providers: ProviderClass[] = [
     Patreon,
     Pingdom,
     Rollbar,
+    Shopify,
     Travis,
     Trello,
     Unity,
@@ -185,7 +187,9 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from/test', async (c) => {
     const provider = new Provider()
     const jsonFileName = `${providerPath}.json`
     const json = fs.readFileSync(`./test/${providerPath}/${jsonFileName}`, 'utf-8')
-    const discordPayload = await provider.parse(JSON.parse(json))
+    const headersFileName = `./test/${providerPath}/${providerPath}.headers.json`
+    const headers = fs.existsSync(headersFileName) ? JSON.parse(fs.readFileSync(headersFileName, 'utf-8')) : null
+    const discordPayload = await provider.parse(JSON.parse(json), headers)
     return sendPayload(providerPath, discordPayload, discordEndpoint, c)
 })
 
