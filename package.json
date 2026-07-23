@@ -22,7 +22,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@hono/node-server": "^2.0.3",
+    "@hono/node-server": "^2.0.10",
     "hono": "^4.12.31",
     "hono-rate-limiter": "^0.5.3",
     "turndown": "^7.2.4"
