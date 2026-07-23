@@ -17,6 +17,7 @@ import { Confluence } from './provider/Confluence.ts'
 import { DockerHub } from './provider/DockerHub.ts'
 import { GitLab } from './provider/GitLab.ts'
 import { Heroku } from './provider/Heroku.ts'
+import { HuggingFace } from './provider/HuggingFace.ts'
 import { Instana } from './provider/Instana.ts'
 import { Jenkins } from './provider/Jenkins.ts'
 import { Jira } from './provider/Jira.ts'
@@ -50,6 +51,7 @@ const providers: ProviderClass[] = [
     DockerHub,
     GitLab,
     Heroku,
+    HuggingFace,
     Instana,
     Jenkins,
     Jira,

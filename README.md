@@ -39,6 +39,7 @@ https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/provi
 - [Dockerhub](https://docs.docker.com/docker-hub/webhooks) - `/dockerhub`
 - [GitLab](https://gitlab.com/help/user/project/integrations/webhooks) - `/gitlab`
 - [Heroku](https://devcenter.heroku.com/articles/deploy-hooks#http-post-hook) - `/heroku`
+- [Hugging Face](https://huggingface.co/docs/hub/main/webhooks) - `/huggingface`
 - [Instana](https://www.instana.com/docs/ecosystem/webhook/) - `/instana`
 - [Jenkins](https://plugins.jenkins.io/notification) - `/jenkins` (requires
   the [notification plugin](https://wiki.jenkins.io/display/JENKINS/Notification+Plugin))
