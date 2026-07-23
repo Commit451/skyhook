@@ -5,6 +5,7 @@ import { type Context, Hono } from 'hono'
 import { bodyLimit } from 'hono/body-limit'
 import { cors } from 'hono/cors'
 import type { ContentfulStatusCode } from 'hono/utils/http-status'
+import { rateLimiter } from 'hono-rate-limiter'
 import type { DiscordPayload } from './model/DiscordApi.ts'
 import { AppCenter } from './provider/AppCenter.ts'
 import { AppVeyor } from './provider/Appveyor.ts'
@@ -110,42 +111,62 @@ app.get('/api/webhooks/:webhookID/:webhookSecret/:from', (c) => {
     return c.body(null, 200)
 })
 
-app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (c) => {
-    const webhookID = c.req.param('webhookID')
-    const webhookSecret = c.req.param('webhookSecret')
-    const providerPath = c.req.param('from')
-    if (!webhookID || !webhookSecret || !providerPath) {
-        return c.body(null, 400)
-    }
-    const discordEndpoint = `https://discordapp.com/api/webhooks/${webhookID}/${webhookSecret}`
+app.post(
+    '/api/webhooks/:webhookID/:webhookSecret/:from',
+    rateLimiter({
+        windowMs: 1000, // 1 second
+        limit: 5, // 5 requests per second per webhook URL
+        keyGenerator: (c) => {
+            const webhookID = c.req.param('webhookID')
+            const webhookSecret = c.req.param('webhookSecret')
+            return `${webhookID}:${webhookSecret}`
+        },
+        message: 'Rate limit exceeded. Maximum 5 requests per second per webhook.',
+        statusCode: 429,
+        handler: (c, _next, _options) => {
+            logger.warn(`Rate limit exceeded for webhook: ${c.req.param('webhookID')}`)
+            return c.text('Rate limit exceeded. Maximum 5 requests per second per webhook.', 429, {
+                'Retry-After': '1',
+            })
+        },
+    }),
+    async (c) => {
+        const webhookID = c.req.param('webhookID')
+        const webhookSecret = c.req.param('webhookSecret')
+        const providerPath = c.req.param('from')
+        if (!webhookID || !webhookSecret || !providerPath) {
+            return c.body(null, 400)
+        }
+        const discordEndpoint = `https://discordapp.com/api/webhooks/${webhookID}/${webhookSecret}`
 
-    let discordPayload: DiscordPayload | null = null
+        let discordPayload: DiscordPayload | null = null
 
-    const Provider = providersMap.get(providerPath)
-    if (Provider == null) {
-        const errorMessage = `Unknown provider ${providerPath}`
-        logger.error(errorMessage)
-        return c.text(errorMessage, 400)
-    }
+        const Provider = providersMap.get(providerPath)
+        if (Provider == null) {
+            const errorMessage = `Unknown provider ${providerPath}`
+            logger.error(errorMessage)
+            return c.text(errorMessage, 400)
+        }
 
-    const instance = new Provider()
-    try {
-        const queryObject = c.req.query()
-        console.log(queryObject)
-        const headersObject: Record<string, string> = {}
-        c.req.raw.headers.forEach((value, key) => {
-            headersObject[key] = value
-        })
-        const body = await parseRequestBody(c)
-        discordPayload = await instance.parse(body, headersObject, queryObject)
-    } catch (error) {
-        logger.error('Error during parse: ' + error.stack)
-        discordPayload = ErrorUtil.createErrorPayload(providerPath, error)
-        return sendPayload(providerPath, discordPayload, discordEndpoint, c, 500)
-    }
+        const instance = new Provider()
+        try {
+            const queryObject = c.req.query()
+            console.log(queryObject)
+            const headersObject: Record<string, string> = {}
+            c.req.raw.headers.forEach((value, key) => {
+                headersObject[key] = value
+            })
+            const body = await parseRequestBody(c)
+            discordPayload = await instance.parse(body, headersObject, queryObject)
+        } catch (error) {
+            logger.error('Error during parse: ' + error.stack)
+            discordPayload = ErrorUtil.createErrorPayload(providerPath, error)
+            return sendPayload(providerPath, discordPayload, discordEndpoint, c, 500)
+        }
 
-    return sendPayload(providerPath, discordPayload, discordEndpoint, c)
-})
+        return sendPayload(providerPath, discordPayload, discordEndpoint, c)
+    },
+)
 
 app.post('/api/webhooks/:webhookID/:webhookSecret/:from/test', async (c) => {
     const webhookID = c.req.param('webhookID')
