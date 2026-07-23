@@ -5,6 +5,7 @@ import { type Context, Hono } from 'hono'
 import { bodyLimit } from 'hono/body-limit'
 import { cors } from 'hono/cors'
 import type { ContentfulStatusCode } from 'hono/utils/http-status'
+import { rateLimiter } from './middleware/rateLimiter.ts'
 import type { DiscordPayload } from './model/DiscordApi.ts'
 import { AppCenter } from './provider/AppCenter.ts'
 import { AppVeyor } from './provider/Appveyor.ts'
@@ -110,7 +111,7 @@ app.get('/api/webhooks/:webhookID/:webhookSecret/:from', (c) => {
     return c.body(null, 200)
 })
 
-app.post('/api/webhooks/:webhookID/:webhookSecret/:from', async (c) => {
+app.post('/api/webhooks/:webhookID/:webhookSecret/:from', rateLimiter(), async (c) => {
     const webhookID = c.req.param('webhookID')
     const webhookSecret = c.req.param('webhookSecret')
     const providerPath = c.req.param('from')
