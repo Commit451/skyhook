@@ -56,6 +56,13 @@ https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/provi
 - [Unity Cloud](https://build-api.cloud.unity3d.com/docs/1.0.0/index.html#operation-webhooks-intro) - `/unity`
 - [Uptime Robot](https://blog.uptimerobot.com/web-hook-alert-contacts-new-feature/) - `/uptimerobot`
 - [VSTS](https://docs.microsoft.com/en-us/vsts/service-hooks/events#) - `/vsts`
+- [Zendesk](https://developer.zendesk.com/api-reference/webhooks/webhooks-api/webhooks/) - `/zendesk`
+
+### Zendesk setup
+
+Use the generated `/zendesk` URL as the endpoint for a Zendesk webhook that subscribes directly to Zendesk events. Configure the webhook to use `POST` with the `json` request format, then select the event subscriptions you want delivered to Discord. Skyhook supports the standard Zendesk event schema across ticket, user, organization, article, and future event domains.
+
+Zendesk trigger and automation webhooks are not automatically parsed because their request payload is administrator-defined. Connect the webhook through event subscriptions instead.
 
 If you want support for a new provider, just create a pull request and add it!  
 Alternatively, a new provider can also be requested by creating an [issue](https://github.com/Commit451/skyhook/issues).
