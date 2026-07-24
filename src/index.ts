@@ -29,6 +29,7 @@ import { NewRelic } from './provider/NewRelic.ts'
 import { Patreon } from './provider/Patreon.ts'
 import { Pingdom } from './provider/Pingdom.ts'
 import { Rollbar } from './provider/Rollbar.ts'
+import { Shopify } from './provider/Shopify.ts'
 import { Travis } from './provider/Travis.ts'
 import { Trello } from './provider/Trello.ts'
 import { Unity } from './provider/Unity.ts'
@@ -63,6 +64,7 @@ const providers: ProviderClass[] = [
     Patreon,
     Pingdom,
     Rollbar,
+    Shopify,
     Travis,
     Trello,
     Unity,

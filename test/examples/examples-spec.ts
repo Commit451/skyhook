@@ -22,6 +22,7 @@ const expectedProviderPaths = [
     'patreon',
     'pingdom',
     'rollbar',
+    'shopify',
     'travis',
     'trello',
     'unity',

@@ -1,0 +1,26 @@
+{
+  "id": 820982911946154508,
+  "admin_graphql_api_id": "gid://shopify/Order/820982911946154508",
+  "created_at": "2021-12-31T19:00:00-05:00",
+  "currency": "USD",
+  "current_total_price": "414.95",
+  "financial_status": "paid",
+  "fulfillment_status": null,
+  "name": "#9999",
+  "customer": {
+    "first_name": "John",
+    "last_name": "Smith"
+  },
+  "line_items": [
+    {
+      "name": "Aviator sunglasses",
+      "quantity": 1,
+      "sku": "SKU2006-001"
+    },
+    {
+      "name": "Lens Protection Plan (2 Year)",
+      "quantity": 2,
+      "sku": "LENS-PROTECT-2YR"
+    }
+  ]
+}

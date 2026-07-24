@@ -27,6 +27,7 @@ const providers: Provider[] = [
     { name: 'Patreon', slug: 'patreon', color: '#ff5a45' },
     { name: 'Pingdom', slug: 'pingdom', color: '#fce000' },
     { name: 'Rollbar', slug: 'rollbar', color: '#5c7cf5' },
+    { name: 'Shopify', slug: 'shopify', color: '#95bf47' },
     { name: 'Travis CI', slug: 'travis', color: '#3eaaaf' },
     { name: 'Trello', slug: 'trello', color: '#2684ff' },
     { name: 'Unity Cloud', slug: 'unity', color: '#e8e8e8' },
@@ -42,9 +43,9 @@ const year = new Date().getFullYear()
 const SITE = Astro.site ?? new URL('https://www.skyhookapi.com')
 const canonical = new URL(base, SITE).href
 const ogImage = new URL(`${base}og.png`, SITE).href
-const pageTitle = 'Discord Notifications for GitLab, Jira & 20+ Tools — skyhook'
+const pageTitle = 'Discord Notifications for Shopify, GitLab, Jira & 20+ Tools — skyhook'
 const pageDescription =
-    'skyhook turns webhooks from GitLab, Hugging Face, Jira, Docker Hub, CI tools and 20+ other services into clean, native Discord notifications — no bot to host, no code to write.'
+    'skyhook turns webhooks from Shopify, GitLab, Hugging Face, Jira, Docker Hub, CI tools and 20+ other services into clean, native Discord notifications — no bot to host, no code to write.'
 
 const faqs = [
     {
@@ -53,7 +54,7 @@ const faqs = [
     },
     {
         q: 'Which services does skyhook support?',
-        a: `${providers.length} and counting — including GitLab, Hugging Face, Jira, Confluence, Bitbucket, Docker Hub, Travis CI, CircleCI, Jenkins, Heroku, New Relic, Rollbar, Pingdom, Uptime Robot, Trello, Patreon and Azure DevOps.`,
+        a: `${providers.length} and counting — including Shopify, GitLab, Hugging Face, Jira, Confluence, Bitbucket, Docker Hub, Travis CI, CircleCI, Jenkins, Heroku, New Relic, Rollbar, Pingdom, Uptime Robot, Trello, Patreon and Azure DevOps.`,
     },
     {
         q: 'Do I need to host a bot or write any code?',
@@ -154,9 +155,9 @@ const structuredData = [
             <div class="hero-copy">
                 <h1>Turn webhooks into <span class="accent">beautiful Discord notifications</span>.</h1>
                 <p class="lead">
-                    skyhook translates webhooks from GitLab, Hugging Face, Jira, Docker Hub and 20+ other services into
-                    clean, native Discord notifications. No bot to host, no code to write — generate a URL, paste it
-                    into your provider, and you're done.
+                    skyhook translates webhooks from Shopify, GitLab, Hugging Face, Jira, Docker Hub and 20+ other
+                    services into clean, native Discord notifications. No bot to host, no code to write — generate a
+                    URL, paste it into your provider, and you're done.
                 </p>
                 <div class="hero-actions">
                     <a class="btn btn-primary" href="#generate">Generate your URL</a>

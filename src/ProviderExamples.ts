@@ -43,6 +43,10 @@ const providerExamples: Record<string, ProviderExampleFiles> = {
     },
     pingdom: { body: 'pingdom/pingdom.json' },
     rollbar: { body: 'rollbar/rollbar.json' },
+    shopify: {
+        body: 'shopify/shopify.json',
+        headers: 'shopify/shopify.headers.json',
+    },
     travis: { body: 'travis/travis.json' },
     trello: { body: 'trello/trello.json' },
     unity: { body: 'unity/unity.json' },

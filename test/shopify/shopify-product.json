@@ -1,0 +1,23 @@
+{
+  "admin_graphql_api_id": "gid://shopify/Product/788032119674292922",
+  "body_html": "An example T-Shirt",
+  "handle": "example-t-shirt",
+  "id": 788032119674292922,
+  "product_type": "Shirts",
+  "title": "Example T-Shirt",
+  "updated_at": "2021-12-31T19:00:00-05:00",
+  "vendor": "Acme",
+  "status": "active",
+  "variants": [
+    {
+      "id": 642667041472713922,
+      "price": "19.99",
+      "title": "Small"
+    },
+    {
+      "id": 757650484644203962,
+      "price": "19.99",
+      "title": "Medium"
+    }
+  ]
+}
