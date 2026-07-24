@@ -35,6 +35,7 @@ const providers: Provider[] = [
     { name: 'Azure DevOps', slug: 'vsts', color: '#2f9be6' },
     { name: 'Zendesk', slug: 'zendesk', color: '#9bb9b5' },
 ]
+providers.sort((left, right) => left.name.localeCompare(right.name))
 
 const footerIcon = `${base}images/skyhook-tiny.png`
 const logoUrl = (slug: string) => `url(${base}providers/${slug}.svg)`
