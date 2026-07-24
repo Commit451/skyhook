@@ -6,8 +6,9 @@ Parses webhooks and forwards them in the proper format to Discord.
 
 ## Setup
 
-You can use the [site](https://skyhookapi.com) to create the right webhook link. If you want to
-manually do it, here are the steps:
+You can use the [site](https://skyhookapi.com) to create the right webhook link and send a test
+notification to Discord before configuring your provider. If you want to manually create the link,
+here are the steps:
 
 1. Create a webhook in Discord (Server Settings -> Webhooks -> Create Webhook)
 2. Copy the webhook url
