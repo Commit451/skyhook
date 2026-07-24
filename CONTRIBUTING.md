@@ -30,3 +30,5 @@ From here you should be able to [setup](https://github.com/Commit451/skyhook#set
 
 If your changes work, the provider's webhooks should be parsed and forwarded to discord. You can also write tests in the `test` directory, using the other tests as an example, to make sure your webhook parsing is working.
 
+Each provider also needs one canonical payload under `examples/<provider>/` registered in `src/ProviderExamples.ts`. The hosted generator uses that same payload for the snackbar's **Test** action. Keep additional test-only payloads under `test/<provider>/`.
+

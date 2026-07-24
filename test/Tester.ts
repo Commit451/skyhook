@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { inspect } from 'node:util'
 import type { DiscordPayload } from '../src/model/DiscordApi.ts'
 import type { BaseProvider } from '../src/provider/BaseProvider.ts'
@@ -37,7 +37,10 @@ class Tester {
     }
 
     public static readTestFile(provider: BaseProvider, fileName: string): string {
-        return readFileSync(`./test/${provider.getPath().toLowerCase()}/${fileName}`, 'utf-8')
+        const providerPath = provider.getPath().toLowerCase()
+        const examplePath = `./examples/${providerPath}/${fileName}`
+        const filePath = existsSync(examplePath) ? examplePath : `./test/${providerPath}/${fileName}`
+        return readFileSync(filePath, 'utf-8')
     }
 }
 
