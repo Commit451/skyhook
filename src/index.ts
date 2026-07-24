@@ -35,6 +35,7 @@ import { Trello } from './provider/Trello.ts'
 import { Unity } from './provider/Unity.ts'
 import { UptimeRobot } from './provider/UptimeRobot.ts'
 import { VSTS } from './provider/VSTS.ts'
+import { Zendesk } from './provider/Zendesk.ts'
 import { ErrorUtil } from './util/ErrorUtil.ts'
 import { logger } from './util/logger.ts'
 
@@ -70,6 +71,7 @@ const providers: ProviderClass[] = [
     Unity,
     UptimeRobot,
     VSTS,
+    Zendesk,
 ]
 
 const providersMap = new Map<string, ProviderClass>()

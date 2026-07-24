@@ -28,6 +28,7 @@ const expectedProviderPaths = [
     'unity',
     'uptimerobot',
     'vsts',
+    'zendesk',
 ]
 
 describe('provider examples', () => {

@@ -52,6 +52,7 @@ const providerExamples: Record<string, ProviderExampleFiles> = {
     unity: { body: 'unity/unity.json' },
     uptimerobot: { body: 'uptimerobot/uptimerobot.json' },
     vsts: { body: 'vsts/vsts.json' },
+    zendesk: { body: 'zendesk/zendesk.json' },
 }
 
 const examplesRoot = fileURLToPath(new URL('../examples/', import.meta.url))
