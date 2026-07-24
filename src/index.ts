@@ -25,6 +25,7 @@ import { HuggingFace } from './provider/HuggingFace.ts'
 import { Instana } from './provider/Instana.ts'
 import { Jenkins } from './provider/Jenkins.ts'
 import { Jira } from './provider/Jira.ts'
+import { Linear } from './provider/Linear.ts'
 import { NewRelic } from './provider/NewRelic.ts'
 import { Patreon } from './provider/Patreon.ts'
 import { Pingdom } from './provider/Pingdom.ts'
@@ -61,6 +62,7 @@ const providers: ProviderClass[] = [
     Instana,
     Jenkins,
     Jira,
+    Linear,
     NewRelic,
     Patreon,
     Pingdom,

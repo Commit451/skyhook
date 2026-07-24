@@ -36,6 +36,10 @@ const providerExamples: Record<string, ProviderExampleFiles> = {
     instana: { body: 'instana/instana.json' },
     jenkins: { body: 'jenkins/jenkins.json' },
     jira: { body: 'jira/jira-issue.json' },
+    linear: {
+        body: 'linear/linear.json',
+        headers: 'linear/linear.headers.json',
+    },
     newrelic: { body: 'newrelic/newrelic.json' },
     patreon: {
         body: 'patreon/patreon-member-create.json',
