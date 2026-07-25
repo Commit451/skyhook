@@ -1,16 +1,16 @@
 import type { DiscordPayload } from '../model/DiscordApi.ts'
 
 /**
- * Error things
+ * Builds the safe Discord-facing payload for an internal parse failure.
  */
 export class ErrorUtil {
-    public static createErrorPayload(provider: string, error: Error): DiscordPayload {
+    public static createErrorPayload(provider: string, _error: unknown): DiscordPayload {
         return {
             embeds: [
                 {
                     title: 'Skyhook Error',
                     url: 'https://github.com/Commit451/skyhook/issues',
-                    description: `An error has occured on skyhook for your webhook with provider ${provider}. Maybe you can copy/paste or screenshot this error if there is no sensitive information and open an issue on the skyhook GitHub.\n\nError: ${JSON.stringify(error.stack)}`,
+                    description: `An error occurred in Skyhook while processing your webhook for provider ${provider}. Internal error and request details are only recorded in the server logs. Please open an issue on the Skyhook GitHub if the problem continues.`,
                 },
             ],
         }

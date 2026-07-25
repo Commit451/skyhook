@@ -1,13 +1,8 @@
 import type { Embed, EmbedField } from '../model/DiscordApi.ts'
 import { DirectParseProvider } from '../provider/BaseProvider.ts'
-
-const MAX_EMBED_CHARACTERS = 6000
-const MAX_TITLE_CHARACTERS = 256
-const MAX_FIELD_NAME_CHARACTERS = 256
-const MAX_FIELD_VALUE_CHARACTERS = 1024
-const MAX_FIELDS = 25
-const FOOTER_TEXT = 'Powered by skyhookapi.com'
-const ISO_8601_TIMESTAMP = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,9}))?(Z|([+-])(\d{2}):(\d{2}))$/
+import { DISCORD_EMBED_LIMITS, fitLiteralEmbedFields } from '../util/DiscordEmbed.ts'
+import { cleanText, humanizeWords, truncateText } from '../util/DiscordText.ts'
+import { canonicalizeIso8601Timestamp, isRecord } from '../util/WebhookValue.ts'
 
 const ACTION_LABELS: Record<string, string> = {
     activate: 'activated',
@@ -104,7 +99,7 @@ export class Shopify extends DirectParseProvider {
         const label = this.getResourceLabel(resourcePart)
         const title = truncateText(
             `${resourceName} ${actionName}${label == null ? '' : `: ${label}`}`,
-            MAX_TITLE_CHARACTERS,
+            DISCORD_EMBED_LIMITS.title,
             true,
         )
 
@@ -129,7 +124,7 @@ export class Shopify extends DirectParseProvider {
         }
 
         const fields = this.createFields(resourcePart, actionPart)
-        embed.fields = fitFields(embed, fields)
+        embed.fields = fitLiteralEmbedFields(embed, fields)
 
         this.payload.allowed_mentions = { parse: [] }
         this.addEmbed(embed)
@@ -222,7 +217,7 @@ export class Shopify extends DirectParseProvider {
         for (const candidate of candidates) {
             const value = scalarText(candidate)
             if (value != null) {
-                const timestamp = canonicalizeTimestamp(value)
+                const timestamp = canonicalizeIso8601Timestamp(value)
                 if (timestamp != null) {
                     return timestamp
                 }
@@ -355,41 +350,6 @@ function humanizeResource(resource: string): string {
     return humanizeWords(words.join('_'))
 }
 
-function humanizeWords(value: string): string {
-    const words = cleanText(value, true)
-        .replace(/[._-]+/g, ' ')
-        .toLowerCase()
-    return words.length === 0 ? '' : words.charAt(0).toUpperCase() + words.slice(1)
-}
-
-function fitFields(embed: Embed, candidates: EmbedField[]): EmbedField[] {
-    let usedCharacters =
-        (embed.title?.length ?? 0) +
-        (embed.description?.length ?? 0) +
-        (embed.author?.name.length ?? 0) +
-        FOOTER_TEXT.length
-    const fields: EmbedField[] = []
-
-    for (const candidate of candidates.slice(0, MAX_FIELDS)) {
-        const name = truncateText(escapeDiscordMarkdown(candidate.name), MAX_FIELD_NAME_CHARACTERS, true)
-        const remainingCharacters = MAX_EMBED_CHARACTERS - usedCharacters - name.length
-        if (remainingCharacters <= 0) {
-            break
-        }
-        const value = truncateText(
-            escapeDiscordMarkdown(candidate.value),
-            Math.min(MAX_FIELD_VALUE_CHARACTERS, remainingCharacters),
-            false,
-        )
-        if (name.length === 0 || value.length === 0) {
-            continue
-        }
-        fields.push({ name, value, inline: candidate.inline })
-        usedCharacters += name.length + value.length
-    }
-    return fields
-}
-
 function safeId(value: unknown): string | null {
     if (typeof value === 'string') {
         const cleaned = cleanText(value, true)
@@ -412,86 +372,4 @@ function scalarText(value: unknown): string | null {
     }
     const text = cleanText(String(value), false)
     return text.length > 0 ? text : null
-}
-
-function escapeDiscordMarkdown(value: string): string {
-    return value.replace(/([\\`*_{}[\]()<>#+!|~])/g, '\\$1')
-}
-
-function canonicalizeTimestamp(value: string): string | null {
-    const match = ISO_8601_TIMESTAMP.exec(value)
-    if (match == null) {
-        return null
-    }
-
-    const [, yearText, monthText, dayText, hourText, minuteText, secondText, fractionText, zone, sign] = match
-    const year = Number(yearText)
-    const month = Number(monthText)
-    const day = Number(dayText)
-    const hour = Number(hourText)
-    const minute = Number(minuteText)
-    const second = Number(secondText)
-    const millisecond = Number(`${fractionText ?? ''}000`.slice(0, 3))
-    const offsetHour = zone === 'Z' ? 0 : Number(match[10])
-    const offsetMinute = zone === 'Z' ? 0 : Number(match[11])
-    if (
-        month < 1 ||
-        month > 12 ||
-        day < 1 ||
-        day > 31 ||
-        hour > 23 ||
-        minute > 59 ||
-        second > 59 ||
-        offsetHour > 23 ||
-        offsetMinute > 59
-    ) {
-        return null
-    }
-
-    const localDate = new Date(0)
-    localDate.setUTCFullYear(year, month - 1, day)
-    localDate.setUTCHours(hour, minute, second, millisecond)
-    if (
-        localDate.getUTCFullYear() !== year ||
-        localDate.getUTCMonth() !== month - 1 ||
-        localDate.getUTCDate() !== day ||
-        localDate.getUTCHours() !== hour ||
-        localDate.getUTCMinutes() !== minute ||
-        localDate.getUTCSeconds() !== second
-    ) {
-        return null
-    }
-
-    const offsetSign = sign === '-' ? -1 : 1
-    const offsetMilliseconds = offsetSign * (offsetHour * 60 + offsetMinute) * 60_000
-    return new Date(localDate.getTime() - offsetMilliseconds).toISOString()
-}
-
-function truncateText(value: string, maxLength: number, singleLine: boolean): string {
-    const cleaned = cleanText(value, singleLine)
-    if (cleaned.length <= maxLength) {
-        return cleaned
-    }
-    if (maxLength <= 1) {
-        return '…'.slice(0, maxLength)
-    }
-    return `${cleaned.slice(0, maxLength - 1)}…`
-}
-
-function cleanText(value: string, singleLine: boolean): string {
-    let cleaned = Array.from(value.replace(/\r\n?/g, '\n'))
-        .filter((character) => {
-            const code = character.charCodeAt(0)
-            return code === 9 || code === 10 || (code > 31 && code !== 127)
-        })
-        .join('')
-        .trim()
-    if (singleLine) {
-        cleaned = cleaned.replace(/\s+/g, ' ')
-    }
-    return cleaned
-}
-
-function isRecord(value: unknown): value is Record<string, any> {
-    return value != null && typeof value === 'object' && !Array.isArray(value)
 }

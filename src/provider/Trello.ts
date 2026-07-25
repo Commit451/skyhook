@@ -7,6 +7,8 @@ type Card = any
 type Board = any
 type Attachment = any
 
+const PLUGIN_MANIFEST_TIMEOUT_MS = 10_000
+
 /**
  * https://developers.trello.com/apis/webhooks
  */
@@ -42,14 +44,8 @@ export class Trello extends TypeParseProvider {
         return str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str
     }
 
-    private embed: Embed
     private action: any
     private model: any
-
-    constructor() {
-        super()
-        this.embed = {}
-    }
 
     public getName(): string {
         return 'Trello'
@@ -429,33 +425,7 @@ export class Trello extends TypeParseProvider {
     }
 
     public async disablePlugin(): Promise<void> {
-        const embed = this._preparePayload()
-        embed.url = this._resolveFullBoardURL(this.action.data.board)
-        const url = this.action.data.plugin.url
-        try {
-            const response = await fetch(url)
-            if (!response.ok) {
-                throw new Error(`Request failed with status ${response.status}`)
-            }
-            const manifest = await response.json()
-            const desc = MarkdownUtil._formatMarkdown(manifest.details, embed)
-            embed.title = '[' + this.action.data.board.name + '] Disabled Plugin \u2717'
-            embed.fields = [
-                {
-                    name: manifest.name,
-                    value: desc,
-                    inline: false,
-                },
-            ]
-            embed.image = {
-                url: new URL(manifest.icon.url, url).toString(),
-            }
-        } catch (err) {
-            console.log('[Trello Provider] Error while retrieving plugin manifest.')
-            console.log(err)
-            embed.title = '[' + this.action.data.board.name + '] Disabled Plugin "' + this.action.data.plugin.name + '"'
-        }
-        this.addEmbed(embed)
+        await this._formatPluginPayload('Disabled', '\u2717')
     }
 
     // How to Trigger?
@@ -471,17 +441,21 @@ export class Trello extends TypeParseProvider {
     }
 
     public async enablePlugin(): Promise<void> {
+        await this._formatPluginPayload('Enabled', '\u2713')
+    }
+
+    private async _formatPluginPayload(action: 'Enabled' | 'Disabled', mark: string): Promise<void> {
         const embed = this._preparePayload()
         embed.url = this._resolveFullBoardURL(this.action.data.board)
         const url = this.action.data.plugin.url
         try {
-            const response = await fetch(url)
+            const response = await fetch(url, { signal: AbortSignal.timeout(PLUGIN_MANIFEST_TIMEOUT_MS) })
             if (!response.ok) {
                 throw new Error(`Request failed with status ${response.status}`)
             }
             const manifest = await response.json()
             const desc = MarkdownUtil._formatMarkdown(manifest.details, embed)
-            embed.title = '[' + this.action.data.board.name + '] Enabled Plugin \u2713'
+            embed.title = `[${this.action.data.board.name}] ${action} Plugin ${mark}`
             embed.fields = [
                 {
                     name: manifest.name,
@@ -493,9 +467,9 @@ export class Trello extends TypeParseProvider {
                 url: new URL(manifest.icon.url, url).toString(),
             }
         } catch (err) {
-            console.log('[Trello Provider] Error while retrieving plugin manifest.')
-            console.log(err)
-            embed.title = '[' + this.action.data.board.name + '] Enabled Plugin "' + this.action.data.plugin.name + '"'
+            const diagnostics = err instanceof Error ? (err.stack ?? err.message) : String(err)
+            this.logger.warn(`[Trello Provider] Error while retrieving plugin manifest: ${diagnostics}`)
+            embed.title = `[${this.action.data.board.name}] ${action} Plugin "${this.action.data.plugin.name}"`
         }
         this.addEmbed(embed)
     }

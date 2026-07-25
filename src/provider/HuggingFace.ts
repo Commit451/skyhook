@@ -1,8 +1,7 @@
 import type { Embed, EmbedField } from '../model/DiscordApi.ts'
+import { DISCORD_EMBED_LIMITS, DISCORD_MESSAGE_LIMITS, SKYHOOK_FOOTER_TEXT } from '../util/DiscordEmbed.ts'
 import { DirectParseProvider } from './BaseProvider.ts'
 
-const DISCORD_EMBED_CHARACTER_LIMIT = 6000
-const SKYHOOK_FOOTER_TEXT = 'Powered by skyhookapi.com'
 const CONTENT_SUMMARY_RESERVE = 64
 
 interface HuggingFaceUrl {
@@ -106,30 +105,36 @@ export class HuggingFace extends DirectParseProvider {
         const embed: Embed = { url: body.repo.url.web }
 
         if (body.event.action === 'move' && body.movedTo != null) {
-            embed.title = HuggingFace.truncate(`Moved ${body.repo.type} ${body.repo.name} to ${body.movedTo.name}`, 256)
+            embed.title = HuggingFace.truncate(
+                `Moved ${body.repo.type} ${body.repo.name} to ${body.movedTo.name}`,
+                DISCORD_EMBED_LIMITS.title,
+            )
             embed.description = `**New name:** \`${HuggingFace.escapeInlineCode(body.movedTo.name)}\``
             return embed
         }
 
-        embed.title = HuggingFace.truncate(`${action} ${body.repo.type} ${body.repo.name}`, 256)
+        embed.title = HuggingFace.truncate(`${action} ${body.repo.type} ${body.repo.name}`, DISCORD_EMBED_LIMITS.title)
         embed.description = `**Visibility:** ${body.repo.private ? 'Private' : 'Public'}`
         return embed
     }
 
     private formatRepoContent(body: HuggingFacePayload): Embed {
         const embed: Embed = {
-            title: HuggingFace.truncate(`Updated content in ${body.repo.type} ${body.repo.name}`, 256),
+            title: HuggingFace.truncate(
+                `Updated content in ${body.repo.type} ${body.repo.name}`,
+                DISCORD_EMBED_LIMITS.title,
+            ),
             url: body.repo.url.web,
         }
         const updatedRefs = body.updatedRefs ?? []
         const fields: EmbedField[] = []
         let remainingCharacters =
-            DISCORD_EMBED_CHARACTER_LIMIT -
+            DISCORD_MESSAGE_LIMITS.embedCharacters -
             (embed.title?.length ?? 0) -
             SKYHOOK_FOOTER_TEXT.length -
             CONTENT_SUMMARY_RESERVE
 
-        for (const updatedRef of updatedRefs.slice(0, 25)) {
+        for (const updatedRef of updatedRefs.slice(0, DISCORD_EMBED_LIMITS.fields)) {
             const field = this.formatUpdatedRef(body.repo, updatedRef)
             const fieldCharacters = field.name.length + field.value.length
             if (fieldCharacters > remainingCharacters) {
@@ -161,14 +166,17 @@ export class HuggingFace extends DirectParseProvider {
         ].filter((sha): sha is string => sha != null)
 
         return {
-            name: HuggingFace.truncate(`${change} ${kind} ${name}`, 256),
-            value: HuggingFace.truncate(shas.join(' → '), 1024),
+            name: HuggingFace.truncate(`${change} ${kind} ${name}`, DISCORD_EMBED_LIMITS.fieldName),
+            value: HuggingFace.truncate(shas.join(' → '), DISCORD_EMBED_LIMITS.fieldValue),
         }
     }
 
     private formatRepoConfig(body: HuggingFacePayload): Embed {
         return {
-            title: HuggingFace.truncate(`Updated settings for ${body.repo.type} ${body.repo.name}`, 256),
+            title: HuggingFace.truncate(
+                `Updated settings for ${body.repo.type} ${body.repo.name}`,
+                DISCORD_EMBED_LIMITS.title,
+            ),
             url: body.repo.url.web,
             description:
                 body.updatedConfig?.private == null
@@ -183,7 +191,7 @@ export class HuggingFace extends DirectParseProvider {
         const embed: Embed = {
             title: HuggingFace.truncate(
                 `${HuggingFace.actionLabel(body.event.action)} ${kind} #${discussion.num} on ${body.repo.name}: ${discussion.title}`,
-                256,
+                DISCORD_EMBED_LIMITS.title,
             ),
             url: discussion.url.web,
             fields: [
@@ -198,14 +206,17 @@ export class HuggingFace extends DirectParseProvider {
         if (discussion.changes?.base != null) {
             embed.fields!.push({
                 name: 'Base',
-                value: HuggingFace.truncate(HuggingFace.stripRefPrefix(discussion.changes.base), 1024),
+                value: HuggingFace.truncate(
+                    HuggingFace.stripRefPrefix(discussion.changes.base),
+                    DISCORD_EMBED_LIMITS.fieldValue,
+                ),
                 inline: true,
             })
         }
         if (body.comment?.hidden === true) {
             embed.description = 'This comment was hidden.'
         } else if (body.comment?.content != null) {
-            embed.description = HuggingFace.truncate(body.comment.content, 4096)
+            embed.description = HuggingFace.truncate(body.comment.content, DISCORD_EMBED_LIMITS.description)
         }
         return embed
     }
@@ -219,13 +230,13 @@ export class HuggingFace extends DirectParseProvider {
         return {
             title: HuggingFace.truncate(
                 `${action} comment on ${kind} #${discussion.num} in ${body.repo.name}: ${discussion.title}`,
-                256,
+                DISCORD_EMBED_LIMITS.title,
             ),
             url: comment.url.web,
             description:
                 comment.hidden || comment.content == null
                     ? 'This comment was hidden.'
-                    : HuggingFace.truncate(comment.content, 4096),
+                    : HuggingFace.truncate(comment.content, DISCORD_EMBED_LIMITS.description),
         }
     }
 
@@ -233,7 +244,7 @@ export class HuggingFace extends DirectParseProvider {
         return {
             title: HuggingFace.truncate(
                 `${HuggingFace.actionLabel(body.event.action)} ${body.event.scope} for ${body.repo.type} ${body.repo.name}`,
-                256,
+                DISCORD_EMBED_LIMITS.title,
             ),
             url: body.repo.url.web,
             description: 'A Hugging Face Hub event was received.',
