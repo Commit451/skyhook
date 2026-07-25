@@ -8,35 +8,8 @@ import { cors } from 'hono/cors'
 import type { ContentfulStatusCode } from 'hono/utils/http-status'
 import { rateLimiter } from 'hono-rate-limiter'
 import type { DiscordPayload } from './model/DiscordApi.ts'
-import { loadProviderExample } from './ProviderExamples.ts'
-import { AppCenter } from './provider/AppCenter.ts'
-import { AppVeyor } from './provider/Appveyor.ts'
-import { Basecamp } from './provider/Basecamp.ts'
-import type { BaseProvider } from './provider/BaseProvider.ts'
-import { BitBucketServer } from './provider/BitBucketServer.ts'
-import { BitBucket } from './provider/Bitbucket.ts'
-import { CircleCi } from './provider/CircleCi.ts'
-import { Codacy } from './provider/Codacy.ts'
-import { Confluence } from './provider/Confluence.ts'
-import { DockerHub } from './provider/DockerHub.ts'
-import { GitLab } from './provider/GitLab.ts'
-import { Heroku } from './provider/Heroku.ts'
-import { HuggingFace } from './provider/HuggingFace.ts'
-import { Instana } from './provider/Instana.ts'
-import { Jenkins } from './provider/Jenkins.ts'
-import { Jira } from './provider/Jira.ts'
-import { Linear } from './provider/Linear.ts'
-import { NewRelic } from './provider/NewRelic.ts'
-import { Patreon } from './provider/Patreon.ts'
-import { Pingdom } from './provider/Pingdom.ts'
-import { Rollbar } from './provider/Rollbar.ts'
-import { Shopify } from './provider/Shopify.ts'
-import { Travis } from './provider/Travis.ts'
-import { Trello } from './provider/Trello.ts'
-import { Unity } from './provider/Unity.ts'
-import { UptimeRobot } from './provider/UptimeRobot.ts'
-import { VSTS } from './provider/VSTS.ts'
-import { Zendesk } from './provider/Zendesk.ts'
+import { providerRegistry } from './provider/ProviderRegistry.ts'
+import { ProviderRunner } from './provider/ProviderRunner.ts'
 import { ErrorUtil } from './util/ErrorUtil.ts'
 import { logger } from './util/logger.ts'
 
@@ -44,48 +17,10 @@ logger.debug('Logger set up successfully.')
 
 export const app = new Hono()
 
-type ProviderClass = new () => BaseProvider
-
-const providers: ProviderClass[] = [
-    AppCenter,
-    AppVeyor,
-    Basecamp,
-    BitBucket,
-    BitBucketServer,
-    CircleCi,
-    Codacy,
-    Confluence,
-    DockerHub,
-    GitLab,
-    Heroku,
-    HuggingFace,
-    Instana,
-    Jenkins,
-    Jira,
-    Linear,
-    NewRelic,
-    Patreon,
-    Pingdom,
-    Rollbar,
-    Shopify,
-    Travis,
-    Trello,
-    Unity,
-    UptimeRobot,
-    VSTS,
-    Zendesk,
-]
-
-const providersMap = new Map<string, ProviderClass>()
-const providerInfos: { name: string; path: string }[] = []
-for (const Provider of providers) {
-    const instance = new Provider()
-    providersMap.set(instance.getPath(), Provider)
-    logger.debug(`Adding provider: ${instance.getName()}`)
-    providerInfos.push({
-        name: instance.getName(),
-        path: instance.getPath(),
-    })
+const providerRunner = new ProviderRunner(providerRegistry)
+const DISCORD_WEBHOOK_TIMEOUT_MS = 10_000
+for (const { name } of providerRegistry.providerInfos) {
+    logger.debug(`Adding provider: ${name}`)
 }
 
 app.use('*', cors())
@@ -100,7 +35,7 @@ app.use('/*', serveStatic({ root: './public' }))
 
 app.get('/', (c) => c.redirect('https://www.skyhookapi.com/'))
 
-app.get('/api/providers', (c) => c.json(providerInfos, 200))
+app.get('/api/providers', (c) => c.json(providerRegistry.providerInfos, 200))
 
 const info = {
     version: process.env.K_REVISION,
@@ -144,7 +79,7 @@ const exampleAbuseRateLimiter = rateLimiter({
 app.get('/api/webhooks/:webhookID/:webhookSecret/:from', (c) => {
     // Return 200 if the provider is valid to show this url is ready.
     const provider = c.req.param('from')
-    if (provider == null || providersMap.get(provider) == null) {
+    if (provider == null || !providerRegistry.has(provider)) {
         const errorMessage = `Unknown provider ${provider}`
         logger.error(errorMessage)
         return c.text(errorMessage, 400)
@@ -163,25 +98,27 @@ app.post('/api/webhooks/:webhookID/:webhookSecret/:from', webhookRateLimiter, as
 
     let discordPayload: DiscordPayload | null = null
 
-    const Provider = providersMap.get(providerPath)
-    if (Provider == null) {
+    if (!providerRegistry.has(providerPath)) {
         const errorMessage = `Unknown provider ${providerPath}`
         logger.error(errorMessage)
         return c.text(errorMessage, 400)
     }
 
-    const instance = new Provider()
     try {
         const queryObject = c.req.query()
-        console.log(queryObject)
         const headersObject: Record<string, string> = {}
         c.req.raw.headers.forEach((value, key) => {
             headersObject[key] = value
         })
         const body = await parseRequestBody(c)
-        discordPayload = await instance.parse(body, headersObject, queryObject)
+        discordPayload = await providerRunner.run(providerPath, {
+            body,
+            headers: headersObject,
+            query: queryObject,
+        })
     } catch (error) {
-        logger.error('Error during parse: ' + error.stack)
+        const diagnostics = error instanceof Error ? (error.stack ?? error.message) : String(error)
+        logger.error(`Error during parse: ${diagnostics}`)
         discordPayload = ErrorUtil.createErrorPayload(providerPath, error)
         return sendPayload(providerPath, discordPayload, discordEndpoint, c, 500)
     }
@@ -197,17 +134,14 @@ const sendExampleWebhook = async (c: Context): Promise<Response> => {
         return c.body(null, 400)
     }
     const discordEndpoint = `https://discordapp.com/api/webhooks/${webhookID}/${webhookSecret}`
-    const Provider = providersMap.get(providerPath)
-    if (Provider == null) {
+    if (!providerRegistry.has(providerPath)) {
         const errorMessage = `Unknown provider ${providerPath}`
         logger.error(errorMessage)
         return c.text(errorMessage, 400)
     }
 
     try {
-        const provider = new Provider()
-        const example = loadProviderExample(providerPath)
-        const discordPayload = await provider.parse(example.body, example.headers, example.query)
+        const discordPayload = await providerRunner.runExample(providerPath)
         return sendPayload(providerPath, discordPayload, discordEndpoint, c)
     } catch (error) {
         logger.error(`Unable to create example payload for /${providerPath}: ${error}`)
@@ -314,7 +248,6 @@ async function sendPayload(
         logger.error('Discord payload is null')
         return c.text(`Webhook event is either not supported or not implemented by /${providerPath}.`, 200)
     }
-    // We could implement a more robust validation on this at some point.
     if (Object.keys(discordPayload).length === 0) {
         logger.error('Bad implementation, outbound payload is empty.')
         return c.text('Bad implementation.', 500)
@@ -327,6 +260,7 @@ async function sendPayload(
                 'Content-Type': 'application/json',
             },
             body: jsonString,
+            signal: AbortSignal.timeout(DISCORD_WEBHOOK_TIMEOUT_MS),
         })
         if (!response.ok) {
             const errorBody = await response.text()
@@ -334,8 +268,9 @@ async function sendPayload(
         }
         return c.body(null, upstreamStatusOverride ?? 200)
     } catch (err) {
-        logger.error(err)
-        return c.text(String(err), 500)
+        const diagnostics = err instanceof Error ? (err.stack ?? err.message) : String(err)
+        logger.error(diagnostics)
+        return c.text('Unable to deliver webhook.', 500)
     }
 }
 

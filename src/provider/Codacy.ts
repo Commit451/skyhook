@@ -20,13 +20,13 @@ export class Codacy extends DirectParseProvider {
         if (this.body.commit.results != null) {
             fields.push({
                 name: 'Fixed Issues',
-                value: this.body.commit.results.fixed_count || 0,
+                value: String(this.body.commit.results.fixed_count || 0),
                 inline: true,
             })
 
             fields.push({
                 name: 'New Issues',
-                value: this.body.commit.results.new_count || 0,
+                value: String(this.body.commit.results.new_count || 0),
                 inline: true,
             })
         }

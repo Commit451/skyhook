@@ -1,4 +1,5 @@
 import type { DiscordPayload, Embed } from '../model/DiscordApi.ts'
+import { SKYHOOK_FOOTER } from '../util/DiscordEmbed.ts'
 import { type Logger, logger } from '../util/logger.ts'
 
 function camelCase(s: string): string {
@@ -24,10 +25,12 @@ export abstract class BaseProvider {
     protected query: any
     // all embeds will use this color
     protected embedColor: number | null
+    private cancelled: boolean
 
     constructor() {
         this.payload = {}
         this.embedColor = null
+        this.cancelled = false
     }
 
     /**
@@ -53,24 +56,29 @@ export abstract class BaseProvider {
         this.body = body
         this.headers = headers
         this.query = query
-        this.preParse()
-        this.parseImpl()
-        this.postParse()
+        this.cancelled = false
+        await this.preParse()
+        if (this.cancelled) return null
 
-        return this.payload
+        await this.parseImpl()
+        if (this.cancelled) return null
+
+        await this.postParse()
+
+        return this.cancelled ? null : this.payload
     }
 
     /**
      * Nullify the payload. This will effectively cancel the operation and sent nothing to discord.
      */
     protected nullifyPayload(): void {
-        this.payload = null!
+        this.cancelled = true
     }
 
     /**
      * Open method to do certain things pre parse.
      */
-    protected preParse(): void {
+    protected preParse(): void | Promise<void> {
         // Default
     }
 
@@ -82,17 +90,16 @@ export abstract class BaseProvider {
     /**
      * Open method to do certain things post parse and before the payload is returned.
      */
-    protected postParse(): void {
+    protected postParse(): void | Promise<void> {
         // Default
     }
 
     protected addEmbed(embed: Embed): void {
+        if (this.cancelled) return
+
         // TODO check to see if too many fields
         // add the footer to all embeds added
-        embed.footer = {
-            text: 'Powered by skyhookapi.com',
-            icon_url: 'https://skyhookapi.com/images/skyhook-tiny.png',
-        }
+        embed.footer = { ...SKYHOOK_FOOTER }
         if (this.embedColor != null) {
             embed.color = this.embedColor
         }

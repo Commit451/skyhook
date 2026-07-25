@@ -4,10 +4,37 @@ import { Codacy } from '../../src/provider/Codacy.ts'
 import { Tester } from '../Tester.ts'
 
 describe('/POST codacy', () => {
-    it('commit', async () => {
+    it('formats a commit exactly', async () => {
+        const res = await Tester.test(new Codacy(), 'codacy.json', null)
+
+        assert.deepStrictEqual(res, {
+            embeds: [
+                {
+                    title: 'New Commit',
+                    url: 'https://www.codacy.com/public/jquery/jquery.git/commit?bid=21776&cid=6037089',
+                    fields: [
+                        { name: 'Fixed Issues', value: '1', inline: true },
+                        { name: 'New Issues', value: '0', inline: true },
+                    ],
+                    footer: {
+                        text: 'Powered by skyhookapi.com',
+                        icon_url: 'https://skyhookapi.com/images/skyhook-tiny.png',
+                    },
+                    color: 0x242c33,
+                },
+            ],
+        })
+    })
+
+    it('emits string field names and values', async () => {
         const res = await Tester.test(new Codacy(), 'codacy.json', null)
         assert.notStrictEqual(res, null)
-        assert.ok(Array.isArray(res!.embeds))
-        assert.strictEqual(res!.embeds.length, 1)
+
+        for (const embed of res!.embeds ?? []) {
+            for (const field of embed.fields ?? []) {
+                assert.strictEqual(typeof field.name, 'string')
+                assert.strictEqual(typeof field.value, 'string')
+            }
+        }
     })
 })

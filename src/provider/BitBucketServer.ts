@@ -4,24 +4,6 @@ import { TypeParseProvider } from './BaseProvider.ts'
 export class BitBucketServer extends TypeParseProvider {
     private embed: Embed
 
-    private static _formatLargeString(str: string, limit = 256): string {
-        return str.length > limit ? str.substring(0, limit - 1) + '\u2026' : str
-    }
-
-    private static _titleCase(str: string, ifNull = 'None'): string {
-        if (str == null) {
-            return ifNull
-        }
-        if (str.length < 1) {
-            return str
-        }
-        const strArray = str.toLowerCase().split(' ')
-        for (let i = 0; i < strArray.length; i++) {
-            strArray[i] = strArray[i].charAt(0).toUpperCase() + strArray[i].slice(1)
-        }
-        return strArray.join(' ')
-    }
-
     constructor() {
         super()
         this.setEmbedColor(0x205081)
@@ -81,7 +63,9 @@ export class BitBucketServer extends TypeParseProvider {
     public async repoRefsChanged(): Promise<void> {
         this.embed.author = this.extractAuthor()
         this.embed.title = `[${this.extractRepoRepositoryName()}] New commit`
-        this.embed.description = this.body.repository.description
+        if (typeof this.body.repository.description === 'string') {
+            this.embed.description = this.body.repository.description
+        }
         this.embed.url = this.extractRepoUrl()
         this.embed.fields = this.extractRepoChangesField()
         this.addEmbed(this.embed)
