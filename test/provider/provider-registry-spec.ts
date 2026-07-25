@@ -73,7 +73,7 @@ const expectedMetadata = [
     { path: 'trello', name: 'Trello', example: { body: 'trello/trello.json' } },
     { path: 'unity', name: 'Unity Cloud', example: { body: 'unity/unity.json' } },
     { path: 'uptimerobot', name: 'Uptime Robot', example: { body: 'uptimerobot/uptimerobot.json' } },
-    { path: 'vsts', name: 'VSTS', example: { body: 'vsts/vsts.json' } },
+    { path: 'azure', name: 'Azure DevOps', example: { body: 'azure/azure.json' } },
     { path: 'zendesk', name: 'Zendesk', example: { body: 'zendesk/zendesk.json' } },
 ]
 
@@ -113,5 +113,10 @@ describe('ProviderRegistry', () => {
         assert.equal(gitlab?.name, 'GitLab')
         assert.strictEqual(gitlab, providerRegistry.definitions[9])
         assert.equal(providerRegistry.get('not-registered'), undefined)
+    })
+
+    it('publishes Azure DevOps at /azure without a legacy /vsts alias', () => {
+        assert.equal(providerRegistry.get('azure')?.name, 'Azure DevOps')
+        assert.equal(providerRegistry.get('vsts'), undefined)
     })
 })

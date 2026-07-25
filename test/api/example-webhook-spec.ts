@@ -13,6 +13,23 @@ type Delivery = {
 afterEach(() => mock.restoreAll())
 
 describe('example webhook API', () => {
+    it('advertises /azure and rejects the retired /vsts endpoint', async () => {
+        const providersResponse = await app.request('/api/providers')
+        assert.equal(providersResponse.status, 200)
+        const providers = (await providersResponse.json()) as { name: string; path: string }[]
+
+        assert.deepEqual(
+            providers.find(({ path }) => path === 'azure'),
+            { name: 'Azure DevOps', path: 'azure' },
+        )
+        assert.equal(
+            providers.find(({ path }) => path === 'vsts'),
+            undefined,
+        )
+        assert.equal((await app.request('/api/webhooks/example/secret/azure')).status, 200)
+        assert.equal((await app.request('/api/webhooks/example/secret/vsts')).status, 400)
+    })
+
     it('parses and sends the packaged example for every advertised provider', async () => {
         const deliveries: Delivery[] = []
         const validationWarnings: string[] = []

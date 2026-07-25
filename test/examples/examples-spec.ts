@@ -44,7 +44,7 @@ const expectedProviderPaths = [
     'trello',
     'unity',
     'uptimerobot',
-    'vsts',
+    'azure',
     'zendesk',
 ]
 

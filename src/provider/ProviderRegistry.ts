@@ -1,5 +1,6 @@
 import { AppCenter } from './AppCenter.ts'
 import { AppVeyor } from './Appveyor.ts'
+import { AzureDevOps } from './AzureDevOps.ts'
 import { Basecamp } from './Basecamp.ts'
 import type { BaseProvider } from './BaseProvider.ts'
 import { BitBucketServer } from './BitBucketServer.ts'
@@ -24,7 +25,6 @@ import { Travis } from './Travis.ts'
 import { Trello } from './Trello.ts'
 import { Unity } from './Unity.ts'
 import { UptimeRobot } from './UptimeRobot.ts'
-import { VSTS } from './VSTS.ts'
 import { Zendesk } from './Zendesk.ts'
 
 export type ProviderConstructor = new () => BaseProvider
@@ -260,10 +260,10 @@ const providerDefinitions: readonly ProviderDefinition[] = [
         example: { body: 'uptimerobot/uptimerobot.json' },
     },
     {
-        path: 'vsts',
-        name: 'VSTS',
-        provider: VSTS,
-        example: { body: 'vsts/vsts.json' },
+        path: 'azure',
+        name: 'Azure DevOps',
+        provider: AzureDevOps,
+        example: { body: 'azure/azure.json' },
     },
     {
         path: 'zendesk',

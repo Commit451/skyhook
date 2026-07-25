@@ -2,9 +2,9 @@ import type { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi.ts'
 import { TypeParseProvider } from '../provider/BaseProvider.ts'
 
 /**
- * https://docs.microsoft.com/en-us/vsts/service-hooks/create-subscription
+ * https://learn.microsoft.com/en-us/azure/devops/service-hooks/services/webhooks?view=azure-devops
  */
-export class VSTS extends TypeParseProvider {
+export class AzureDevOps extends TypeParseProvider {
     private embed: Embed
 
     constructor() {
@@ -14,7 +14,11 @@ export class VSTS extends TypeParseProvider {
     }
 
     public getName(): string {
-        return 'VSTS'
+        return 'Azure DevOps'
+    }
+
+    public getPath(): string {
+        return 'azure'
     }
 
     public getType(): string {

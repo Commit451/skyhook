@@ -56,7 +56,7 @@ https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/provi
 - [Trello](https://developers.trello.com/apis/webhooks) - `/trello`
 - [Unity Cloud](https://build-api.cloud.unity3d.com/docs/1.0.0/index.html#operation-webhooks-intro) - `/unity`
 - [Uptime Robot](https://blog.uptimerobot.com/web-hook-alert-contacts-new-feature/) - `/uptimerobot`
-- [VSTS](https://docs.microsoft.com/en-us/vsts/service-hooks/events#) - `/vsts`
+- [Azure DevOps](https://learn.microsoft.com/en-us/azure/devops/service-hooks/events?view=azure-devops) - `/azure`
 - [Zendesk](https://developer.zendesk.com/api-reference/webhooks/webhooks-api/webhooks/) - `/zendesk`
 
 ### Linear setup

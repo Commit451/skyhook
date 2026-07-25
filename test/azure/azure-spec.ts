@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { VSTS } from '../../src/provider/VSTS.ts'
+import { AzureDevOps } from '../../src/provider/AzureDevOps.ts'
 import { Tester } from '../Tester.ts'
 
-describe('/POST vsts', () => {
+describe('/POST azure', () => {
     it('git.push', async () => {
-        const res = await Tester.test(new VSTS(), 'vsts.json', null)
+        const res = await Tester.test(new AzureDevOps(), 'azure.json', null)
         assert.notStrictEqual(res, null)
         assert.ok(Array.isArray(res!.embeds))
         assert.strictEqual(res!.embeds.length, 1)
@@ -19,7 +19,7 @@ describe('/POST vsts', () => {
 
     for (const [eventType, fieldName] of pullRequestCases) {
         it(`preserves the ${eventType} pull-request payload`, async () => {
-            const res = await Tester.testWithBody(new VSTS(), {
+            const res = await Tester.testWithBody(new AzureDevOps(), {
                 eventType,
                 message: { markdown: '**Pull request event**' },
                 resource: {

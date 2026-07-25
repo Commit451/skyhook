@@ -23,4 +23,11 @@ test('supported providers are rendered alphabetically by display name', () => {
     assert.deepEqual(names, alphabetizedNames)
     assert.ok(names.includes('Linear'), 'Linear should appear in the supported-provider grid')
     assert.ok(existsSync(new URL('../public/providers/linear.svg', import.meta.url)), 'Linear should have a logo asset')
+    assert.ok(names.includes('Azure DevOps'), 'Azure DevOps should appear in the supported-provider grid')
+    assert.match(providerSection[1], /title="\/azure"/, 'Azure DevOps should use the /azure endpoint')
+    assert.doesNotMatch(providerSection[1], /title="\/vsts"/, 'the retired /vsts endpoint should not be shown')
+    assert.ok(
+        existsSync(new URL('../public/providers/azure.svg', import.meta.url)),
+        'Azure DevOps should have a matching /azure logo asset',
+    )
 })
