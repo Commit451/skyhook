@@ -89,48 +89,24 @@ export class VSTS extends TypeParseProvider {
 
     // PULL REQUEST
     public async gitPullrequestCreated(): Promise<void> {
-        this.embed.author = this.extractCreatedByAuthor()
-        this.embed.fields = [
-            {
-                name: 'Pull Request from ' + this.body.resource.createdBy.displayName,
-                value:
-                    '([`' +
-                    this.body.resource.title +
-                    '`](' +
-                    this.body.resource.repository.remoteUrl +
-                    ')) ' +
-                    this.body.resource.description,
-                inline: false,
-            },
-        ]
-        this.addMinimalMessage()
+        this.formatPullRequest('Pull Request from ')
     }
 
     // PULL REQUEST MERGE COMMIT
     public async gitPullrequestMerged(): Promise<void> {
-        this.embed.author = this.extractCreatedByAuthor()
-        this.embed.fields = [
-            {
-                name: 'Pull Request Merge Commit from ' + this.body.resource.createdBy.displayName,
-                value:
-                    '([`' +
-                    this.body.resource.title +
-                    '`](' +
-                    this.body.resource.repository.remoteUrl +
-                    ')) ' +
-                    this.body.resource.description,
-                inline: false,
-            },
-        ]
-        this.addMinimalMessage()
+        this.formatPullRequest('Pull Request Merge Commit from ')
     }
 
     // PULL REQUEST UPDATED
     public async gitPullrequestUpdated(): Promise<void> {
+        this.formatPullRequest('Pull Request Updated by ')
+    }
+
+    private formatPullRequest(fieldLabel: string): void {
         this.embed.author = this.extractCreatedByAuthor()
         this.embed.fields = [
             {
-                name: 'Pull Request Updated by ' + this.body.resource.createdBy.displayName,
+                name: fieldLabel + this.body.resource.createdBy.displayName,
                 value:
                     '([`' +
                     this.body.resource.title +

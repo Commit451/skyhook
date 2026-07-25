@@ -41,10 +41,6 @@ export class GitLab extends TypeParseProvider {
     }
 
     public async push(): Promise<void> {
-        const branch = this.body.ref.split('/')
-        branch.shift()
-        branch.shift()
-
         const project = this.projectFromBody()
 
         if (project.totalCommitsCount > 0) {

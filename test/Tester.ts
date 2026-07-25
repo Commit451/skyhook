@@ -1,5 +1,4 @@
 import { existsSync, readFileSync } from 'node:fs'
-import { inspect } from 'node:util'
 import type { DiscordPayload } from '../src/model/DiscordApi.ts'
 import type { BaseProvider } from '../src/provider/BaseProvider.ts'
 
@@ -28,7 +27,6 @@ class Tester {
     ): Promise<DiscordPayload | null> {
         try {
             const res = await provider.parse(body, headers, query)
-            console.log(inspect(res, false, null, true))
             return Promise.resolve(res)
         } catch (err) {
             console.error(err)

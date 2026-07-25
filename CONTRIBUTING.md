@@ -4,7 +4,7 @@ Skyhook happily accepts pull requests for new providers and features. To make th
 
 ### Code Style
 
-We have eslint configured for the project. If you are using VSCode (which you should, because it is awesome) and have the eslint plugin installed, you will be guided through the coding style and changes will be suggested. While writing your changes, please follow the code style maintained throughout the project. You should browse some of the existing code to get a feel of the style.
+Skyhook uses [Biome](https://biomejs.dev/) for formatting and linting. Run `npm run lint` before submitting a change and follow the style already used by nearby code.
 
 ### Working on Changes
 
@@ -18,9 +18,9 @@ Once you are satisfied with your changes, you may submit a [pull request](https:
 
 In order to test the features you've implemented, it's a good idea to setup and run skyhook locally.
 
-Ensure you have the latest version of Node.js installed and have cloned the repo. Open a command window in the root folder and run the command `npm install` to install the dependencies. From there you can start the server by simply running the command `npm start`.
+Use Node 24, as specified by `.nvmrc`, and clone the repository. Run `npm install` in the root folder, then use `npm run dev` while developing. `npm start` runs the compiled output and therefore requires `npm run build` first.
 
-In order to accept data from the webhook providers, you should forward the port which skyhook will bind to. By default, this is set to `8080`, however if another port is more convienient for you, you may change this in the code. **Be mindful not to submit this change in a pull request.**
+In order to accept data from webhook providers, forward the port Skyhook binds to. It defaults to `8080`; set the `PORT` environment variable if another port is more convenient.
 
 > If you are unable to forward a port you may use [ngrok](https://ngrok.com/).
 
@@ -30,5 +30,5 @@ From here you should be able to [setup](https://github.com/Commit451/skyhook#set
 
 If your changes work, the provider's webhooks should be parsed and forwarded to discord. You can also write tests in the `test` directory, using the other tests as an example, to make sure your webhook parsing is working.
 
-Each provider also needs one canonical payload under `examples/<provider>/` registered in `src/ProviderExamples.ts`. The hosted generator uses that same payload for the snackbar's **Test** action. Keep additional test-only payloads under `test/<provider>/`.
+Each provider also needs one canonical payload under `examples/<provider>/` and one explicit definition in `src/provider/ProviderRegistry.ts`. Live routing, `/api/providers`, and the hosted example action all derive from that registry. Keep additional test-only payloads under `test/<provider>/`; see [Creating a provider](docs/CreateNewProvider.md) for the complete checklist.
 
