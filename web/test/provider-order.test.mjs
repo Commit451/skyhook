@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { test } from 'node:test'
 
 const projectRoot = new URL('../', import.meta.url)
@@ -21,4 +21,6 @@ test('supported providers are rendered alphabetically by display name', () => {
     const alphabetizedNames = names.toSorted((left, right) => left.localeCompare(right))
 
     assert.deepEqual(names, alphabetizedNames)
+    assert.ok(names.includes('Linear'), 'Linear should appear in the supported-provider grid')
+    assert.ok(existsSync(new URL('../public/providers/linear.svg', import.meta.url)), 'Linear should have a logo asset')
 })

@@ -45,6 +45,7 @@ https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/provi
 - [Jenkins](https://plugins.jenkins.io/notification) - `/jenkins` (requires
   the [notification plugin](https://wiki.jenkins.io/display/JENKINS/Notification+Plugin))
 - [Jira](https://developer.atlassian.com/server/jira/platform/webhooks/) - `/jira`
+- [Linear](https://linear.app/developers/webhooks) - `/linear`
 - [NewRelic](https://docs.newrelic.com/docs/alerts/new-relic-alerts/managing-notification-channels/customize-your-webhook-payload) -
   `/newrelic`
 - [Patreon](https://www.patreon.com/platform/documentation/webhooks) - `/patreon`
@@ -57,6 +58,12 @@ https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/provi
 - [Uptime Robot](https://blog.uptimerobot.com/web-hook-alert-contacts-new-feature/) - `/uptimerobot`
 - [VSTS](https://docs.microsoft.com/en-us/vsts/service-hooks/events#) - `/vsts`
 - [Zendesk](https://developer.zendesk.com/api-reference/webhooks/webhooks-api/webhooks/) - `/zendesk`
+
+### Linear setup
+
+Create a webhook in Linear's API settings and use the generated `/linear` URL as its endpoint. You can subscribe the webhook to all public teams or one team and select any supported resource types. Skyhook formats Linear data-change events (including issues, comments, projects, cycles, documents, initiatives, customers, and users) as well as Issue SLA and OAuth app revocation events.
+
+Linear signatures use a secret that belongs to the configured webhook. Skyhook's generated URL does not include or store that secret, so Skyhook cannot verify `Linear-Signature`; all incoming values are treated as untrusted display data and Discord mentions are disabled.
 
 ### Zendesk setup
 

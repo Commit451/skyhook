@@ -51,6 +51,11 @@ const expectedMetadata = [
     { path: 'instana', name: 'Instana', example: { body: 'instana/instana.json' } },
     { path: 'jenkins', name: 'Jenkins-CI', example: { body: 'jenkins/jenkins.json' } },
     { path: 'jira', name: 'Jira', example: { body: 'jira/jira-issue.json' } },
+    {
+        path: 'linear',
+        name: 'Linear',
+        example: { body: 'linear/linear.json', headers: 'linear/linear.headers.json' },
+    },
     { path: 'newrelic', name: 'New Relic', example: { body: 'newrelic/newrelic.json' } },
     {
         path: 'patreon',

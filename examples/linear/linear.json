@@ -1,0 +1,26 @@
+{
+  "action": "create",
+  "actor": {
+    "id": "b5ea5f1f-8adc-4f52-b4bd-ab4e84cf51ba",
+    "type": "user",
+    "name": "Linear Orbit",
+    "email": "orbit@linear.app",
+    "url": "https://linear.app/company/profiles/orbit"
+  },
+  "data": {
+    "id": "2174add1-f7c8-44e3-bbf3-2d60b5ea8bc9",
+    "createdAt": "2020-01-23T12:53:18.084Z",
+    "updatedAt": "2020-01-23T12:53:18.084Z",
+    "archivedAt": null,
+    "body": "Indeed, I think this is definitely an improvement over the previous version.",
+    "edited": false,
+    "issueId": "539068e2-ae88-4d09-bd75-22eb4a59612f",
+    "userId": "aacdca22-6266-4c0a-ab3c-8fa70a26765c"
+  },
+  "type": "Comment",
+  "url": "https://linear.app/issue/LIN-1778/foo-bar#comment-77217de3-fb52-4dad-bb9a-b356beb93de8",
+  "createdAt": "2020-01-23T12:53:18.084Z",
+  "organizationId": "dc844923-f9a4-40a3-825c-dea7747e57d6",
+  "webhookTimestamp": 1676056940508,
+  "webhookId": "000042e3-d123-4980-b49f-8e140eef9329"
+}

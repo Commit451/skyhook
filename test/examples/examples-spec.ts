@@ -34,6 +34,7 @@ const expectedProviderPaths = [
     'instana',
     'jenkins',
     'jira',
+    'linear',
     'newrelic',
     'patreon',
     'pingdom',

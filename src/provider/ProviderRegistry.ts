@@ -14,6 +14,7 @@ import { HuggingFace } from './HuggingFace.ts'
 import { Instana } from './Instana.ts'
 import { Jenkins } from './Jenkins.ts'
 import { Jira } from './Jira.ts'
+import { Linear } from './Linear.ts'
 import { NewRelic } from './NewRelic.ts'
 import { Patreon } from './Patreon.ts'
 import { Pingdom } from './Pingdom.ts'
@@ -188,6 +189,15 @@ const providerDefinitions: readonly ProviderDefinition[] = [
         name: 'Jira',
         provider: Jira,
         example: { body: 'jira/jira-issue.json' },
+    },
+    {
+        path: 'linear',
+        name: 'Linear',
+        provider: Linear,
+        example: {
+            body: 'linear/linear.json',
+            headers: 'linear/linear.headers.json',
+        },
     },
     {
         path: 'newrelic',
