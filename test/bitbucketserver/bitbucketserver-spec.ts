@@ -30,7 +30,7 @@ describe('/POST bitbucketserver', () => {
         )
         assert.deepEqual(embed.footer, {
             text: 'Powered by skyhookapi.com',
-            icon_url: 'https://skyhookapi.com/images/skyhook-tiny.png',
+            icon_url: 'https://www.skyhookapi.com/images/skyhook-tiny.png',
         })
         assert.equal(embed.color, 0x205081)
     })

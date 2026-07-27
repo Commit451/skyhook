@@ -28,7 +28,7 @@ describe('DiscordEmbed', () => {
         assert.equal(SKYHOOK_FOOTER_TEXT, 'Powered by skyhookapi.com')
         assert.deepEqual(SKYHOOK_FOOTER, {
             text: 'Powered by skyhookapi.com',
-            icon_url: 'https://skyhookapi.com/images/skyhook-tiny.png',
+            icon_url: 'https://www.skyhookapi.com/images/skyhook-tiny.png',
         })
     })
 

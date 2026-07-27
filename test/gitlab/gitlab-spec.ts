@@ -31,7 +31,7 @@ describe('/POST gitlab', () => {
             },
             footer: {
                 text: 'Powered by skyhookapi.com',
-                icon_url: 'https://skyhookapi.com/images/skyhook-tiny.png',
+                icon_url: 'https://www.skyhookapi.com/images/skyhook-tiny.png',
             },
             color: 0xfca326,
         })

@@ -19,7 +19,7 @@ export const DISCORD_EMBED_LIMITS = {
 
 export const SKYHOOK_FOOTER = {
     text: 'Powered by skyhookapi.com',
-    icon_url: 'https://skyhookapi.com/images/skyhook-tiny.png',
+    icon_url: 'https://www.skyhookapi.com/images/skyhook-tiny.png',
 } as const
 
 export const SKYHOOK_FOOTER_TEXT = SKYHOOK_FOOTER.text

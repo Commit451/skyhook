@@ -51,7 +51,7 @@ describe('/POST azure', () => {
                         title: '**Pull request event**',
                         footer: {
                             text: 'Powered by skyhookapi.com',
-                            icon_url: 'https://skyhookapi.com/images/skyhook-tiny.png',
+                            icon_url: 'https://www.skyhookapi.com/images/skyhook-tiny.png',
                         },
                         color: 0x68217a,
                     },

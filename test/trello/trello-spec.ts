@@ -23,7 +23,7 @@ describe('/POST trello', () => {
             description: '**Example Comment**\n\nThis is an example comment.',
             footer: {
                 text: 'Powered by skyhookapi.com',
-                icon_url: 'https://skyhookapi.com/images/skyhook-tiny.png',
+                icon_url: 'https://www.skyhookapi.com/images/skyhook-tiny.png',
             },
         })
     })
@@ -79,7 +79,7 @@ describe('/POST trello', () => {
                 image: { url: 'https://trello.com/calendar.png' },
                 footer: {
                     text: 'Powered by skyhookapi.com',
-                    icon_url: 'https://skyhookapi.com/images/skyhook-tiny.png',
+                    icon_url: 'https://www.skyhookapi.com/images/skyhook-tiny.png',
                 },
             })
         })

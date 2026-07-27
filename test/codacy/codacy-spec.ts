@@ -19,7 +19,7 @@ describe('/POST codacy', () => {
                     ],
                     footer: {
                         text: 'Powered by skyhookapi.com',
-                        icon_url: 'https://skyhookapi.com/images/skyhook-tiny.png',
+                        icon_url: 'https://www.skyhookapi.com/images/skyhook-tiny.png',
                     },
                     color: 0x242c33,
                 },
