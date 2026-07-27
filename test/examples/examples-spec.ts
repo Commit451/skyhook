@@ -37,6 +37,7 @@ const expectedProviderPaths = [
     'rollbar',
     'shopify',
     'square',
+    'stripe',
     'travis',
     'trello',
     'unity',

@@ -12,6 +12,18 @@
 
 Buildkite is a trademark of Buildkite Pty Ltd. The icon is used only to identify the supported provider.
 
+## Simple Icons — Stripe icon
+
+- File: `web/public/providers/stripe.svg`
+- Project: Simple Icons
+- Source: https://github.com/simple-icons/simple-icons/blob/25d6e5b39bc55bc446e147700294628af1734f7e/icons/stripe.svg
+- Revision: `25d6e5b39bc55bc446e147700294628af1734f7e`
+- Imported size: 588 bytes
+- Imported SHA-256: `130c6d957b8977f5eda2928267b9df531ca038a400a801765d263801bb1bd870`
+- License: CC0 1.0 Universal; a copy is included at `web/public/providers/LICENSE.simple-icons.md`
+
+Stripe is a trademark of Stripe, Inc. The icon is used only to identify the supported provider.
+
 ## Simple Icons — Linear icon
 
 - File: `web/public/providers/linear.svg`

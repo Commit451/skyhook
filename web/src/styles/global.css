@@ -641,6 +641,25 @@ header nav a:focus-visible {
     min-height: 1em;
 }
 
+.provider-warning {
+    margin: 6px 0 0;
+    padding: 12px 14px;
+    border: 1px solid rgba(245, 199, 107, 0.45);
+    border-radius: var(--radius);
+    background: rgba(245, 199, 107, 0.08);
+    color: #f5c76b;
+    font-size: 0.85rem;
+    line-height: 1.45;
+}
+
+.provider-warning[hidden] {
+    display: none;
+}
+
+.provider-warning code {
+    color: inherit;
+}
+
 .field select {
     appearance: none;
     background-color: var(--bg);
