@@ -69,6 +69,7 @@ const expectedMetadata = [
         name: 'Shopify',
         example: { body: 'shopify/shopify.json', headers: 'shopify/shopify.headers.json' },
     },
+    { path: 'square', name: 'Square', example: { body: 'square/square.json' } },
     { path: 'travis', name: 'Travis', example: { body: 'travis/travis.json' } },
     { path: 'trello', name: 'Trello', example: { body: 'trello/trello.json' } },
     { path: 'unity', name: 'Unity Cloud', example: { body: 'unity/unity.json' } },

@@ -1,0 +1,25 @@
+{
+  "merchant_id": "{MERCHANT_ID}",
+  "type": "customer.created",
+  "event_id": "edce24d3-bf56-46b4-b5ea-40266mnaa5a84",
+  "created_at": "2021-05-17T22:46:29Z",
+  "data": {
+    "type": "customer",
+    "id": "{CUSTOMER_ID}",
+    "object": {
+      "customer": {
+        "created_at": "2021-05-17T22:46:28.856Z",
+        "creation_source": "THIRD_PARTY",
+        "email_address": "customer@mysite.com",
+        "family_name": "Customer",
+        "given_name": "MyFirst",
+        "id": "{CUSTOMER_ID}",
+        "preferences": {
+          "email_unsubscribed": false
+        },
+        "updated_at": "2021-05-17T22:46:29Z",
+        "version": 0
+      }
+    }
+  }
+}

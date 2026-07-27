@@ -40,6 +40,7 @@ const expectedProviderPaths = [
     'pingdom',
     'rollbar',
     'shopify',
+    'square',
     'travis',
     'trello',
     'unity',
