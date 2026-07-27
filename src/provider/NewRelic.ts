@@ -1,22 +1,17 @@
-import { DirectParseProvider } from '../provider/BaseProvider.ts'
+import { defineProvider } from './Provider.ts'
 
 /**
  * https://docs.newrelic.com/docs/alerts/new-relic-alerts/managing-notification-channels/customize-your-webhook-payload
  */
-export class NewRelic extends DirectParseProvider {
-    public getName(): string {
-        return 'New Relic'
-    }
-
-    public getPath(): string {
-        return 'newrelic'
-    }
-
-    public async parseData(): Promise<void> {
-        this.addEmbed({
-            title: `${this.body.condition_name} ${this.body.current_state}`,
-            url: this.body.incident_url,
-            description: this.body.details,
+export const NewRelic = defineProvider({
+    path: 'newrelic',
+    name: 'New Relic',
+    example: { body: 'newrelic/newrelic.json' },
+    map({ body }, output) {
+        output.addEmbed({
+            title: `${body.condition_name} ${body.current_state}`,
+            url: body.incident_url,
+            description: body.details,
         })
-    }
-}
+    },
+})

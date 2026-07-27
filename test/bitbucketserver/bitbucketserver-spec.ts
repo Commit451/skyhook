@@ -9,7 +9,7 @@ describe('/POST bitbucketserver', () => {
             'x-event-key': 'repo:refs_changed',
         }
 
-        const res = await Tester.test(new BitBucketServer(), 'bitbucketserver.json', headers)
+        const res = await Tester.test(BitBucketServer, 'bitbucketserver.json', headers)
         assert.notStrictEqual(res, null)
         assert.ok(Array.isArray(res!.embeds))
         assert.strictEqual(res!.embeds.length, 1)
@@ -40,8 +40,8 @@ describe('/POST bitbucketserver', () => {
             'x-event-key': 'repo:refs_changed',
         }
 
-        const res = await Tester.test(new BitBucketServer(), 'bitbucketserver.json', headers)
+        const res = await Tester.test(BitBucketServer, 'bitbucketserver.json', headers)
         assert.notStrictEqual(res, null)
-        assert.ok(res!.embeds![0]?.fields?.length <= 18)
+        assert.ok((res!.embeds![0]?.fields?.length ?? 0) <= 18)
     })
 })

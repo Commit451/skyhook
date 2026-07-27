@@ -1,5 +1,5 @@
 import type { Embed } from '../model/DiscordApi.ts'
-import { TypeParseProvider } from '../provider/BaseProvider.ts'
+import { defineEventProvider } from './Provider.ts'
 
 const PatreonAction = {
     CREATE: 'CREATE',
@@ -8,230 +8,155 @@ const PatreonAction = {
 } as const
 type PatreonAction = (typeof PatreonAction)[keyof typeof PatreonAction]
 
+const boldRegex = /<strong>(.*?)<\/strong>/
+const italicRegex = /<em>(.*?)<\/em>/
+const underlineRegex = /<u>(.*?)<\/u>/
+const anchorRegex = /<a.*?href="(.*?)".*?>(.*?)<\/a>/
+const ulRegex = /<ul>(.*?)<\/ul>/
+const liRegex = /<li>(.*?)<\/li>/
+const imageRegex = /<img.*src="(.*?)">/
+
 /**
  * https://docs.patreon.com/#webhooks
  */
-export class Patreon extends TypeParseProvider {
-    // HTML Regular Expressions
-    private static boldRegex = /<strong>(.*?)<\/strong>/
-    private static italicRegex = /<em>(.*?)<\/em>/
-    private static underlineRegex = /<u>(.*?)<\/u>/
-    private static anchorRegex = /<a.*?href="(.*?)".*?>(.*?)<\/a>/
-    private static ulRegex = /<ul>(.*?)<\/ul>/
-    private static liRegex = /<li>(.*?)<\/li>/
-    private static imageRegex = /<img.*src="(.*?)">/
+export const Patreon = defineEventProvider({
+    path: 'patreon',
+    name: 'Patreon',
+    example: {
+        body: 'patreon/patreon-member-create.json',
+        headers: 'patreon/patreon.headers.json',
+    },
+    defaults: { embedColor: 0xf96854 },
+    event: ({ headers }) => headers.get('x-patreon-event'),
+    handlers: {
+        'members:create': apiV2Handler(PatreonAction.CREATE),
+        'members:update': apiV2Handler(PatreonAction.UPDATE),
+        'members:delete': apiV2Handler(PatreonAction.DELETE),
+        'members:pledge:create': apiV2Handler(PatreonAction.CREATE),
+        'members:pledge:update': apiV2Handler(PatreonAction.UPDATE),
+        'members:pledge:delete': apiV2Handler(PatreonAction.DELETE),
+        'pledges:create': apiV1Handler(PatreonAction.CREATE),
+        'pledges:update': apiV1Handler(PatreonAction.UPDATE),
+        'pledges:delete': apiV1Handler(PatreonAction.DELETE),
+    },
+})
 
-    private static _formatHTML(html: string, baseLink: string): string {
-        const newLineRegex = /<br>/g
-        // Match lists
-        while (Patreon.ulRegex.test(html)) {
-            const match = Patreon.ulRegex.exec(html)!
-            html = html.replace(Patreon.ulRegex, match[1])
-            let str = match[1]
-            while (Patreon.liRegex.test(str)) {
-                const match2 = Patreon.liRegex.exec(match[1])!
-                str = str.replace(match2[0], '')
-                html = html.replace(Patreon.liRegex, '\uFEFF\u00A0\u00A0\u00A0\u00A0\u2022 ' + match2[1] + '\n')
+function apiV2Handler(type: PatreonAction) {
+    return ({ body }: { body: Record<string, any> }, output: { addEmbed(embed: Embed): void }): void => {
+        output.addEmbed(handleApiV2(body, type))
+    }
+}
+
+function apiV1Handler(type: PatreonAction) {
+    return ({ body }: { body: Record<string, any> }, output: { addEmbed(embed: Embed): void }): void => {
+        output.addEmbed(handleApiV1(body, type))
+    }
+}
+
+function handleApiV2(body: Record<string, any>, type: PatreonAction): Embed {
+    const embed: Embed = {}
+    const campaignId = body.data.relationships.campaign?.data?.id
+    const patronId = body.data.relationships.user?.data?.id
+    const rewards = (body.included as any[]).filter(
+        (value) =>
+            value.type === 'reward' &&
+            value.attributes.published &&
+            value.attributes.amount_cents <= body.data.attributes.pledge_amount_cents,
+    )
+    const reward =
+        rewards.length === 0
+            ? null
+            : rewards.reduce((a, b) => (a.attributes.amount_cents >= b.attributes.amount_cents ? a : b))
+
+    for (const entry of body.included) {
+        if (entry.type === 'campaign' && entry.id === campaignId) {
+            const dollarAmount = (body.data.attributes.pledge_amount_cents / 100).toFixed(2)
+            embed.title =
+                type === PatreonAction.DELETE ? `Canceled $${dollarAmount} Pledge` : `Pledged $${dollarAmount}`
+            embed.url = entry.attributes.url
+        } else if (entry.type === 'user' && entry.id === patronId) {
+            embed.author = {
+                name: entry.attributes.full_name,
+                icon_url: entry.attributes.thumb_url,
+                url: entry.attributes.url,
             }
         }
-        // Match bold
-        while (Patreon.boldRegex.test(html)) {
-            const match = Patreon.boldRegex.exec(html)!
-            html = html.replace(Patreon.boldRegex, '**' + match[1] + '**')
-        }
-        // Match Italic
-        while (Patreon.italicRegex.test(html)) {
-            const match = Patreon.italicRegex.exec(html)!
-            html = html.replace(Patreon.italicRegex, '_' + match[1] + '_')
-        }
-        // Replace Underlined
-        while (Patreon.underlineRegex.test(html)) {
-            const match = Patreon.underlineRegex.exec(html)!
-            html = html.replace(Patreon.underlineRegex, '__' + match[1] + '__')
-        }
-        // Replace Anchors
-        while (Patreon.anchorRegex.test(html)) {
-            const match = Patreon.anchorRegex.exec(html)!
-            const url = match[1].startsWith('#') ? baseLink + match[1] : match[1]
-            html = html.replace(Patreon.anchorRegex, '[' + match[2] + '](' + url + ')')
-        }
-        // Replace Images
-        while (Patreon.imageRegex.test(html)) {
-            const match = Patreon.imageRegex.exec(html)!
-            html = html.replace(Patreon.imageRegex, '[View Image..](' + match[1] + ')')
-        }
-        // Replace all br tags
-        html = html.replace(newLineRegex, '\n')
-        return html
     }
 
-    constructor() {
-        super()
-        this.setEmbedColor(0xf96854)
-    }
+    addRewardField(embed, reward, type)
+    return embed
+}
 
-    public getName(): string {
-        return 'Patreon'
-    }
+function handleApiV1(body: Record<string, any>, type: PatreonAction): Embed {
+    const embed: Embed = {}
+    const campaignId = body.data.relationships.campaign?.data?.id
+    const patronId = body.data.relationships.patron?.data?.id
+    const rewardId = body.data.relationships.reward?.data?.id
+    let reward: any = null
 
-    public getType(): string | null {
-        return this.headers['x-patreon-event']
-    }
-
-    public knownTypes(): string[] {
-        return [
-            'membersCreate',
-            'membersUpdate',
-            'membersDelete',
-            'membersPledgeCreate',
-            'membersPledgeUpdate',
-            'membersPledgeDelete',
-            'pledgesCreate',
-            'pledgesUpdate',
-            'pledgesDelete',
-        ]
-    }
-
-    private _handleAPIV2(type: PatreonAction): void {
-        const embed: Embed = {}
-        const campaignId = this.body.data.relationships.campaign?.data?.id
-        const patronId = this.body.data.relationships.user?.data?.id
-
-        // TODO Test endpoint may be returning incomplete data.
-        // Does not provide a way to get the reward without keying off of amount_cents.
-        // Keep an eye on data.relationships.currently_entitled_tiers
-        // For now, find closest tier that is below or at the cents value.
-        const rewards = (this.body.included as any[]).filter(
-            (val) =>
-                val.type === 'reward' &&
-                val.attributes.published &&
-                val.attributes.amount_cents <= this.body.data.attributes.pledge_amount_cents,
-        )
-        const reward =
-            rewards.length > 0
-                ? rewards.reduce((a, b) => {
-                      const max = Math.max(a.attributes.amount_cents, b.attributes.amount_cents)
-                      return max === a.attributes.amount_cents ? a : b
-                  })
-                : null
-
-        for (const entry of this.body.included) {
-            if (entry.type === 'campaign' && entry.id === campaignId) {
-                const dollarAmount = (this.body.data.attributes.pledge_amount_cents / 100).toFixed(2)
-                if (type === PatreonAction.DELETE) {
-                    embed.title = `Canceled $${dollarAmount} Pledge`
-                } else {
-                    embed.title = `Pledged $${dollarAmount}`
-                }
-                embed.url = entry.attributes.url
-            } else if (entry.type === 'user' && entry.id === patronId) {
-                embed.author = {
-                    name: entry.attributes.full_name,
-                    icon_url: entry.attributes.thumb_url,
-                    url: entry.attributes.url,
-                }
+    for (const entry of body.included) {
+        if (entry.id === campaignId) {
+            const dollarAmount = (body.data.attributes.amount_cents / 100).toFixed(2)
+            embed.title =
+                type === PatreonAction.DELETE ? `Canceled $${dollarAmount} Pledge` : `Pledged $${dollarAmount}`
+            embed.url = entry.attributes.url
+        } else if (entry.id === patronId) {
+            embed.author = {
+                name: entry.attributes.full_name,
+                icon_url: entry.attributes.thumb_url,
+                url: entry.attributes.url,
             }
+        } else if (entry.id === rewardId) {
+            reward = entry
         }
+    }
 
-        if (reward != null && type !== PatreonAction.DELETE) {
-            embed.fields = [
-                {
-                    name: 'Unlocked Tier',
-                    value: `[${reward.attributes.title} ($${(reward.attributes.amount_cents / 100).toFixed(2)}+/mo)](https://www.patreon.com${reward.attributes.url})\n${Patreon._formatHTML(reward.attributes.description, embed.url!)}`,
-                    inline: false,
-                },
-            ]
+    addRewardField(embed, reward, type)
+    return embed
+}
+
+function addRewardField(embed: Embed, reward: any, type: PatreonAction): void {
+    if (reward == null || type === PatreonAction.DELETE) return
+    embed.fields = [
+        {
+            name: 'Unlocked Tier',
+            value: `[${reward.attributes.title} ($${(reward.attributes.amount_cents / 100).toFixed(2)}+/mo)](https://www.patreon.com${reward.attributes.url})\n${formatHtml(reward.attributes.description, embed.url!)}`,
+            inline: false,
+        },
+    ]
+}
+
+function formatHtml(html: string, baseLink: string): string {
+    while (ulRegex.test(html)) {
+        const match = ulRegex.exec(html)!
+        html = html.replace(ulRegex, match[1])
+        let list = match[1]
+        while (liRegex.test(list)) {
+            const item = liRegex.exec(match[1])!
+            list = list.replace(item[0], '')
+            html = html.replace(liRegex, '\uFEFF\u00A0\u00A0\u00A0\u00A0\u2022 ' + item[1] + '\n')
         }
-        this.addEmbed(embed)
     }
-
-    private async membersCreate(): Promise<void> {
-        this._handleAPIV2(PatreonAction.CREATE)
+    while (boldRegex.test(html)) {
+        const match = boldRegex.exec(html)!
+        html = html.replace(boldRegex, '**' + match[1] + '**')
     }
-
-    private async membersUpdate(): Promise<void> {
-        this._handleAPIV2(PatreonAction.UPDATE)
+    while (italicRegex.test(html)) {
+        const match = italicRegex.exec(html)!
+        html = html.replace(italicRegex, '_' + match[1] + '_')
     }
-
-    private async membersDelete(): Promise<void> {
-        this._handleAPIV2(PatreonAction.DELETE)
+    while (underlineRegex.test(html)) {
+        const match = underlineRegex.exec(html)!
+        html = html.replace(underlineRegex, '__' + match[1] + '__')
     }
-
-    private async membersPledgeCreate(): Promise<void> {
-        this._handleAPIV2(PatreonAction.CREATE)
+    while (anchorRegex.test(html)) {
+        const match = anchorRegex.exec(html)!
+        const url = match[1].startsWith('#') ? baseLink + match[1] : match[1]
+        html = html.replace(anchorRegex, `[${match[2]}](${url})`)
     }
-
-    private async membersPledgeUpdate(): Promise<void> {
-        this._handleAPIV2(PatreonAction.UPDATE)
+    while (imageRegex.test(html)) {
+        const match = imageRegex.exec(html)!
+        html = html.replace(imageRegex, `[View Image..](${match[1]})`)
     }
-
-    private async membersPledgeDelete(): Promise<void> {
-        this._handleAPIV2(PatreonAction.DELETE)
-    }
-
-    /**
-     * @deprecated Patreon v1 API
-     */
-    private _createUpdateCommon(type: PatreonAction): void {
-        const embed: Embed = {}
-        const campaignId = this.body.data.relationships.campaign?.data?.id
-        const patronId = this.body.data.relationships.patron?.data?.id
-        const rewardId = this.body.data.relationships.reward?.data?.id
-
-        const incl = this.body.included
-        // This is deprecated, don't care.
-        let reward: any = null
-
-        // This is deprecated, don't care.
-        incl.forEach((attr: any) => {
-            if (attr.id === campaignId) {
-                const dollarAmount = (this.body.data.attributes.amount_cents / 100).toFixed(2)
-                if (type === PatreonAction.DELETE) {
-                    embed.title = `Canceled $${dollarAmount} Pledge`
-                } else {
-                    embed.title = `Pledged $${dollarAmount}`
-                }
-                embed.url = attr.attributes.url
-            } else if (attr.id === patronId) {
-                embed.author = {
-                    name: attr.attributes.full_name,
-                    icon_url: attr.attributes.thumb_url,
-                    url: attr.attributes.url,
-                }
-            } else if (attr.id === rewardId) {
-                reward = attr
-            }
-        })
-        if (reward != null && type !== PatreonAction.DELETE) {
-            embed.fields = [
-                {
-                    name: 'Unlocked Tier',
-                    value: `[${reward.attributes.title} ($${(reward.attributes.amount_cents / 100).toFixed(2)}+/mo)](https://www.patreon.com${reward.attributes.url})\n${Patreon._formatHTML(reward.attributes.description, embed.url!)}`,
-                    inline: false,
-                },
-            ]
-        }
-        this.addEmbed(embed)
-    }
-
-    /**
-     * @deprecated Patreon v1 API
-     */
-    private async pledgesCreate(): Promise<void> {
-        this._createUpdateCommon(PatreonAction.CREATE)
-    }
-
-    /**
-     * @deprecated Patreon v1 API
-     */
-    private async pledgesUpdate(): Promise<void> {
-        this._createUpdateCommon(PatreonAction.UPDATE)
-    }
-
-    /**
-     * @deprecated Patreon v1 API
-     */
-    private async pledgesDelete(): Promise<void> {
-        this._createUpdateCommon(PatreonAction.DELETE)
-    }
+    return html.replace(/<br>/g, '\n')
 }

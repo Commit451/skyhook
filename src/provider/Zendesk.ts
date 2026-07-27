@@ -1,8 +1,8 @@
 import type { Embed, EmbedField } from '../model/DiscordApi.ts'
-import { DirectParseProvider } from '../provider/BaseProvider.ts'
 import { DISCORD_EMBED_LIMITS, fitLiteralEmbedFields } from '../util/DiscordEmbed.ts'
 import { cleanText, escapeDiscordMarkdownLiteral, humanizeWords, truncateText } from '../util/DiscordText.ts'
-import { canonicalizeIso8601Timestamp, isRecord } from '../util/WebhookValue.ts'
+import { canonicalizeIso8601Timestamp, safeId as extractSafeId, isRecord, scalarText } from '../util/WebhookValue.ts'
+import { defineProvider, type ProviderOutput } from './Provider.ts'
 
 const EVENT_TYPE_PREFIX = 'zen:event-type'
 const SUBJECT_DOMAIN_ALIASES: Record<string, readonly string[]> = {
@@ -20,29 +20,32 @@ const SUBJECT_DOMAIN_ALIASES: Record<string, readonly string[]> = {
  * @see https://developer.zendesk.com/api-reference/webhooks/webhooks-api/webhooks/
  * @see https://developer.zendesk.com/api-reference/webhooks/event-types/webhook-event-types/
  */
-export class Zendesk extends DirectParseProvider {
-    constructor() {
-        super()
-        this.setEmbedColor(0x03363d)
+export const Zendesk = defineProvider({
+    path: 'zendesk',
+    name: 'Zendesk',
+    example: { body: 'zendesk/zendesk.json' },
+    defaults: { embedColor: 0x03363d },
+    map({ body }, output) {
+        new ZendeskMapper(body).map(output)
+    },
+})
+
+class ZendeskMapper {
+    private readonly body: Record<string, any>
+
+    public constructor(body: Record<string, any>) {
+        this.body = body
     }
 
-    public getName(): string {
-        return 'Zendesk'
-    }
-
-    public getPath(): string {
-        return 'zendesk'
-    }
-
-    public async parseData(): Promise<void> {
+    public map(output: ProviderOutput): void {
         if (!isRecord(this.body) || !isRecord(this.body.detail) || !isRecord(this.body.event)) {
-            this.nullifyPayload()
+            output.ignore()
             return
         }
 
         const timestamp = validateEnvelope(this.body)
         if (timestamp == null) {
-            this.nullifyPayload()
+            output.ignore()
             return
         }
 
@@ -51,26 +54,26 @@ export class Zendesk extends DirectParseProvider {
             eventType?.startsWith(`${EVENT_TYPE_PREFIX}:`) === true ||
             eventType?.startsWith(`${EVENT_TYPE_PREFIX}/`) === true
         if (eventType == null || !hasKnownDelimiter) {
-            this.nullifyPayload()
+            output.ignore()
             return
         }
 
         const eventName = eventType.slice(EVENT_TYPE_PREFIX.length + 1)
         const separator = eventName.indexOf('.')
         if (separator <= 0 || separator === eventName.length - 1) {
-            this.nullifyPayload()
+            output.ignore()
             return
         }
 
         const resource = eventName.slice(0, separator)
         const action = eventName.slice(separator + 1)
         if (!/^[a-z0-9_]+$/.test(resource) || !/^[a-z0-9_]+$/.test(action)) {
-            this.nullifyPayload()
+            output.ignore()
             return
         }
         const subjectDomain = this.body.subject.split(':', 3)[1]
         if (subjectDomain !== resource && !SUBJECT_DOMAIN_ALIASES[resource]?.includes(subjectDomain)) {
-            this.nullifyPayload()
+            output.ignore()
             return
         }
 
@@ -107,8 +110,7 @@ export class Zendesk extends DirectParseProvider {
         const fields = [...this.createEventFields(event), ...this.createResourceFields(resource, detail)]
         embed.fields = fitLiteralEmbedFields(embed, fields)
 
-        this.payload.allowed_mentions = { parse: [] }
-        this.addEmbed(embed)
+        output.addEmbed(embed)
     }
 
     private getResourceLabel(detail: Record<string, any>, event: Record<string, any>): string | null {
@@ -286,28 +288,7 @@ function humanizeListItem(value: string): string {
 }
 
 function safeId(value: unknown): string | null {
-    if (typeof value === 'string') {
-        const cleaned = cleanText(value, true)
-        return cleaned.length > 0 && cleaned.length <= 128 ? cleaned : null
-    }
-    if (typeof value === 'number' && Number.isSafeInteger(value)) {
-        return String(value)
-    }
-    return null
-}
-
-function scalarText(value: unknown): string | null {
-    if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'boolean') {
-        return null
-    }
-    if (
-        typeof value === 'number' &&
-        (!Number.isFinite(value) || (Number.isInteger(value) && !Number.isSafeInteger(value)))
-    ) {
-        return null
-    }
-    const text = cleanText(String(value), false)
-    return text.length > 0 ? text : null
+    return extractSafeId(value, 128)
 }
 
 function escapeAndTruncate(value: string, maxLength: number, singleLine: boolean): string {

@@ -5,7 +5,7 @@ import { Tester } from '../Tester.ts'
 
 describe('/POST travis', () => {
     it('build', async () => {
-        const res = await Tester.test(new Travis(), 'travis.json', {})
+        const res = await Tester.test(Travis, 'travis.json', {})
         assert.notStrictEqual(res, null)
         assert.ok(Array.isArray(res!.embeds))
         assert.strictEqual(res!.embeds.length, 1)

@@ -1,285 +1,140 @@
 import type { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi.ts'
-import { TypeParseProvider } from './BaseProvider.ts'
+import { defineEventProvider, type ProviderMapper } from './Provider.ts'
 
-export class BitBucketServer extends TypeParseProvider {
-    private embed: Embed
+const BITBUCKET_ICON = 'https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/44_Bitbucket_logo_logos-512.png'
 
-    constructor() {
-        super()
-        this.setEmbedColor(0x205081)
-        this.embed = {}
+/**
+ * https://developer.atlassian.com/server/bitbucket/how-tos/webhooks/
+ */
+export const BitBucketServer = defineEventProvider({
+    path: 'bitbucketserver',
+    name: 'BitBucketServer',
+    example: {
+        body: 'bitbucketserver/bitbucketserver.json',
+        headers: 'bitbucketserver/bitbucketserver.headers.json',
+    },
+    defaults: { embedColor: 0x205081 },
+    event: ({ headers }) => headers.get('x-event-key'),
+    handlers: {
+        'diagnostics:ping': ({ body }, output) => {
+            output.addEmbed({
+                title: 'Test Connection',
+                description: 'You have successfully configured Skyhook with your BitBucket Server instance.',
+                fields: [{ name: 'Test', value: body.test }],
+            })
+        },
+        'repo:refs_changed': embedHandler(repoRefsChanged),
+        'repo:modified': embedHandler(repoModified),
+        'repo:forked': embedHandler((body) => ({
+            author: author(body),
+            description: 'A new [`fork`] has been created.',
+        })),
+        'repo:comment:added': embedHandler((body) => commitComment(body, 'New comment on commit')),
+        'repo:comment:edited': embedHandler((body) => commitComment(body, 'Comment edited on commit')),
+        'repo:comment:deleted': embedHandler((body) => commitComment(body, 'Comment deleted on commit')),
+        'pr:opened': embedHandler((body) => pullRequest(body, 'Pull request opened')),
+        'pr:from_ref_updated': embedHandler((body) => pullRequest(body, 'Pull request updated')),
+        'pr:modified': embedHandler((body) => pullRequest(body, 'Pull request modified')),
+        'pr:reviewer:updated': embedHandler((body) => pullRequest(body, 'New reviewers for pull request')),
+        'pr:reviewer:approved': embedHandler((body) => pullRequest(body, 'Pull request approved')),
+        'pr:reviewer:unapproved': embedHandler((body) => pullRequest(body, 'Removed approval for pull request')),
+        'pr:reviewer:needs_work': embedHandler((body) => pullRequest(body, 'Pull request needs work')),
+        'pr:merged': embedHandler((body) => pullRequest(body, 'Pull request merged')),
+        'pr:declined': embedHandler((body) => pullRequest(body, 'Pull request declined')),
+        'pr:deleted': embedHandler((body) => pullRequest(body, 'Deleted pull request')),
+        'pr:comment:added': embedHandler((body) => pullRequestComment(body, 'New comment on pull request')),
+        'pr:comment:edited': embedHandler((body) => pullRequestComment(body, 'Updated comment on pull request')),
+        'pr:comment:deleted': embedHandler((body) => pullRequestComment(body, 'Deleted comment on pull request')),
+        'mirror:repo_synchronized': embedHandler((body) => ({
+            title: `[${body.repository.name}] Mirror Synchronized`,
+        })),
+    },
+})
+
+function embedHandler(formatter: (body: Record<string, any>) => Embed): ProviderMapper {
+    return ({ body }, output) => output.addEmbed(formatter(body))
+}
+
+function repoRefsChanged(body: Record<string, any>): Embed {
+    return {
+        author: author(body),
+        title: `[${body.repository.name}] New commit`,
+        ...(typeof body.repository.description === 'string' ? { description: body.repository.description } : {}),
+        url: repoUrl(body),
+        fields: repoChangeFields(body),
     }
+}
 
-    public getName(): string {
-        return 'BitBucketServer'
+function repoModified(body: Record<string, any>): Embed {
+    return {
+        author: author(body),
+        title: `[${body.old.name}] Repository has been updated`,
+        url: `${baseLink(body)}/projects/${body.new.project.key}/repos/${body.new.slug}/browse`,
     }
+}
 
-    public getType(): string | null {
-        if (this.headers == null) {
-            return null
-        }
-        return this.headers['x-event-key']
+function pullRequest(body: Record<string, any>, title: string): Embed {
+    return {
+        author: author(body),
+        title: `[${body.pullRequest.toRef.repository.name}] ${title}: #${body.pullRequest.id} ${body.pullRequest.title}`,
+        description: body.pullRequest.description,
+        url: pullRequestUrl(body),
+        fields: pullRequestFields(body),
     }
+}
 
-    public knownTypes(): string[] {
-        return [
-            'diagnosticsPing',
-            'repoRefsChanged',
-            'repoModified',
-            'repoForked',
-            'repoCommentAdded',
-            'repoCommentEdited',
-            'repoCommentDeleted',
-            'prOpened',
-            'prFromRefUpdated',
-            'prModified',
-            'prReviewerUpdated',
-            'prReviewerApproved',
-            'prReviewerUnapproved',
-            'prReviewerNeedsWork',
-            'prMerged',
-            'prDeclined',
-            'prDeleted',
-            'prCommentAdded',
-            'prCommentEdited',
-            'prCommentDeleted',
-            'mirrorRepoSynchronized',
-        ]
+function pullRequestComment(body: Record<string, any>, title: string): Embed {
+    return {
+        author: author(body),
+        title: `[${body.pullRequest.toRef.repository.name}] ${title}: #${body.pullRequest.id} ${body.pullRequest.title}`,
+        description: body.comment.text,
+        url: pullRequestUrl(body),
     }
+}
 
-    public async diagnosticsPing(): Promise<void> {
-        this.embed.title = 'Test Connection'
-        this.embed.description = 'You have successfully configured Skyhook with your BitBucket Server instance.'
-        this.embed.fields = [
-            {
-                name: 'Test',
-                value: this.body.test,
-            },
-        ]
-
-        this.addEmbed(this.embed)
+function commitComment(body: Record<string, any>, title: string): Embed {
+    return {
+        author: author(body),
+        title: `[${body.repository.name}] ${title} ${body.commit.slice(0, 10)}`,
+        description: body.comment.text,
+        url: `${baseLink(body)}/projects/${body.repository.project.key}/repos/${body.repository.slug}/commits/${body.commit}`,
     }
+}
 
-    public async repoRefsChanged(): Promise<void> {
-        this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.extractRepoRepositoryName()}] New commit`
-        if (typeof this.body.repository.description === 'string') {
-            this.embed.description = this.body.repository.description
-        }
-        this.embed.url = this.extractRepoUrl()
-        this.embed.fields = this.extractRepoChangesField()
-        this.addEmbed(this.embed)
-    }
+function author(body: Record<string, any>): EmbedAuthor {
+    return { name: body.actor.displayName, icon_url: BITBUCKET_ICON }
+}
 
-    public async repoModified(): Promise<void> {
-        this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.body.old.name}] Repository has been updated`
-        this.embed.url =
-            this.extractBaseLink() +
-            '/projects/' +
-            this.body.new.project.key +
-            '/repos/' +
-            this.body.new.slug +
-            '/browse'
-        this.addEmbed(this.embed)
-    }
+function pullRequestUrl(body: Record<string, any>): string {
+    const repository = body.pullRequest.fromRef.repository
+    return `${baseLink(body)}/projects/${repository.project.key}/repos/${repository.slug}/pull-requests/${body.pullRequest.id}/overview`
+}
 
-    public async repoForked(): Promise<void> {
-        this.embed.author = this.extractAuthor()
-        this.embed.description = 'A new [`fork`] has been created.'
-        this.addEmbed(this.embed)
-    }
-
-    public async repoCommentAdded(): Promise<void> {
-        this.formatCommitCommentPayload('New comment on commit')
-        this.addEmbed(this.embed)
-    }
-
-    public async repoCommentEdited(): Promise<void> {
-        this.formatCommitCommentPayload('Comment edited on commit')
-        this.addEmbed(this.embed)
-    }
-
-    public async repoCommentDeleted(): Promise<void> {
-        this.formatCommitCommentPayload('Comment deleted on commit')
-        this.addEmbed(this.embed)
-    }
-
-    public async prOpened(): Promise<void> {
-        this.formatPrPayload('Pull request opened')
-        this.addEmbed(this.embed)
-    }
-
-    public async prFromRefUpdated(): Promise<void> {
-        this.formatPrPayload('Pull request updated')
-        this.addEmbed(this.embed)
-    }
-
-    public async prModified(): Promise<void> {
-        this.formatPrPayload('Pull request modified')
-        this.addEmbed(this.embed)
-    }
-
-    public async prReviewerUpdated(): Promise<void> {
-        this.formatPrPayload('New reviewers for pull request')
-        this.addEmbed(this.embed)
-    }
-
-    public async prReviewerApproved(): Promise<void> {
-        this.formatPrPayload('Pull request approved')
-        this.addEmbed(this.embed)
-    }
-
-    public async prReviewerUnapproved(): Promise<void> {
-        this.formatPrPayload('Removed approval for pull request')
-        this.addEmbed(this.embed)
-    }
-
-    public async prReviewerNeedsWork(): Promise<void> {
-        this.formatPrPayload('Pull request needs work')
-        this.addEmbed(this.embed)
-    }
-
-    public async prMerged(): Promise<void> {
-        this.formatPrPayload('Pull request merged')
-        this.addEmbed(this.embed)
-    }
-
-    public async prDeclined(): Promise<void> {
-        this.formatPrPayload('Pull request declined')
-        this.addEmbed(this.embed)
-    }
-
-    public async prDeleted(): Promise<void> {
-        this.formatPrPayload('Deleted pull request')
-        this.addEmbed(this.embed)
-    }
-
-    public async prCommentAdded(): Promise<void> {
-        this.formatCommentPayload('New comment on pull request')
-        this.addEmbed(this.embed)
-    }
-
-    public async prCommentEdited(): Promise<void> {
-        this.formatCommentPayload('Updated comment on pull request')
-        this.addEmbed(this.embed)
-    }
-
-    public async prCommentDeleted(): Promise<void> {
-        this.formatCommentPayload('Deleted comment on pull request')
-        this.addEmbed(this.embed)
-    }
-
-    public async mirrorRepoSynchronized(): Promise<void> {
-        this.embed.title = `[${this.extractRepoRepositoryName()}] Mirror Synchronized`
-    }
-
-    private formatPrPayload(title: string): void {
-        this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.extractPullRequestRepositoryName()}] ${title}: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
-        this.embed.description = this.body.pullRequest.description
-        this.embed.url = this.extractPullRequestUrl()
-        this.embed.fields = this.extractPullRequestFields()
-    }
-
-    private formatCommentPayload(title: string): void {
-        this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.extractPullRequestRepositoryName()}] ${title}: #${this.body.pullRequest.id} ${this.body.pullRequest.title}`
-        this.embed.description = this.body.comment.text
-        this.embed.url = this.extractPullRequestUrl()
-    }
-
-    private formatCommitCommentPayload(title: string): void {
-        this.embed.author = this.extractAuthor()
-        this.embed.title = `[${this.extractRepoRepositoryName()}] ${title} ${this.body.commit.slice(0, 10)}`
-        this.embed.description = this.body.comment.text
-        this.embed.url = this.extractCommitCommentUrl()
-    }
-
-    private extractAuthor(): EmbedAuthor {
-        return {
-            name: this.body.actor.displayName,
-            icon_url: 'https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/44_Bitbucket_logo_logos-512.png',
-        }
-    }
-
-    private extractPullRequestUrl(): string {
-        return (
-            this.extractBaseLink() +
-            '/projects/' +
-            this.body.pullRequest.fromRef.repository.project.key +
-            '/repos/' +
-            this.body.pullRequest.fromRef.repository.slug +
-            '/pull-requests/' +
-            this.body.pullRequest.id +
-            '/overview'
-        )
-    }
-
-    private extractPullRequestFields(): EmbedField[] {
-        const fieldArray: EmbedField[] = []
-
-        fieldArray.push({
+function pullRequestFields(body: Record<string, any>): EmbedField[] {
+    const fields: EmbedField[] = [
+        {
             name: 'From --> To',
-            value: `**Source branch:** ${this.body.pullRequest.fromRef.displayId} \n **Destination branch:** ${this.body.pullRequest.toRef.displayId} \n **State:** ${this.body.pullRequest.state}`,
-        })
-
-        for (let i = 0; i < Math.min(this.body.pullRequest.reviewers.length, 18); i++) {
-            fieldArray.push({
-                name: 'Reviewer',
-                value: this.body.pullRequest.reviewers[i].user.displayName,
-            })
-        }
-
-        return fieldArray
+            value: `**Source branch:** ${body.pullRequest.fromRef.displayId} \n **Destination branch:** ${body.pullRequest.toRef.displayId} \n **State:** ${body.pullRequest.state}`,
+        },
+    ]
+    for (const reviewer of body.pullRequest.reviewers.slice(0, 18)) {
+        fields.push({ name: 'Reviewer', value: reviewer.user.displayName })
     }
+    return fields
+}
 
-    private extractPullRequestRepositoryName(): string {
-        return this.body.pullRequest.toRef.repository.name
-    }
+function repoUrl(body: Record<string, any>): string {
+    return `${baseLink(body)}/projects/${body.repository.project.key}/repos/${body.repository.slug}/browse`
+}
 
-    private extractRepoRepositoryName(): string {
-        return this.body.repository.name
-    }
+function repoChangeFields(body: Record<string, any>): EmbedField[] {
+    return body.changes.slice(0, 18).map((change: Record<string, any>) => ({
+        name: 'Change',
+        value: `**Branch:** ${change.ref.displayId} \n **Old Hash:** ${change.fromHash.slice(0, 10)} \n **New Hash:** ${change.toHash.slice(0, 10)} \n **Type:** ${change.type}`,
+    }))
+}
 
-    private extractRepoUrl(): string {
-        return (
-            this.extractBaseLink() +
-            '/projects/' +
-            this.body.repository.project.key +
-            '/repos/' +
-            this.body.repository.slug +
-            '/browse'
-        )
-    }
-
-    private extractRepoChangesField(): EmbedField[] {
-        const fieldArray: EmbedField[] = []
-
-        for (let i = 0; i < Math.min(this.body.changes.length, 18); i++) {
-            fieldArray.push({
-                name: 'Change',
-                value: `**Branch:** ${this.body.changes[i].ref.displayId} \n **Old Hash:** ${this.body.changes[i].fromHash.slice(0, 10)} \n **New Hash:** ${this.body.changes[i].toHash.slice(0, 10)} \n **Type:** ${this.body.changes[i].type}`,
-            })
-        }
-
-        return fieldArray
-    }
-
-    private extractCommitCommentUrl(): string {
-        return (
-            this.extractBaseLink() +
-            '/projects/' +
-            this.body.repository.project.key +
-            '/repos/' +
-            this.body.repository.slug +
-            '/commits/' +
-            this.body.commit
-        )
-    }
-
-    private extractBaseLink(): string {
-        const actorLink = this.body.actor.links.self[0].href
-        return actorLink.substring(0, actorLink.indexOf('/user'))
-    }
+function baseLink(body: Record<string, any>): string {
+    const actorLink = body.actor.links.self[0].href
+    return actorLink.substring(0, actorLink.indexOf('/user'))
 }

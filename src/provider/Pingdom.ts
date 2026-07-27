@@ -1,20 +1,19 @@
-import { DirectParseProvider } from '../provider/BaseProvider.ts'
+import { defineProvider } from './Provider.ts'
 
 /**
  * https://www.pingdom.com/resources/webhooks
  */
-export class Pingdom extends DirectParseProvider {
-    public getName(): string {
-        return 'Pingdom'
-    }
-
-    public async parseData(): Promise<void> {
-        if (this.body.current_state !== this.body.previous_state) {
-            this.setEmbedColor(this.body.current_state === 'UP' ? 0x4caf50 : 0xd32f2f)
-            this.addEmbed({
-                title: this.body.check_name + ' - State changed',
-                description: 'State change from ' + this.body.previous_state + ' to ' + this.body.current_state,
+export const Pingdom = defineProvider({
+    path: 'pingdom',
+    name: 'Pingdom',
+    example: { body: 'pingdom/pingdom.json' },
+    map({ body }, output) {
+        if (body.current_state !== body.previous_state) {
+            output.setEmbedColor(body.current_state === 'UP' ? 0x4caf50 : 0xd32f2f)
+            output.addEmbed({
+                title: body.check_name + ' - State changed',
+                description: 'State change from ' + body.previous_state + ' to ' + body.current_state,
             })
         }
-    }
-}
+    },
+})

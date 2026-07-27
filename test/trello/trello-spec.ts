@@ -7,7 +7,7 @@ afterEach(() => mock.restoreAll())
 
 describe('/POST trello', () => {
     it('commentCard', async () => {
-        const res = await Tester.test(new Trello(), 'trello.json', null)
+        const res = await Tester.test(Trello, 'trello.json', null)
         assert.notStrictEqual(res, null)
         assert.ok(Array.isArray(res!.embeds))
         assert.strictEqual(res!.embeds.length, 1)
@@ -46,7 +46,7 @@ describe('/POST trello', () => {
                 )
             })
 
-            const res = await Tester.testWithBody(new Trello(), {
+            const res = await Tester.testWithBody(Trello, {
                 action: {
                     type: eventType,
                     memberCreator: {
@@ -58,7 +58,7 @@ describe('/POST trello', () => {
                         board: { name: 'Example Board', shortLink: 'board' },
                         plugin: {
                             name: 'Calendar fallback',
-                            url: 'https://plugins.example/manifest.json',
+                            url: 'https://trello.com/manifest.json',
                         },
                     },
                 },
@@ -76,7 +76,7 @@ describe('/POST trello', () => {
                 url: 'https://trello.com/b/board/example-board',
                 title: `[Example Board] ${action} Plugin ${mark}`,
                 fields: [{ name: 'Calendar', value: 'Plugin details', inline: false }],
-                image: { url: 'https://plugins.example/calendar.png' },
+                image: { url: 'https://trello.com/calendar.png' },
                 footer: {
                     text: 'Powered by skyhookapi.com',
                     icon_url: 'https://skyhookapi.com/images/skyhook-tiny.png',

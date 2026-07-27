@@ -13,15 +13,15 @@ const envelope = {
 
 describe('/POST linear', () => {
     it('exposes provider metadata', () => {
-        const provider = new Linear()
+        const provider = Linear
 
-        assert.equal(provider.getName(), 'Linear')
-        assert.equal(provider.getPath(), 'linear')
+        assert.equal(provider.name, 'Linear')
+        assert.equal(provider.path, 'linear')
     })
 
     it('formats the documented comment payload used by example delivery', async () => {
         const example = loadProviderExample('linear')
-        const result = await Tester.testWithBody(new Linear(), example.body, example.headers, example.query)
+        const result = await Tester.testWithBody(Linear, example.body, example.headers, example.query)
         assert.notEqual(result, null)
         assert.deepEqual(result!.allowed_mentions, { parse: [] })
         assert.equal(result!.username, 'Linear')
@@ -44,7 +44,7 @@ describe('/POST linear', () => {
     })
 
     it('summarizes issue updates with useful current values and changed fields', async () => {
-        const result = await Tester.testWithBody(new Linear(), {
+        const result = await Tester.testWithBody(Linear, {
             ...envelope,
             action: 'update',
             actor: {
@@ -90,7 +90,7 @@ describe('/POST linear', () => {
     })
 
     it('handles current and future data-change resource types generically', async () => {
-        const result = await Tester.testWithBody(new Linear(), {
+        const result = await Tester.testWithBody(Linear, {
             ...envelope,
             action: 'create',
             data: {
@@ -108,7 +108,7 @@ describe('/POST linear', () => {
         assert.equal(embed.description, 'The rollout is at 50% with \\[details\\]\\(https://example.com\\).')
         assert.deepEqual(embed.fields, [{ name: 'Project', value: 'Mobile', inline: true }])
 
-        const removedResult = await Tester.testWithBody(new Linear(), {
+        const removedResult = await Tester.testWithBody(Linear, {
             ...envelope,
             action: 'remove',
             data: { identifier: 'ENG-41', title: 'Retired issue' },
@@ -119,7 +119,7 @@ describe('/POST linear', () => {
     })
 
     it('formats Issue SLA and OAuth app convenience events', async () => {
-        const slaResult = await Tester.testWithBody(new Linear(), {
+        const slaResult = await Tester.testWithBody(Linear, {
             ...envelope,
             action: 'breached',
             issueData: {
@@ -138,7 +138,7 @@ describe('/POST linear', () => {
             ['set', 'set'],
             ['highRisk', 'at high risk'],
         ] as const) {
-            const result = await Tester.testWithBody(new Linear(), {
+            const result = await Tester.testWithBody(Linear, {
                 ...envelope,
                 action,
                 issueData: { identifier: 'SUP-7', title: 'Customer cannot check out' },
@@ -148,7 +148,7 @@ describe('/POST linear', () => {
             assert.equal(result!.embeds![0].title, `Issue SLA ${phrase}: SUP-7 — Customer cannot check out`)
         }
 
-        const revokedResult = await Tester.testWithBody(new Linear(), {
+        const revokedResult = await Tester.testWithBody(Linear, {
             ...envelope,
             action: 'revoked',
             oauthClientId: 'oauth-client-id',
@@ -172,12 +172,12 @@ describe('/POST linear', () => {
             { ...envelope, action: 'create', data: {}, type: '' },
             { ...envelope, action: 'create', data: {}, type: 'Issue', webhookTimestamp: Number.NaN },
         ]) {
-            assert.equal(await Tester.testWithBody(new Linear(), body), null)
+            assert.equal(await Tester.testWithBody(Linear, body), null)
         }
 
         assert.equal(
             await Tester.testWithBody(
-                new Linear(),
+                Linear,
                 { ...envelope, action: 'create', data: {}, type: 'Issue' },
                 { 'linear-event': 'Comment' },
             ),
@@ -186,7 +186,7 @@ describe('/POST linear', () => {
     })
 
     it('only links trusted Linear URLs', async () => {
-        const result = await Tester.testWithBody(new Linear(), {
+        const result = await Tester.testWithBody(Linear, {
             ...envelope,
             action: 'create',
             actor: { name: 'Unsafe actor', url: 'https://evil.example/profile' },
@@ -199,7 +199,7 @@ describe('/POST linear', () => {
         assert.deepEqual(result!.embeds![0].author, { name: 'Unsafe actor' })
 
         const oversizedUrl = `https://linear.app/${'😀'.repeat(500)}`
-        const oversizedResult = await Tester.testWithBody(new Linear(), {
+        const oversizedResult = await Tester.testWithBody(Linear, {
             ...envelope,
             action: 'create',
             actor: { name: 'Actor', url: oversizedUrl },
@@ -217,7 +217,7 @@ describe('/POST linear', () => {
         const updatedFrom = Object.fromEntries(
             Array.from({ length: 100 }, (_, index) => [`veryLongChangedField${index}${longText}`, 'old']),
         )
-        const result = await Tester.testWithBody(new Linear(), {
+        const result = await Tester.testWithBody(Linear, {
             ...envelope,
             action: 'update',
             actor: { name: longText },

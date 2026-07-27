@@ -1,6 +1,16 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { canonicalizeIso8601Timestamp, isRecord } from '../../src/util/WebhookValue.ts'
+import {
+    canonicalizeIso8601Timestamp,
+    firstIso8601Timestamp,
+    firstScalar,
+    isAllowedHostname,
+    isRecord,
+    safeId,
+    safeIntegerText,
+    scalarText,
+    trustedHttpsUrl,
+} from '../../src/util/WebhookValue.ts'
 
 describe('WebhookValue', () => {
     describe('isRecord', () => {
@@ -54,6 +64,55 @@ describe('WebhookValue', () => {
             ]) {
                 assert.equal(canonicalizeIso8601Timestamp(value), null)
             }
+        })
+    })
+
+    describe('safe scalar extraction', () => {
+        it('accepts useful scalar values while rejecting ambiguous numeric values', () => {
+            assert.equal(scalarText('  value\n'), 'value')
+            assert.equal(scalarText(true), 'true')
+            assert.equal(scalarText(42.5), '42.5')
+            assert.equal(scalarText(Number.POSITIVE_INFINITY), null)
+            assert.equal(scalarText(Number.MAX_SAFE_INTEGER + 1), null)
+            assert.equal(scalarText({ value: 'no coercion' }), null)
+            assert.equal(firstScalar(null, {}, 'chosen'), 'chosen')
+        })
+
+        it('extracts bounded IDs and safe integers', () => {
+            assert.equal(safeId('  abc-123  ', 16), 'abc-123')
+            assert.equal(safeId('too-long', 4), null)
+            assert.equal(safeId(42), '42')
+            assert.equal(safeId(1.5), null)
+            assert.equal(safeIntegerText(0), '0')
+            assert.equal(safeIntegerText(0, true), null)
+            assert.equal(safeIntegerText(42, true), '42')
+        })
+
+        it('returns the first valid ISO timestamp', () => {
+            assert.equal(firstIso8601Timestamp('invalid', '2025-01-10T17:27:48Z'), '2025-01-10T17:27:48.000Z')
+        })
+    })
+
+    describe('trusted URL policy', () => {
+        it('requires HTTPS and an explicitly allowed hostname', () => {
+            const policy = { allowedHosts: ['example.com'], maxLength: 100 }
+            assert.equal(trustedHttpsUrl('https://example.com/path', policy), 'https://example.com/path')
+            assert.equal(trustedHttpsUrl('http://example.com/path', policy), null)
+            assert.equal(trustedHttpsUrl('https://evil.example/path', policy), null)
+            assert.equal(trustedHttpsUrl('https://example.com.evil/path', policy), null)
+        })
+
+        it('allows true subdomains only when requested', () => {
+            assert.equal(isAllowedHostname('api.example.com', ['example.com']), false)
+            assert.equal(isAllowedHostname('api.example.com', ['example.com'], true), true)
+            assert.equal(isAllowedHostname('notexample.com', ['example.com'], true), false)
+            assert.equal(
+                trustedHttpsUrl('https://api.example.com/path', {
+                    allowedHosts: ['example.com'],
+                    allowSubdomains: true,
+                }),
+                'https://api.example.com/path',
+            )
         })
     })
 })

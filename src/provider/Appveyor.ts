@@ -1,35 +1,34 @@
 import type { Embed } from '../model/DiscordApi.ts'
-import { DirectParseProvider } from '../provider/BaseProvider.ts'
+import { defineProvider } from './Provider.ts'
 
 /**
  * https://www.appveyor.com/docs/notifications/#webhook-payload-default
  */
-export class AppVeyor extends DirectParseProvider {
-    public getName(): string {
-        return 'AppVeyor'
-    }
-
-    public async parseData(): Promise<void> {
-        this.setEmbedColor(0x00b3e0)
+export const AppVeyor = defineProvider({
+    path: 'appveyor',
+    name: 'AppVeyor',
+    example: { body: 'appveyor/appveyor.json' },
+    defaults: { embedColor: 0x00b3e0 },
+    map({ body }, output) {
         const embed: Embed = {
-            title: 'Build ' + this.body.eventData.buildVersion,
-            url: this.body.eventData.buildUrl,
-            description: this.body.eventData.commitMessage + '\n\n' + '**Status**: ' + this.body.eventData.status,
+            title: 'Build ' + body.eventData.buildVersion,
+            url: body.eventData.buildUrl,
+            description: body.eventData.commitMessage + '\n\n' + '**Status**: ' + body.eventData.status,
             author: {
-                name: this.body.eventData.commitAuthor,
+                name: body.eventData.commitAuthor,
             },
         }
-        if (this.body.eventData.repositoryProvider === 'gitHub') {
+        if (body.eventData.repositoryProvider === 'gitHub') {
             embed.author!.url =
-                'https://github.com/' + this.body.eventData.repositoryName + '/commit/' + this.body.eventData.commitId
+                'https://github.com/' + body.eventData.repositoryName + '/commit/' + body.eventData.commitId
         }
 
-        if (this.body.eventData.jobs[0].artifacts.length !== 0) {
+        if (body.eventData.jobs[0].artifacts.length !== 0) {
             embed.description += '\n**Artifacts**:'
-            for (const artifact of this.body.eventData.jobs[0].artifacts) {
+            for (const artifact of body.eventData.jobs[0].artifacts) {
                 embed.description += '\n- [' + artifact.fileName + '](' + artifact.permalink + ')'
             }
         }
-        this.addEmbed(embed)
-    }
-}
+        output.addEmbed(embed)
+    },
+})

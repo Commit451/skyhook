@@ -1,22 +1,17 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import { loadProviderExample, providerExamplePaths } from '../../src/ProviderExamples.ts'
-import { DirectParseProvider } from '../../src/provider/BaseProvider.ts'
+import { defineProvider } from '../../src/provider/Provider.ts'
 import { ProviderRegistry, providerRegistry } from '../../src/provider/ProviderRegistry.ts'
 
-class ExampleAliasProvider extends DirectParseProvider {
-    public getName(): string {
-        return 'Example Alias'
-    }
-
-    public getPath(): string {
-        return 'example-alias'
-    }
-
-    public async parseData(): Promise<void> {
-        this.payload.content = 'example'
-    }
-}
+const exampleAliasProvider = defineProvider({
+    path: 'example-alias',
+    name: 'Example Alias',
+    example: { body: 'gitlab/gitlab.json' },
+    map(_request, output) {
+        output.payload.content = 'example'
+    },
+})
 
 const expectedProviderPaths = [
     'appcenter',
@@ -66,14 +61,7 @@ describe('provider examples', () => {
     })
 
     it('resolves example files from the supplied registry', () => {
-        const registry = new ProviderRegistry([
-            {
-                path: 'example-alias',
-                name: 'Example Alias',
-                provider: ExampleAliasProvider,
-                example: { body: 'gitlab/gitlab.json' },
-            },
-        ])
+        const registry = new ProviderRegistry([exampleAliasProvider])
 
         const example = loadProviderExample('example-alias', registry)
 

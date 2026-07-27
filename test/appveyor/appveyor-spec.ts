@@ -5,7 +5,7 @@ import { Tester } from '../Tester.ts'
 
 describe('/POST appveyor', () => {
     it('build', async () => {
-        const res = await Tester.test(new AppVeyor(), 'appveyor.json', null)
+        const res = await Tester.test(AppVeyor, 'appveyor.json', null)
         assert.notStrictEqual(res, null)
         assert.ok(Array.isArray(res!.embeds))
         assert.strictEqual(res!.embeds.length, 1)

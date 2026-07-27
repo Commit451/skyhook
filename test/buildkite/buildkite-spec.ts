@@ -34,15 +34,15 @@ const build = {
 
 describe('/POST buildkite', () => {
     it('exposes provider metadata', () => {
-        const provider = new Buildkite()
+        const provider = Buildkite
 
-        assert.equal(provider.getName(), 'Buildkite')
-        assert.equal(provider.getPath(), 'buildkite')
+        assert.equal(provider.name, 'Buildkite')
+        assert.equal(provider.path, 'buildkite')
     })
 
     it('formats the canonical build fixture used by example delivery', async () => {
         const example = loadProviderExample('buildkite')
-        const result = await Tester.testWithBody(new Buildkite(), example.body, example.headers, example.query)
+        const result = await Tester.testWithBody(Buildkite, example.body, example.headers, example.query)
 
         assert.notEqual(result, null)
         assert.equal(result!.username, 'Buildkite')
@@ -65,7 +65,7 @@ describe('/POST buildkite', () => {
 
     it('formats build lifecycle events and blocked builds', async () => {
         const running = await Tester.testWithBody(
-            new Buildkite(),
+            Buildkite,
             { event: 'build.running', build, pipeline, sender },
             { 'X-Buildkite-Event': 'build.running' },
         )
@@ -73,7 +73,7 @@ describe('/POST buildkite', () => {
         assert.equal(running!.embeds![0].title, 'My Pipeline build \\#27 running')
         assert.equal(running!.embeds![0].timestamp, '2026-07-27T14:20:05.000Z')
 
-        const failing = await Tester.testWithBody(new Buildkite(), {
+        const failing = await Tester.testWithBody(Buildkite, {
             event: 'build.failing',
             build: { ...build, state: 'passed', failing_at: '2026-07-27T14:24:00Z' },
             pipeline,
@@ -83,7 +83,7 @@ describe('/POST buildkite', () => {
         assert.equal(failing!.embeds![0].title, 'My Pipeline build \\#27 failing')
         assert.equal(failing!.embeds![0].color, 0xe53935)
 
-        const blocked = await Tester.testWithBody(new Buildkite(), {
+        const blocked = await Tester.testWithBody(Buildkite, {
             event: 'build.finished',
             build: { ...build, state: 'blocked', blocked: true, finished_at: '2026-07-27T14:25:00Z' },
             pipeline,
@@ -95,7 +95,7 @@ describe('/POST buildkite', () => {
     })
 
     it('formats job events with build and execution details', async () => {
-        const result = await Tester.testWithBody(new Buildkite(), {
+        const result = await Tester.testWithBody(Buildkite, {
             event: 'job.finished',
             job: {
                 id: 'b63254c0-3271-4a98-8270-7cfbd6c2f14e',
@@ -139,7 +139,7 @@ describe('/POST buildkite', () => {
         }
         for (const [event, state] of Object.entries(buildEvents)) {
             const result = await Tester.testWithBody(
-                new Buildkite(),
+                Buildkite,
                 { event, build: { ...build, state, finished_at: '2026-07-27T14:23:00Z' }, pipeline, sender },
                 { 'x-buildkite-event': event },
             )
@@ -155,7 +155,7 @@ describe('/POST buildkite', () => {
         }
         for (const [event, state] of Object.entries(jobEvents)) {
             const result = await Tester.testWithBody(
-                new Buildkite(),
+                Buildkite,
                 {
                     event,
                     job: {
@@ -182,7 +182,7 @@ describe('/POST buildkite', () => {
         }
         for (const [event, connectionState] of Object.entries(agentEvents)) {
             const result = await Tester.testWithBody(
-                new Buildkite(),
+                Buildkite,
                 {
                     event,
                     agent: { name: 'runner-1', connection_state: connectionState },
@@ -196,7 +196,7 @@ describe('/POST buildkite', () => {
     })
 
     it('formats agent, blocked registration, ping, package, and the documented Test Engine alarm event', async () => {
-        const agentResult = await Tester.testWithBody(new Buildkite(), {
+        const agentResult = await Tester.testWithBody(Buildkite, {
             event: 'agent.blocked',
             agent: {
                 name: 'runner_1',
@@ -219,7 +219,7 @@ describe('/POST buildkite', () => {
             { name: 'Blocked IP', value: '203.0.113.10', inline: true },
         ])
 
-        const tokenResult = await Tester.testWithBody(new Buildkite(), {
+        const tokenResult = await Tester.testWithBody(Buildkite, {
             event: 'cluster_token.registration_blocked',
             blocked_ip: '203.0.113.11',
             cluster_token: { description: 'Production **agents**' },
@@ -231,7 +231,7 @@ describe('/POST buildkite', () => {
             { name: 'Blocked IP', value: '203.0.113.11', inline: true },
         ])
 
-        const pingResult = await Tester.testWithBody(new Buildkite(), {
+        const pingResult = await Tester.testWithBody(Buildkite, {
             event: 'ping',
             service: { provider: 'webhook' },
             organization: { name: 'Acme Inc', slug: 'acme-inc' },
@@ -240,7 +240,7 @@ describe('/POST buildkite', () => {
         assert.equal(pingResult!.embeds![0].title, 'Buildkite webhook settings updated')
         assert.deepEqual(pingResult!.embeds![0].fields, [{ name: 'Organization', value: 'Acme Inc', inline: true }])
 
-        const packageResult = await Tester.testWithBody(new Buildkite(), {
+        const packageResult = await Tester.testWithBody(Buildkite, {
             event: 'package.created',
             package: {
                 name: 'banana',
@@ -256,7 +256,7 @@ describe('/POST buildkite', () => {
             { name: 'Organization', value: 'acme-inc', inline: true },
         ])
 
-        const workflowResult = await Tester.testWithBody(new Buildkite(), {
+        const workflowResult = await Tester.testWithBody(Buildkite, {
             event: 'workflow.alarm',
             subject: {
                 type: 'test',
@@ -277,7 +277,7 @@ describe('/POST buildkite', () => {
 
     it('accepts future event families generically and only links trusted Buildkite URLs', async () => {
         const result = await Tester.testWithBody(
-            new Buildkite(),
+            Buildkite,
             {
                 event: 'pipeline.archived',
                 web_url: 'https://evil.example/phishing',
@@ -290,7 +290,7 @@ describe('/POST buildkite', () => {
         assert.equal(result!.embeds![0].url, undefined)
         assert.deepEqual(result!.embeds![0].author, { name: 'Future \\*\\*sender\\*\\*' })
 
-        const allowed = await Tester.testWithBody(new Buildkite(), {
+        const allowed = await Tester.testWithBody(Buildkite, {
             event: 'pipeline.archived',
             web_url: 'https://api.buildkite.com/v2/organizations/acme-inc/pipelines/my-pipeline',
             sender: 'Webhook creator',
@@ -306,7 +306,7 @@ describe('/POST buildkite', () => {
             'https://buildkite.com.evil.example/acme-inc/my-pipeline',
             'https://buildkite.com@evil.example/acme-inc/my-pipeline',
         ]) {
-            const unsafe = await Tester.testWithBody(new Buildkite(), {
+            const unsafe = await Tester.testWithBody(Buildkite, {
                 event: 'pipeline.archived',
                 web_url: webUrl,
             })
@@ -327,12 +327,12 @@ describe('/POST buildkite', () => {
             { event: 'package.created', sender },
             { event: 'workflow.alarm' },
         ]) {
-            assert.equal(await Tester.testWithBody(new Buildkite(), body), null)
+            assert.equal(await Tester.testWithBody(Buildkite, body), null)
         }
 
         assert.equal(
             await Tester.testWithBody(
-                new Buildkite(),
+                Buildkite,
                 { event: 'build.running', build, pipeline, sender },
                 { 'x-buildkite-event': 'build.finished' },
             ),
@@ -340,7 +340,7 @@ describe('/POST buildkite', () => {
         )
         assert.equal(
             await Tester.testWithBody(
-                new Buildkite(),
+                Buildkite,
                 { event: 'build.running', build, pipeline, sender },
                 { 'x-buildkite-event': '' },
             ),
@@ -350,7 +350,7 @@ describe('/POST buildkite', () => {
 
     it('stays within Discord limits for long untrusted values', async () => {
         const longText = '@everyone [click](https://evil.example) ' + 'x'.repeat(7000)
-        const result = await Tester.testWithBody(new Buildkite(), {
+        const result = await Tester.testWithBody(Buildkite, {
             event: 'job.promised_exit_status',
             promised_exit_status_reason: longText,
             job: {

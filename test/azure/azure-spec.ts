@@ -5,7 +5,7 @@ import { Tester } from '../Tester.ts'
 
 describe('/POST azure', () => {
     it('git.push', async () => {
-        const res = await Tester.test(new AzureDevOps(), 'azure.json', null)
+        const res = await Tester.test(AzureDevOps, 'azure.json', null)
         assert.notStrictEqual(res, null)
         assert.ok(Array.isArray(res!.embeds))
         assert.strictEqual(res!.embeds.length, 1)
@@ -19,7 +19,7 @@ describe('/POST azure', () => {
 
     for (const [eventType, fieldName] of pullRequestCases) {
         it(`preserves the ${eventType} pull-request payload`, async () => {
-            const res = await Tester.testWithBody(new AzureDevOps(), {
+            const res = await Tester.testWithBody(AzureDevOps, {
                 eventType,
                 message: { markdown: '**Pull request event**' },
                 resource: {
@@ -34,6 +34,7 @@ describe('/POST azure', () => {
             })
 
             assert.deepEqual(res, {
+                allowed_mentions: { parse: [] },
                 embeds: [
                     {
                         author: {

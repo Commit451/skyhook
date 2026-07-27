@@ -8,7 +8,7 @@ describe('/POST patreon', () => {
         const headers = {
             'x-patreon-event': 'pledges:create',
         }
-        const res = await Tester.test(new Patreon(), 'patreon-pledge-create.json', headers)
+        const res = await Tester.test(Patreon, 'patreon-pledge-create.json', headers)
         assert.notStrictEqual(res, null)
         assert.ok(Array.isArray(res!.embeds))
         assert.strictEqual(res!.embeds.length, 1)
@@ -23,20 +23,20 @@ describe('/POST patreon', () => {
         assert.deepEqual(res!.embeds[0].fields, [
             {
                 name: 'Unlocked Tier',
-                value: '[Patron on Discord ($1.00+/mo)](https://www.patreon.com/join/thecampaign/checkout?rid=5050505)\n﻿    • Earn the **Patron** rank on our [Discord Server](https://discord.gg/abcdefg).\n',
+                value: '[Patron on Discord ($1.00+/mo)](https://www.patreon.com/join/thecampaign/checkout?rid=5050505)\n﻿    • Earn the **Patron** rank on our [Discord Server](https://discord.gg/abcdefg).',
                 inline: false,
             },
         ])
     })
 
     it('members:create preserves the current v2 output', async () => {
-        const deprecatedPayload = await Tester.test(new Patreon(), 'patreon-pledge-create.json', {
+        const deprecatedPayload = await Tester.test(Patreon, 'patreon-pledge-create.json', {
             'x-patreon-event': 'pledges:create',
         })
         const headers = {
             'x-patreon-event': 'members:create',
         }
-        const res = await Tester.test(new Patreon(), 'patreon-member-create.json', headers)
+        const res = await Tester.test(Patreon, 'patreon-member-create.json', headers)
         assert.notStrictEqual(res, null)
         assert.ok(Array.isArray(res!.embeds))
         assert.strictEqual(res!.embeds.length, 1)

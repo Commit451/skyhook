@@ -13,13 +13,13 @@ const headers = (topic: string, overrides: Record<string, string> = {}) => ({
 
 describe('/POST shopify', () => {
     it('exposes provider metadata', () => {
-        const provider = new Shopify()
-        assert.strictEqual(provider.getName(), 'Shopify')
-        assert.strictEqual(provider.getPath(), 'shopify')
+        const provider = Shopify
+        assert.strictEqual(provider.name, 'Shopify')
+        assert.strictEqual(provider.path, 'shopify')
     })
 
     it('formats an order creation from the documented payload', async () => {
-        const res = await Tester.test(new Shopify(), 'shopify.json', headers('orders/create'))
+        const res = await Tester.test(Shopify, 'shopify.json', headers('orders/create'))
         assert.notStrictEqual(res, null)
         assert.deepStrictEqual(res!.allowed_mentions, { parse: [] })
         assert.strictEqual(res!.embeds?.length, 1)
@@ -47,7 +47,7 @@ describe('/POST shopify', () => {
     })
 
     it('formats a product update from the documented payload', async () => {
-        const res = await Tester.test(new Shopify(), 'shopify-product.json', headers('products/update'))
+        const res = await Tester.test(Shopify, 'shopify-product.json', headers('products/update'))
         assert.notStrictEqual(res, null)
 
         const embed = res!.embeds![0]
@@ -63,7 +63,7 @@ describe('/POST shopify', () => {
 
     it('handles any current or future topic with a safe generic summary', async () => {
         const res = await Tester.testWithBody(
-            new Shopify(),
+            Shopify,
             {
                 inventory_item_id: 808950810,
                 location_id: 487838322,
@@ -90,7 +90,7 @@ describe('/POST shopify', () => {
 
     it('formats app uninstall events without exposing contact data', async () => {
         const res = await Tester.testWithBody(
-            new Shopify(),
+            Shopify,
             {
                 id: 548380009,
                 name: 'Super Toys',
@@ -109,13 +109,13 @@ describe('/POST shopify', () => {
     })
 
     it('ignores malformed requests without a Shopify topic', async () => {
-        const res = await Tester.testWithBody(new Shopify(), { id: 1 }, headers('not-used', { 'x-shopify-topic': '' }))
+        const res = await Tester.testWithBody(Shopify, { id: 1 }, headers('not-used', { 'x-shopify-topic': '' }))
         assert.strictEqual(res, null)
     })
 
     it('does not trust an invalid shop domain for links', async () => {
         const res = await Tester.testWithBody(
-            new Shopify(),
+            Shopify,
             {
                 admin_graphql_api_id: 'gid://shopify/Product/123',
                 title: 'Unsafe product',
@@ -129,7 +129,7 @@ describe('/POST shopify', () => {
 
     it('rejects oversized shop domains and resource IDs before building Discord links', async () => {
         const res = await Tester.testWithBody(
-            new Shopify(),
+            Shopify,
             {
                 admin_graphql_api_id: `gid://shopify/Product/${'1'.repeat(3000)}`,
                 title: 'Oversized identifiers',
@@ -145,7 +145,7 @@ describe('/POST shopify', () => {
 
     it('does not display rounded 64-bit Shopify IDs', async () => {
         const res = await Tester.testWithBody(
-            new Shopify(),
+            Shopify,
             {
                 inventory_item_id: Number('820982911946154508'),
                 location_id: '487838322',
@@ -163,7 +163,7 @@ describe('/POST shopify', () => {
     it('does not forward malformed or oversized timestamps to Discord', async () => {
         for (const timestamp of ['0', '2026-02-31T00:00:00.000Z', '2026-07-23T15:30:00.12345678901234567890Z']) {
             const res = await Tester.testWithBody(
-                new Shopify(),
+                Shopify,
                 { available: 75 },
                 headers('inventory_levels/update', { 'x-shopify-triggered-at': timestamp }),
             )
@@ -174,7 +174,7 @@ describe('/POST shopify', () => {
 
     it('escapes untrusted Discord Markdown in embed fields', async () => {
         const res = await Tester.testWithBody(
-            new Shopify(),
+            Shopify,
             {
                 title: 'Safe title',
                 status: '**active**',
@@ -196,7 +196,7 @@ describe('/POST shopify', () => {
     it('stays inside Discord embed limits for long untrusted values', async () => {
         const longText = '@everyone ' + 'x'.repeat(7000)
         const res = await Tester.testWithBody(
-            new Shopify(),
+            Shopify,
             {
                 admin_graphql_api_id: 'gid://shopify/Product/123',
                 title: longText,

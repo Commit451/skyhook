@@ -1,28 +1,17 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { DirectParseProvider } from '../../src/provider/BaseProvider.ts'
+import { defineProvider } from '../../src/provider/Provider.ts'
 import { type ProviderDefinition, ProviderRegistry, providerRegistry } from '../../src/provider/ProviderRegistry.ts'
 
-class DuplicatePathProvider extends DirectParseProvider {
-    public getName(): string {
-        return 'Duplicate Path'
-    }
-
-    public getPath(): string {
-        return 'duplicate'
-    }
-
-    public async parseData(): Promise<void> {
-        this.payload.content = 'duplicate'
-    }
-}
-
-const duplicateDefinition = (): ProviderDefinition => ({
-    path: 'duplicate',
-    name: 'Duplicate Path',
-    provider: DuplicatePathProvider,
-    example: { body: 'gitlab/gitlab.json' },
-})
+const duplicateDefinition = (): ProviderDefinition =>
+    defineProvider({
+        path: 'duplicate',
+        name: 'Duplicate Path',
+        example: { body: 'gitlab/gitlab.json' },
+        map: ({ body }, output) => {
+            output.payload.content = String(body.value ?? 'duplicate')
+        },
+    })
 
 const expectedMetadata = [
     { path: 'appcenter', name: 'AppCenter', example: { body: 'appcenter/appcenter-pipeline.json' } },
@@ -88,17 +77,6 @@ describe('ProviderRegistry', () => {
         assert.throws(
             () => new ProviderRegistry([duplicateDefinition(), duplicateDefinition()]),
             /Duplicate provider path "duplicate"/,
-        )
-    })
-
-    it('rejects registry metadata that disagrees with the provider contract', () => {
-        assert.throws(
-            () => new ProviderRegistry([{ ...duplicateDefinition(), path: 'wrong-path' }]),
-            /Provider path "wrong-path" does not match "duplicate"/,
-        )
-        assert.throws(
-            () => new ProviderRegistry([{ ...duplicateDefinition(), name: 'Wrong Name' }]),
-            /Provider name "Wrong Name" does not match "Duplicate Path"/,
         )
     })
 

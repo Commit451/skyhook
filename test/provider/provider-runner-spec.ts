@@ -1,9 +1,8 @@
 import assert from 'node:assert/strict'
 import { beforeEach, describe, it } from 'node:test'
-import type { DiscordPayload } from '../../src/model/DiscordApi.ts'
 import { loadProviderExample } from '../../src/ProviderExamples.ts'
-import { DirectParseProvider } from '../../src/provider/BaseProvider.ts'
-import { type ProviderDefinition, ProviderRegistry } from '../../src/provider/ProviderRegistry.ts'
+import { defineProvider, type ProviderOutput } from '../../src/provider/Provider.ts'
+import { ProviderRegistry } from '../../src/provider/ProviderRegistry.ts'
 import { ProviderRunner } from '../../src/provider/ProviderRunner.ts'
 
 const delay = (milliseconds: number): Promise<void> =>
@@ -11,83 +10,53 @@ const delay = (milliseconds: number): Promise<void> =>
         setTimeout(resolve, milliseconds)
     })
 
-class RunnerProvider extends DirectParseProvider {
-    public static constructions = 0
-    public static completions = 0
-    private readonly instanceNumber = ++RunnerProvider.constructions
+let completions = 0
+const outputs = new Set<ProviderOutput>()
 
-    public getName(): string {
-        return 'Runner'
-    }
-
-    public getPath(): string {
-        return 'runner'
-    }
-
-    public async parseData(): Promise<void> {
-        await delay(5)
-        RunnerProvider.completions += 1
-        if (this.body.ignore === true) {
-            this.nullifyPayload()
-            return
-        }
-        this.payload.content = `instance-${this.instanceNumber}:${this.body.value ?? 'complete'}`
-    }
-}
-
-class InvalidPayloadProvider extends DirectParseProvider {
-    public getName(): string {
-        return 'Invalid Payload'
-    }
-
-    public getPath(): string {
-        return 'invalid'
-    }
-
-    public async parseData(): Promise<void> {
-        this.payload.content = 'x'.repeat(2001)
-    }
-}
-
-const runnerDefinition: ProviderDefinition = {
+const runnerDefinition = defineProvider({
     path: 'runner',
     name: 'Runner',
-    provider: RunnerProvider,
     example: { body: 'gitlab/gitlab.json' },
-}
+    async map({ body }, output) {
+        outputs.add(output)
+        await delay(5)
+        completions += 1
+        if (body.ignore === true) {
+            output.ignore()
+            return
+        }
+        output.payload.content = String(body.value ?? 'complete')
+    },
+})
 
 function createRunnerRegistry(): ProviderRegistry {
-    const registry = new ProviderRegistry([runnerDefinition])
-    // Registry construction validates metadata with a temporary provider. Request
-    // construction counts start after that startup-only contract check.
-    RunnerProvider.constructions = 0
-    return registry
+    return new ProviderRegistry([runnerDefinition])
 }
 
 beforeEach(() => {
-    RunnerProvider.constructions = 0
-    RunnerProvider.completions = 0
+    completions = 0
+    outputs.clear()
 })
 
 describe('ProviderRunner', () => {
-    it('awaits asynchronous provider parsing before returning', async () => {
+    it('awaits asynchronous provider mapping before returning', async () => {
         const runner = new ProviderRunner(createRunnerRegistry())
 
         const payload = await runner.run('runner', { body: { value: 'finished' } })
 
-        assert.equal(RunnerProvider.completions, 1)
-        assert.equal(payload?.content, 'instance-1:finished')
+        assert.equal(completions, 1)
+        assert.equal(payload?.content, 'finished')
     })
 
-    it('constructs a fresh provider for every execution', async () => {
+    it('uses fresh output state for every execution', async () => {
         const runner = new ProviderRunner(createRunnerRegistry())
 
         const first = await runner.run('runner', { body: { value: 'first' } })
         const second = await runner.run('runner', { body: { value: 'second' } })
 
-        assert.equal(first?.content, 'instance-1:first')
-        assert.equal(second?.content, 'instance-2:second')
-        assert.equal(RunnerProvider.constructions, 2)
+        assert.equal(first?.content, 'first')
+        assert.equal(second?.content, 'second')
+        assert.equal(outputs.size, 2)
     })
 
     it('preserves null for ignored or unsupported events', async () => {
@@ -106,30 +75,28 @@ describe('ProviderRunner', () => {
         const livePayload = await runner.run('runner', example)
         const examplePayload = await runner.runExample('runner')
 
-        assert.equal(livePayload?.content, 'instance-1:complete')
-        assert.equal(examplePayload?.content, 'instance-2:complete')
+        assert.equal(livePayload?.content, 'complete')
+        assert.equal(examplePayload?.content, 'complete')
     })
 
-    it('reports validation issues as structured warnings without mutating or rejecting output', async () => {
-        const definition: ProviderDefinition = {
-            path: 'invalid',
-            name: 'Invalid Payload',
-            provider: InvalidPayloadProvider,
+    it('returns a centrally finalized Discord payload', async () => {
+        const definition = defineProvider({
+            path: 'oversized',
+            name: 'Oversized',
             example: { body: 'gitlab/gitlab.json' },
-        }
+            map(_request, output) {
+                output.payload.content = 'x'.repeat(2_001)
+            },
+        })
         const warnings: unknown[] = []
         const runner = new ProviderRunner(new ProviderRegistry([definition]), {
             warn: (warning: unknown) => warnings.push(warning),
         })
-        const expected: DiscordPayload = { content: 'x'.repeat(2001) }
 
-        const payload = await runner.run('invalid', { body: {} })
+        const payload = await runner.run('oversized', { body: {} })
 
-        assert.deepEqual(payload, expected)
-        assert.equal(warnings.length, 1)
-        const warning = JSON.parse(String(warnings[0]))
-        assert.equal(warning.event, 'discord_payload_validation_warning')
-        assert.equal(warning.provider, 'invalid')
-        assert.deepEqual(warning.issues, [{ code: 'content-length', path: 'content', actual: 2001, limit: 2000 }])
+        assert.equal(payload?.content?.length, 2_000)
+        assert.deepEqual(payload?.allowed_mentions, { parse: [] })
+        assert.deepEqual(warnings, [])
     })
 })

@@ -5,7 +5,7 @@ import { Tester } from '../Tester.ts'
 
 describe('/POST heroku', () => {
     it('deploy', async () => {
-        const res = await Tester.test(new Heroku(), 'heroku.json', null)
+        const res = await Tester.test(Heroku, 'heroku.json', null)
         assert.notStrictEqual(res, null)
         assert.ok(Array.isArray(res!.embeds))
         assert.strictEqual(res!.embeds.length, 1)

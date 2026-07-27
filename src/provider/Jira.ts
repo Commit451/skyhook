@@ -1,69 +1,55 @@
 import type { Embed } from '../model/DiscordApi.ts'
-import { DirectParseProvider } from '../provider/BaseProvider.ts'
+import { defineProvider } from './Provider.ts'
 
 /**
  * https://developer.atlassian.com/server/jira/platform/webhooks/
  */
-export class Jira extends DirectParseProvider {
-    constructor() {
-        super()
-        this.setEmbedColor(0x1e45a8)
-    }
-
-    public getName(): string {
-        return 'Jira'
-    }
-
-    public getPath(): string {
-        return 'jira'
-    }
-
-    public async parseData(): Promise<void> {
-        if (this.body.webhookEvent == null) {
-            this.nullifyPayload()
+export const Jira = defineProvider({
+    path: 'jira',
+    name: 'Jira',
+    example: { body: 'jira/jira-issue.json' },
+    defaults: { embedColor: 0x1e45a8 },
+    map({ body }, output) {
+        if (body.webhookEvent == null) {
+            output.ignore()
             return
         }
 
         let isIssue: boolean
-        if (this.body.webhookEvent.startsWith('jira:issue_')) {
+        if (body.webhookEvent.startsWith('jira:issue_')) {
             isIssue = true
-        } else if (this.body.webhookEvent.startsWith('comment_')) {
+        } else if (body.webhookEvent.startsWith('comment_')) {
             isIssue = false
-            if (this.body.issue == null) {
-                // What's the point of notifying a new comment if ONLY comment information is sent?
-                // Do we care that a comment was made if we cant tell what was commented on?
-                // This solution will silence errors until someone makes sense of Atlassian's decisions..
-                this.nullifyPayload()
+            if (body.issue == null) {
+                output.ignore()
                 return
             }
         } else {
+            output.ignore()
             return
         }
 
-        // extract variable from Jira
-        const issueHasAsignee = this.body?.issue?.fields?.assignee != null
-        const issue = this.body.issue
-        const user = this.body.user || { displayName: 'Anonymous' }
-        const action = this.body.webhookEvent.split('_')[1]
-
-        // create the embed
+        const issueHasAssignee = body.issue?.fields?.assignee != null
+        const issue = body.issue
+        const user = body.user || { displayName: 'Anonymous' }
+        const action = body.webhookEvent.split('_')[1]
         const embed: Embed = {
             title: `${issue.key} - ${issue.fields.summary}`,
-            url: this.createBrowseUrl(issue),
+            url: createBrowseUrl(issue),
         }
         if (isIssue) {
-            embed.description = `${user.displayName} ${action} issue: ${embed.title}${issueHasAsignee ? ` (${issue.fields.assignee.displayName})` : ''} `
+            embed.description = `${user.displayName} ${action} issue: ${embed.title}${issueHasAssignee ? ` (${issue.fields.assignee.displayName})` : ''} `
         } else {
-            const comment = this.body.comment
+            const comment = body.comment
             embed.description = `${comment.updateAuthor.displayName} ${action} comment: ${comment.body}`
         }
-        this.addEmbed(embed)
-    }
+        output.addEmbed(embed)
+    },
+})
 
-    private createBrowseUrl(issue: { self: string; key: string }): string {
-        const url: URL = new URL(issue.self)
-        const path: string | RegExpMatchArray = url.pathname.match(/.+?(?=\/rest\/api)/) ?? ''
-        url.pathname = `${path}/browse/${issue.key}`
-        return url.toString()
-    }
+function createBrowseUrl(issue: { self: string; key: string }): string {
+    const url = new URL(issue.self)
+    const path = url.pathname.match(/.+?(?=\/rest\/api)/) ?? ''
+    url.pathname = `${path}/browse/${issue.key}`
+    return url.toString()
 }

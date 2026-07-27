@@ -1,44 +1,35 @@
 import type { Embed } from '../model/DiscordApi.ts'
-import { DirectParseProvider } from '../provider/BaseProvider.ts'
+import { defineProvider } from './Provider.ts'
 
 /**
  * https://plugins.jenkins.io/notification
  */
-export class Jenkins extends DirectParseProvider {
-    private static capitalize(str: string): string {
-        const tmp = str.toLowerCase()
-        return tmp.charAt(0).toUpperCase() + tmp.slice(1)
-    }
-
-    public getName(): string {
-        return 'Jenkins-CI'
-    }
-
-    public getPath(): string {
-        return 'jenkins'
-    }
-
-    public async parseData(): Promise<void> {
-        this.setEmbedColor(0xf0d6b7)
-        const phase = this.body.build.phase
+export const Jenkins = defineProvider({
+    path: 'jenkins',
+    name: 'Jenkins-CI',
+    example: { body: 'jenkins/jenkins.json' },
+    defaults: { embedColor: 0xf0d6b7 },
+    map({ body }, output) {
+        const phase = body.build.phase
         const embed: Embed = {
-            title: 'Project ' + this.body.name,
-            url: this.body.build.full_url,
+            title: 'Project ' + body.name,
+            url: body.build.full_url,
         }
         switch (phase) {
             case 'STARTED':
-                embed.description = 'Started build #' + this.body.build.number
+                embed.description = 'Started build #' + body.build.number
                 break
             case 'COMPLETED':
             case 'FINALIZED':
                 embed.description =
-                    Jenkins.capitalize(phase) +
-                    ' build #' +
-                    this.body.build.number +
-                    ' with status: ' +
-                    this.body.build.status
+                    capitalize(phase) + ' build #' + body.build.number + ' with status: ' + body.build.status
                 break
         }
-        this.addEmbed(embed)
-    }
+        output.addEmbed(embed)
+    },
+})
+
+function capitalize(value: string): string {
+    const lowerCase = value.toLowerCase()
+    return lowerCase.charAt(0).toUpperCase() + lowerCase.slice(1)
 }

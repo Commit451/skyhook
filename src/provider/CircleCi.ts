@@ -1,24 +1,22 @@
 import type { Embed } from '../model/DiscordApi.ts'
-import { DirectParseProvider } from '../provider/BaseProvider.ts'
+import { defineProvider } from './Provider.ts'
 
 /**
  * https://circleci.com/docs/2.0/webhooks
  */
-export class CircleCi extends DirectParseProvider {
-    public getName(): string {
-        return 'CircleCi'
-    }
-
-    public async parseData(): Promise<void> {
-        this.setEmbedColor(0x343433)
-
-        const sha = this.body.pipeline.vcs.revision
-        const project = this.body.project.name
-        const subject = this.body.pipeline.vcs.commit.subject
-        const committer = this.body.pipeline.vcs.commit.author.name
-        const status = this.body.workflow.status
-        const url = this.body.workflow.url
-        const number = this.body.pipeline.number
+export const CircleCi = defineProvider({
+    path: 'circleci',
+    name: 'CircleCi',
+    example: { body: 'circleci/circleci.json' },
+    defaults: { embedColor: 0x343433 },
+    map({ body }, output) {
+        const sha = body.pipeline.vcs.revision
+        const project = body.project.name
+        const subject = body.pipeline.vcs.commit.subject
+        const committer = body.pipeline.vcs.commit.author.name
+        const status = body.workflow.status
+        const url = body.workflow.url
+        const number = body.pipeline.number
         let description = ''
         if (sha != null) {
             description += `[${sha.slice(0, 7)}]`
@@ -34,13 +32,12 @@ export class CircleCi extends DirectParseProvider {
         }
         const embed: Embed = {
             title: `Pipeline #${number}`,
-            url: url,
-            description: description,
+            url,
+            description,
             author: {
                 name: committer,
             },
         }
-
-        this.addEmbed(embed)
-    }
-}
+        output.addEmbed(embed)
+    },
+})
