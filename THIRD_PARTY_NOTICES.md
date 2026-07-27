@@ -1,5 +1,17 @@
 # Third-party notices
 
+## Simple Icons — Buildkite icon
+
+- File: `web/public/providers/buildkite.svg`
+- Project: Simple Icons
+- Source: https://github.com/simple-icons/simple-icons/blob/25d6e5b39bc55bc446e147700294628af1734f7e/icons/buildkite.svg
+- Revision: `25d6e5b39bc55bc446e147700294628af1734f7e`
+- Imported size: 478 bytes
+- Imported SHA-256: `32d45e2a770e5198bd0b12da30a43c3f560a54dd182a970fb32949e91f807a3f`
+- License: CC0 1.0 Universal; a copy is included at `web/public/providers/LICENSE.simple-icons.md`
+
+Buildkite is a trademark of Buildkite Pty Ltd. The icon is used only to identify the supported provider.
+
 ## Simple Icons — Linear icon
 
 - File: `web/public/providers/linear.svg`

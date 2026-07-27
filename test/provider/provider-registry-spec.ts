@@ -41,6 +41,11 @@ const expectedMetadata = [
             headers: 'bitbucketserver/bitbucketserver.headers.json',
         },
     },
+    {
+        path: 'buildkite',
+        name: 'Buildkite',
+        example: { body: 'buildkite/buildkite.json', headers: 'buildkite/buildkite.headers.json' },
+    },
     { path: 'circleci', name: 'CircleCi', example: { body: 'circleci/circleci.json' } },
     { path: 'codacy', name: 'Codacy', example: { body: 'codacy/codacy.json' } },
     { path: 'confluence', name: 'Confluence', example: { body: 'confluence/confluence_page.json' } },
@@ -112,7 +117,7 @@ describe('ProviderRegistry', () => {
         const gitlab = providerRegistry.get('gitlab')
 
         assert.equal(gitlab?.name, 'GitLab')
-        assert.strictEqual(gitlab, providerRegistry.definitions[9])
+        assert.strictEqual(gitlab, providerRegistry.definitions[10])
         assert.equal(providerRegistry.get('not-registered'), undefined)
     })
 
