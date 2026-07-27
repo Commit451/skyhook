@@ -1,41 +1,30 @@
 import { existsSync, readFileSync } from 'node:fs'
 import type { DiscordPayload } from '../src/model/DiscordApi.ts'
-import type { BaseProvider } from '../src/provider/BaseProvider.ts'
+import { executeProvider, type ProviderDefinition } from '../src/provider/Provider.ts'
 
-/**
- * Helps with testing things
- */
+/** Helps execute provider definitions against fixtures. */
 class Tester {
     public static async test(
-        provider: BaseProvider,
+        provider: ProviderDefinition,
         jsonFileName: string | null = null,
-        headers: any = null,
-        query: any = null,
+        headers: unknown = null,
+        query: unknown = null,
     ): Promise<DiscordPayload | null> {
-        let requestBody = null
-        if (jsonFileName != null) {
-            requestBody = JSON.parse(Tester.readTestFile(provider, jsonFileName))
-        }
-        return Tester.testWithBody(provider, requestBody, headers, query)
+        const body = jsonFileName == null ? null : JSON.parse(Tester.readTestFile(provider, jsonFileName))
+        return Tester.testWithBody(provider, body, headers, query)
     }
 
     public static async testWithBody(
-        provider: BaseProvider,
+        provider: ProviderDefinition,
         body: Record<string, any> | null = null,
-        headers: any = null,
-        query: any = null,
+        headers: unknown = null,
+        query: unknown = null,
     ): Promise<DiscordPayload | null> {
-        try {
-            const res = await provider.parse(body, headers, query)
-            return Promise.resolve(res)
-        } catch (err) {
-            console.error(err)
-            return Promise.reject(err)
-        }
+        return executeProvider(provider, { body, headers, query })
     }
 
-    public static readTestFile(provider: BaseProvider, fileName: string): string {
-        const providerPath = provider.getPath().toLowerCase()
+    public static readTestFile(provider: ProviderDefinition, fileName: string): string {
+        const providerPath = provider.path.toLowerCase()
         const examplePath = `./examples/${providerPath}/${fileName}`
         const filePath = existsSync(examplePath) ? examplePath : `./test/${providerPath}/${fileName}`
         return readFileSync(filePath, 'utf-8')

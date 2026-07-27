@@ -1,6 +1,6 @@
 import type { Embed, EmbedField } from '../model/DiscordApi.ts'
 import { DISCORD_EMBED_LIMITS, DISCORD_MESSAGE_LIMITS, SKYHOOK_FOOTER_TEXT } from '../util/DiscordEmbed.ts'
-import { DirectParseProvider } from './BaseProvider.ts'
+import { defineProvider, type ProviderOutput } from './Provider.ts'
 
 const CONTENT_SUMMARY_RESERVE = 64
 
@@ -65,62 +65,62 @@ interface HuggingFacePayload {
 /**
  * https://huggingface.co/docs/hub/main/webhooks
  */
-export class HuggingFace extends DirectParseProvider {
-    constructor() {
-        super()
-        this.setEmbedColor(0xffd21e)
-        this.payload.username = 'Hugging Face'
-        this.payload.allowed_mentions = { parse: [] }
-    }
+export const HuggingFace = defineProvider({
+    path: 'huggingface',
+    name: 'Hugging Face',
+    example: { body: 'huggingface/huggingface.json' },
+    defaults: {
+        username: 'Hugging Face',
+        embedColor: 0xffd21e,
+    },
+    map({ body }, output) {
+        new HuggingFaceMapper().map(body as unknown as HuggingFacePayload, output)
+    },
+})
 
-    public getName(): string {
-        return 'Hugging Face'
-    }
-
-    public getPath(): string {
-        return 'huggingface'
-    }
-
-    public async parseData(): Promise<void> {
-        const body = this.body as HuggingFacePayload
+class HuggingFaceMapper {
+    public map(body: HuggingFacePayload, output: ProviderOutput): void {
         const scope = body.event.scope
 
         if (scope === 'discussion.comment' || scope.startsWith('discussion.comment.')) {
-            this.addEmbed(this.formatComment(body))
+            output.addEmbed(this.formatComment(body))
         } else if (scope === 'discussion' || scope.startsWith('discussion.')) {
-            this.addEmbed(this.formatDiscussion(body))
+            output.addEmbed(this.formatDiscussion(body))
         } else if (scope === 'repo.config' || scope.startsWith('repo.config.')) {
-            this.addEmbed(this.formatRepoConfig(body))
+            output.addEmbed(this.formatRepoConfig(body))
         } else if (scope === 'repo.content' || scope.startsWith('repo.content.')) {
-            this.addEmbed(this.formatRepoContent(body))
+            output.addEmbed(this.formatRepoContent(body))
         } else if (scope === 'repo' || scope.startsWith('repo.')) {
-            this.addEmbed(this.formatRepo(body))
+            output.addEmbed(this.formatRepo(body))
         } else {
-            this.addEmbed(this.formatUnknownScope(body))
+            output.addEmbed(this.formatUnknownScope(body))
         }
     }
 
     private formatRepo(body: HuggingFacePayload): Embed {
-        const action = HuggingFace.actionLabel(body.event.action)
+        const action = HuggingFaceMapper.actionLabel(body.event.action)
         const embed: Embed = { url: body.repo.url.web }
 
         if (body.event.action === 'move' && body.movedTo != null) {
-            embed.title = HuggingFace.truncate(
+            embed.title = HuggingFaceMapper.truncate(
                 `Moved ${body.repo.type} ${body.repo.name} to ${body.movedTo.name}`,
                 DISCORD_EMBED_LIMITS.title,
             )
-            embed.description = `**New name:** \`${HuggingFace.escapeInlineCode(body.movedTo.name)}\``
+            embed.description = `**New name:** \`${HuggingFaceMapper.escapeInlineCode(body.movedTo.name)}\``
             return embed
         }
 
-        embed.title = HuggingFace.truncate(`${action} ${body.repo.type} ${body.repo.name}`, DISCORD_EMBED_LIMITS.title)
+        embed.title = HuggingFaceMapper.truncate(
+            `${action} ${body.repo.type} ${body.repo.name}`,
+            DISCORD_EMBED_LIMITS.title,
+        )
         embed.description = `**Visibility:** ${body.repo.private ? 'Private' : 'Public'}`
         return embed
     }
 
     private formatRepoContent(body: HuggingFacePayload): Embed {
         const embed: Embed = {
-            title: HuggingFace.truncate(
+            title: HuggingFaceMapper.truncate(
                 `Updated content in ${body.repo.type} ${body.repo.name}`,
                 DISCORD_EMBED_LIMITS.title,
             ),
@@ -158,7 +158,7 @@ export class HuggingFace extends DirectParseProvider {
     }
 
     private formatUpdatedRef(repo: HuggingFaceRepo, updatedRef: HuggingFaceUpdatedRef): EmbedField {
-        const { kind, name } = HuggingFace.describeRef(updatedRef.ref)
+        const { kind, name } = HuggingFaceMapper.describeRef(updatedRef.ref)
         const change = updatedRef.oldSha == null ? 'Created' : updatedRef.newSha == null ? 'Deleted' : 'Updated'
         const shas = [
             updatedRef.oldSha == null ? null : this.commitLink(repo, updatedRef.oldSha),
@@ -166,14 +166,14 @@ export class HuggingFace extends DirectParseProvider {
         ].filter((sha): sha is string => sha != null)
 
         return {
-            name: HuggingFace.truncate(`${change} ${kind} ${name}`, DISCORD_EMBED_LIMITS.fieldName),
-            value: HuggingFace.truncate(shas.join(' → '), DISCORD_EMBED_LIMITS.fieldValue),
+            name: HuggingFaceMapper.truncate(`${change} ${kind} ${name}`, DISCORD_EMBED_LIMITS.fieldName),
+            value: HuggingFaceMapper.truncate(shas.join(' → '), DISCORD_EMBED_LIMITS.fieldValue),
         }
     }
 
     private formatRepoConfig(body: HuggingFacePayload): Embed {
         return {
-            title: HuggingFace.truncate(
+            title: HuggingFaceMapper.truncate(
                 `Updated settings for ${body.repo.type} ${body.repo.name}`,
                 DISCORD_EMBED_LIMITS.title,
             ),
@@ -186,18 +186,18 @@ export class HuggingFace extends DirectParseProvider {
     }
 
     private formatDiscussion(body: HuggingFacePayload): Embed {
-        const discussion = HuggingFace.requireDiscussion(body)
+        const discussion = HuggingFaceMapper.requireDiscussion(body)
         const kind = discussion.isPullRequest ? 'pull request' : 'discussion'
         const embed: Embed = {
-            title: HuggingFace.truncate(
-                `${HuggingFace.actionLabel(body.event.action)} ${kind} #${discussion.num} on ${body.repo.name}: ${discussion.title}`,
+            title: HuggingFaceMapper.truncate(
+                `${HuggingFaceMapper.actionLabel(body.event.action)} ${kind} #${discussion.num} on ${body.repo.name}: ${discussion.title}`,
                 DISCORD_EMBED_LIMITS.title,
             ),
             url: discussion.url.web,
             fields: [
                 {
                     name: 'Status',
-                    value: HuggingFace.titleCase(discussion.status),
+                    value: HuggingFaceMapper.titleCase(discussion.status),
                     inline: true,
                 },
             ],
@@ -206,8 +206,8 @@ export class HuggingFace extends DirectParseProvider {
         if (discussion.changes?.base != null) {
             embed.fields!.push({
                 name: 'Base',
-                value: HuggingFace.truncate(
-                    HuggingFace.stripRefPrefix(discussion.changes.base),
+                value: HuggingFaceMapper.truncate(
+                    HuggingFaceMapper.stripRefPrefix(discussion.changes.base),
                     DISCORD_EMBED_LIMITS.fieldValue,
                 ),
                 inline: true,
@@ -216,19 +216,19 @@ export class HuggingFace extends DirectParseProvider {
         if (body.comment?.hidden === true) {
             embed.description = 'This comment was hidden.'
         } else if (body.comment?.content != null) {
-            embed.description = HuggingFace.truncate(body.comment.content, DISCORD_EMBED_LIMITS.description)
+            embed.description = HuggingFaceMapper.truncate(body.comment.content, DISCORD_EMBED_LIMITS.description)
         }
         return embed
     }
 
     private formatComment(body: HuggingFacePayload): Embed {
-        const discussion = HuggingFace.requireDiscussion(body)
-        const comment = HuggingFace.requireComment(body)
+        const discussion = HuggingFaceMapper.requireDiscussion(body)
+        const comment = HuggingFaceMapper.requireComment(body)
         const kind = discussion.isPullRequest ? 'pull request' : 'discussion'
-        const action = body.event.action === 'create' ? 'New' : HuggingFace.actionLabel(body.event.action)
+        const action = body.event.action === 'create' ? 'New' : HuggingFaceMapper.actionLabel(body.event.action)
 
         return {
-            title: HuggingFace.truncate(
+            title: HuggingFaceMapper.truncate(
                 `${action} comment on ${kind} #${discussion.num} in ${body.repo.name}: ${discussion.title}`,
                 DISCORD_EMBED_LIMITS.title,
             ),
@@ -236,14 +236,14 @@ export class HuggingFace extends DirectParseProvider {
             description:
                 comment.hidden || comment.content == null
                     ? 'This comment was hidden.'
-                    : HuggingFace.truncate(comment.content, DISCORD_EMBED_LIMITS.description),
+                    : HuggingFaceMapper.truncate(comment.content, DISCORD_EMBED_LIMITS.description),
         }
     }
 
     private formatUnknownScope(body: HuggingFacePayload): Embed {
         return {
-            title: HuggingFace.truncate(
-                `${HuggingFace.actionLabel(body.event.action)} ${body.event.scope} for ${body.repo.type} ${body.repo.name}`,
+            title: HuggingFaceMapper.truncate(
+                `${HuggingFaceMapper.actionLabel(body.event.action)} ${body.event.scope} for ${body.repo.type} ${body.repo.name}`,
                 DISCORD_EMBED_LIMITS.title,
             ),
             url: body.repo.url.web,
@@ -277,7 +277,7 @@ export class HuggingFace extends DirectParseProvider {
             move: 'Moved',
             update: 'Updated',
         }
-        return labels[action] ?? HuggingFace.titleCase(action)
+        return labels[action] ?? HuggingFaceMapper.titleCase(action)
     }
 
     private static describeRef(ref: string): { kind: string; name: string } {
@@ -287,7 +287,7 @@ export class HuggingFace extends DirectParseProvider {
         if (ref.startsWith('refs/tags/')) {
             return { kind: 'tag', name: ref.slice('refs/tags/'.length) }
         }
-        return { kind: 'reference', name: HuggingFace.stripRefPrefix(ref) }
+        return { kind: 'reference', name: HuggingFaceMapper.stripRefPrefix(ref) }
     }
 
     private static stripRefPrefix(ref: string): string {

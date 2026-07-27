@@ -10,8 +10,9 @@
     "start": "node dist/index.js",
     "dev": "node --watch --experimental-strip-types src/index.ts",
     "test": "node --experimental-strip-types --test 'test/**/*-spec.ts'",
-    "lint": "biome check src test",
-    "lint:fix": "biome check --write src test",
+    "lint": "biome check src test scripts",
+    "lint:fix": "biome check --write src test scripts",
+    "provider:new": "node scripts/create-provider.mjs",
     "deploy": "gcloud run deploy skyhook --source . --region us-central1 --allow-unauthenticated --max-instances 1 --port 8080",
     "logs": "gcloud run services logs tail skyhook --region us-central1"
   },

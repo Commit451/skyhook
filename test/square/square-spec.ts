@@ -12,15 +12,15 @@ const envelope = {
 
 describe('/POST square', () => {
     it('exposes provider metadata', () => {
-        const provider = new Square()
+        const provider = Square
 
-        assert.equal(provider.getName(), 'Square')
-        assert.equal(provider.getPath(), 'square')
+        assert.equal(provider.name, 'Square')
+        assert.equal(provider.path, 'square')
     })
 
     it('formats the documented customer payload used by example delivery', async () => {
         const example = loadProviderExample('square')
-        const result = await Tester.testWithBody(new Square(), example.body, example.headers, example.query)
+        const result = await Tester.testWithBody(Square, example.body, example.headers, example.query)
         assert.notEqual(result, null)
         assert.equal(result!.username, 'Square')
         assert.deepEqual(result!.allowed_mentions, { parse: [] })
@@ -35,7 +35,7 @@ describe('/POST square', () => {
     })
 
     it('summarizes payment events with status, money, and identifiers', async () => {
-        const result = await Tester.testWithBody(new Square(), {
+        const result = await Tester.testWithBody(Square, {
             ...envelope,
             location_id: 'location_123',
             type: 'payment.updated',
@@ -67,7 +67,7 @@ describe('/POST square', () => {
     })
 
     it('accepts the documented mixed-case Location data type', async () => {
-        const result = await Tester.testWithBody(new Square(), {
+        const result = await Tester.testWithBody(Square, {
             ...envelope,
             location_id: 'location_123',
             type: 'location.created',
@@ -92,7 +92,7 @@ describe('/POST square', () => {
     })
 
     it('handles deleted objects and future event families generically', async () => {
-        const deleted = await Tester.testWithBody(new Square(), {
+        const deleted = await Tester.testWithBody(Square, {
             ...envelope,
             type: 'customer.deleted',
             data: {
@@ -105,7 +105,7 @@ describe('/POST square', () => {
         assert.equal(deleted!.embeds![0].title, 'Customer deleted')
         assert.deepEqual(deleted!.embeds![0].fields, [{ name: 'Customer ID', value: 'customer\\_456', inline: true }])
 
-        const future = await Tester.testWithBody(new Square(), {
+        const future = await Tester.testWithBody(Square, {
             ...envelope,
             type: 'inventory.adjustment.flagged',
             data: {
@@ -132,7 +132,7 @@ describe('/POST square', () => {
     })
 
     it('accepts documented event data that has no affected object ID', async () => {
-        const catalog = await Tester.testWithBody(new Square(), {
+        const catalog = await Tester.testWithBody(Square, {
             ...envelope,
             type: 'catalog.version.updated',
             data: {
@@ -148,7 +148,7 @@ describe('/POST square', () => {
         assert.equal(catalog!.embeds![0].title, 'Catalog version updated')
         assert.deepEqual(catalog!.embeds![0].fields, [])
 
-        const revoked = await Tester.testWithBody(new Square(), {
+        const revoked = await Tester.testWithBody(Square, {
             ...envelope,
             type: 'oauth.authorization.revoked',
             data: {
@@ -184,13 +184,13 @@ describe('/POST square', () => {
             { ...valid, data: { type: 'customer', id: '' } },
             { ...valid, data: { type: 'customer', id: null } },
         ]) {
-            assert.equal(await Tester.testWithBody(new Square(), body), null)
+            assert.equal(await Tester.testWithBody(Square, body), null)
         }
     })
 
     it('stays within Discord limits for long untrusted object values', async () => {
         const longText = '@everyone [click](https://evil.example) ' + 'x'.repeat(7000)
-        const result = await Tester.testWithBody(new Square(), {
+        const result = await Tester.testWithBody(Square, {
             ...envelope,
             type: 'catalog.version.updated',
             data: {

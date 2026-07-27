@@ -5,7 +5,7 @@ import { Tester } from '../Tester.ts'
 
 describe('/POST basecamp', () => {
     it('general', async () => {
-        const res = await Tester.test(new Basecamp(), 'basecamp.json', null)
+        const res = await Tester.test(Basecamp, 'basecamp.json', null)
         assert.notStrictEqual(res, null)
         assert.ok(Array.isArray(res!.embeds) && res!.embeds.length > 0)
     })

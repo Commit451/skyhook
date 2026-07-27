@@ -1,8 +1,14 @@
 import type { Embed, EmbedField } from '../model/DiscordApi.ts'
 import { DISCORD_EMBED_LIMITS, fitLiteralEmbedFields } from '../util/DiscordEmbed.ts'
 import { cleanText, escapeDiscordMarkdownLiteral, truncateText } from '../util/DiscordText.ts'
-import { canonicalizeIso8601Timestamp, isRecord } from '../util/WebhookValue.ts'
-import { DirectParseProvider } from './BaseProvider.ts'
+import {
+    canonicalizeIso8601Timestamp,
+    firstScalar,
+    isRecord,
+    scalarText,
+    trustedHttpsUrl,
+} from '../util/WebhookValue.ts'
+import { defineProvider } from './Provider.ts'
 
 const MAX_URL_CHARACTERS = 2048
 const DATA_CHANGE_ACTIONS = new Set(['create', 'update', 'remove'])
@@ -24,61 +30,47 @@ const PRIORITY_LABELS: Record<number, string> = {
  *
  * @see https://linear.app/developers/webhooks
  */
-export class Linear extends DirectParseProvider {
-    constructor() {
-        super()
-        this.setEmbedColor(0x5e6ad2)
-        this.payload.username = 'Linear'
-        this.payload.allowed_mentions = { parse: [] }
-    }
-
-    public getName(): string {
-        return 'Linear'
-    }
-
-    public getPath(): string {
-        return 'linear'
-    }
-
-    public async parseData(): Promise<void> {
-        if (!isRecord(this.body)) {
-            this.nullifyPayload()
-            return
-        }
-
-        const action = boundedToken(this.body.action, 64)
-        const type = boundedToken(this.body.type, 100)
-        const timestamp = canonicalizeIso8601Timestamp(this.body.createdAt)
+export const Linear = defineProvider({
+    path: 'linear',
+    name: 'Linear',
+    example: {
+        body: 'linear/linear.json',
+        headers: 'linear/linear.headers.json',
+    },
+    defaults: {
+        username: 'Linear',
+        embedColor: 0x5e6ad2,
+    },
+    map({ body, headers }, output) {
+        const action = boundedToken(body.action, 64)
+        const type = boundedToken(body.type, 100)
+        const timestamp = canonicalizeIso8601Timestamp(body.createdAt)
         if (
             action == null ||
             type == null ||
             timestamp == null ||
-            !Number.isSafeInteger(this.body.webhookTimestamp) ||
-            this.body.webhookTimestamp <= 0 ||
-            !isBoundedString(this.body.webhookId, 128)
+            !Number.isSafeInteger(body.webhookTimestamp) ||
+            body.webhookTimestamp <= 0 ||
+            !isBoundedString(body.webhookId, 128)
         ) {
-            this.nullifyPayload()
+            output.ignore()
             return
         }
 
-        const data = isRecord(this.body.data)
-            ? this.body.data
-            : isRecord(this.body.issueData)
-              ? this.body.issueData
-              : {}
-        if (DATA_CHANGE_ACTIONS.has(action) && !isRecord(this.body.data)) {
-            this.nullifyPayload()
+        const data = isRecord(body.data) ? body.data : isRecord(body.issueData) ? body.issueData : {}
+        if (DATA_CHANGE_ACTIONS.has(action) && !isRecord(body.data)) {
+            output.ignore()
             return
         }
 
-        const headerEvent = getHeader(this.headers, 'linear-event')
+        const headerEvent = getHeader(headers, 'linear-event')
         if (headerEvent != null && headerEvent !== type) {
-            this.nullifyPayload()
+            output.ignore()
             return
         }
 
         const embed: Embed = {
-            title: escapeAndTruncate(this.createTitle(type, action, data), DISCORD_EMBED_LIMITS.title, true),
+            title: escapeAndTruncate(createTitle(type, action, data), DISCORD_EMBED_LIMITS.title, true),
             timestamp,
         }
 
@@ -87,12 +79,12 @@ export class Linear extends DirectParseProvider {
             embed.description = escapeAndTruncate(description, DISCORD_EMBED_LIMITS.description, false)
         }
 
-        const url = trustedLinearUrl(this.body.url)
+        const url = trustedLinearUrl(body.url)
         if (url != null) {
             embed.url = url
         }
 
-        const actor = isRecord(this.body.actor) ? this.body.actor : null
+        const actor = isRecord(body.actor) ? body.actor : null
         const actorName = scalarText(actor?.name)
         if (actorName != null) {
             embed.author = {
@@ -104,49 +96,49 @@ export class Linear extends DirectParseProvider {
             }
         }
 
-        embed.fields = fitLiteralEmbedFields(embed, this.createFields(data))
-        this.addEmbed(embed)
-    }
+        embed.fields = fitLiteralEmbedFields(embed, createFields(body, data))
+        output.addEmbed(embed)
+    },
+})
 
-    private createTitle(type: string, action: string, data: Record<string, any>): string {
-        const resource = resourceTypeLabel(type)
-        const actionLabel = actionPhrase(action, type)
-        const identifier = scalarText(data.identifier)
-        const name = scalarText(data.name)
-        const title = scalarText(data.title)
-        const subject = identifier != null && title != null ? `${identifier} — ${title}` : (identifier ?? name ?? title)
+function createTitle(type: string, action: string, data: Record<string, any>): string {
+    const resource = resourceTypeLabel(type)
+    const actionLabel = actionPhrase(action, type)
+    const identifier = scalarText(data.identifier)
+    const name = scalarText(data.name)
+    const title = scalarText(data.title)
+    const subject = identifier != null && title != null ? `${identifier} — ${title}` : (identifier ?? name ?? title)
 
-        return `${resource} ${actionLabel}${subject == null ? '' : `: ${subject}`}`
-    }
+    return `${resource} ${actionLabel}${subject == null ? '' : `: ${subject}`}`
+}
 
-    private createFields(data: Record<string, any>): EmbedField[] {
-        const fields: EmbedField[] = []
+function createFields(body: Record<string, any>, data: Record<string, any>): EmbedField[] {
+    const fields: EmbedField[] = []
 
-        addField(fields, 'State', nestedName(data.state) ?? scalarText(data.stateName))
-        addField(fields, 'Assignee', nestedName(data.assignee))
-        addField(fields, 'Priority', priorityLabel(data.priority))
-        addField(fields, 'Team', nestedName(data.team))
-        addField(fields, 'Project', nestedName(data.project))
-        addField(fields, 'Cycle', nestedName(data.cycle))
-        addField(fields, 'Customer', nestedName(data.customer))
-        addField(fields, 'Labels', listNames(data.labels), false)
-        addField(fields, 'OAuth client ID', scalarText(this.body.oauthClientId))
+    addField(fields, 'State', nestedName(data.state) ?? scalarText(data.stateName))
+    addField(fields, 'Assignee', nestedName(data.assignee))
+    addField(fields, 'Priority', priorityLabel(data.priority))
+    addField(fields, 'Team', nestedName(data.team))
+    addField(fields, 'Project', nestedName(data.project))
+    addField(fields, 'Cycle', nestedName(data.cycle))
+    addField(fields, 'Customer', nestedName(data.customer))
+    addField(fields, 'Labels', listNames(data.labels), false)
+    addField(fields, 'OAuth client ID', scalarText(body.oauthClientId))
 
-        if (isRecord(this.body.updatedFrom)) {
-            const changedFields = [
-                ...new Set(
-                    Object.keys(this.body.updatedFrom)
-                        .filter((key) => !IGNORED_UPDATED_FIELDS.has(key))
-                        .map((key) => changedFieldLabel(key)),
-                ),
-            ]
-            if (changedFields.length > 0) {
-                fields.push({ name: 'Updated fields', value: changedFields.join(', '), inline: false })
-            }
+    if (isRecord(body.updatedFrom)) {
+        const changedFields = [
+            ...new Set(
+                Object.keys(body.updatedFrom)
+                    .filter((key) => !IGNORED_UPDATED_FIELDS.has(key))
+                    .map((key) => changedFieldLabel(key)),
+            ),
+        ]
+        if (changedFields.length > 0) {
+            fields.push({ name: 'Updated fields', value: changedFields.join(', '), inline: false })
         }
-
-        return fields
     }
+
+    return fields
 }
 
 function addField(fields: EmbedField[], name: string, value: string | null, inline = true): void {
@@ -217,16 +209,6 @@ function priorityLabel(value: unknown): string | null {
     return scalarText(value)
 }
 
-function firstScalar(...values: unknown[]): string | null {
-    for (const value of values) {
-        const text = scalarText(value)
-        if (text != null) {
-            return text
-        }
-    }
-    return null
-}
-
 function getHeader(headers: unknown, name: string): string | null {
     if (headers instanceof Headers) {
         return scalarText(headers.get(name))
@@ -243,19 +225,10 @@ function getHeader(headers: unknown, name: string): string | null {
 }
 
 function trustedLinearUrl(value: unknown): string | null {
-    if (!isBoundedString(value, MAX_URL_CHARACTERS)) {
-        return null
-    }
-    try {
-        const url = new URL(value)
-        if (url.protocol !== 'https:' || (url.hostname !== 'linear.app' && url.hostname !== 'www.linear.app')) {
-            return null
-        }
-        const normalizedUrl = url.href
-        return normalizedUrl.length <= MAX_URL_CHARACTERS ? normalizedUrl : null
-    } catch {
-        return null
-    }
+    return trustedHttpsUrl(value, {
+        allowedHosts: ['linear.app', 'www.linear.app'],
+        maxLength: MAX_URL_CHARACTERS,
+    })
 }
 
 function boundedToken(value: unknown, maxLength: number): string | null {
@@ -264,20 +237,6 @@ function boundedToken(value: unknown, maxLength: number): string | null {
 
 function isBoundedString(value: unknown, maxLength: number): value is string {
     return typeof value === 'string' && value.length > 0 && value.length <= maxLength
-}
-
-function scalarText(value: unknown): string | null {
-    if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'boolean') {
-        return null
-    }
-    if (
-        typeof value === 'number' &&
-        (!Number.isFinite(value) || (Number.isInteger(value) && !Number.isSafeInteger(value)))
-    ) {
-        return null
-    }
-    const text = cleanText(String(value), false)
-    return text.length > 0 ? text : null
 }
 
 function escapeAndTruncate(value: string, maxLength: number, singleLine: boolean): string {

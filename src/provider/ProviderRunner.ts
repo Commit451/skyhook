@@ -2,13 +2,10 @@ import type { DiscordPayload } from '../model/DiscordApi.ts'
 import { loadProviderExample } from '../ProviderExamples.ts'
 import { validateDiscordPayload } from '../util/DiscordPayloadValidator.ts'
 import { type Logger, logger } from '../util/logger.ts'
+import { executeProvider, type ProviderRunInput } from './Provider.ts'
 import { type ProviderRegistry, providerRegistry } from './ProviderRegistry.ts'
 
-export interface ProviderRunInput {
-    readonly body: any
-    readonly headers?: any
-    readonly query?: any
-}
+export type { ProviderRunInput } from './Provider.ts'
 
 type WarningLogger = Pick<Logger, 'warn'>
 
@@ -27,8 +24,7 @@ export class ProviderRunner {
             throw new Error(`Unknown provider ${providerPath}`)
         }
 
-        const provider = new definition.provider()
-        const payload = await provider.parse(input.body, input.headers ?? null, input.query ?? null)
+        const payload = await executeProvider(definition, input)
         if (payload != null) {
             const issues = validateDiscordPayload(payload)
             if (issues.length > 0) {

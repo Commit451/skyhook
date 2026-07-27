@@ -1,204 +1,92 @@
-import type { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi.ts'
-import { TypeParseProvider } from '../provider/BaseProvider.ts'
+import type { Embed, EmbedField } from '../model/DiscordApi.ts'
+import { defineEventProvider, type ProviderMapper } from './Provider.ts'
+
+const minimalHandler: ProviderMapper = ({ body }, output) => {
+    output.addEmbed(minimalMessage(body))
+}
 
 /**
  * https://learn.microsoft.com/en-us/azure/devops/service-hooks/services/webhooks?view=azure-devops
  */
-export class AzureDevOps extends TypeParseProvider {
-    private embed: Embed
-
-    constructor() {
-        super()
-        this.setEmbedColor(0x68217a)
-        this.embed = {}
-    }
-
-    public getName(): string {
-        return 'Azure DevOps'
-    }
-
-    public getPath(): string {
-        return 'azure'
-    }
-
-    public getType(): string {
-        return this.body.eventType
-    }
-
-    public knownTypes(): string[] {
-        return [
-            'gitPush',
-            'tfvcCheckin',
-            'gitPullrequestCreated',
-            'gitPullrequestMerged',
-            'gitPullrequestUpdated',
-            'workitemCommented',
-            'workitemCreated',
-            'workitemDeleted',
-            'workitemRestored',
-            'workitemUpdated',
-            'buildComplete',
-            'msVssReleaseReleaseCreatedEvent',
-            'msVssReleaseReleaseAbandonedEvent',
-            'msVssReleaseDeploymentApprovalCompleted',
-            'msVssReleaseDeploymentApprovalPendingEvent',
-            'msVssReleaseDeploymentCompletedEvent',
-            'msVssReleaseDeplyomentStartedEvent',
-        ]
-    }
-
-    // PUSH
-    public async gitPush(): Promise<void> {
-        const fields: EmbedField[] = []
-        this.body.resource.commits.forEach((commit: { commitId: string; comment: string }) => {
-            fields.push({
-                name: 'Commit from ' + this.body.resource.pushedBy.displayName,
-                value:
-                    '([`' +
-                    commit.commitId.substring(0, 7) +
-                    '`](' +
-                    this.body.resource.repository.remoteUrl +
-                    '/commit/' +
-                    commit.commitId +
-                    ')) ' +
-                    commit.comment,
+export const AzureDevOps = defineEventProvider({
+    path: 'azure',
+    name: 'Azure DevOps',
+    example: { body: 'azure/azure.json' },
+    defaults: { embedColor: 0x68217a },
+    event: 'eventType',
+    handlers: {
+        'git.push'({ body }, output) {
+            const fields: EmbedField[] = body.resource.commits.map((commit: { commitId: string; comment: string }) => ({
+                name: `Commit from ${body.resource.pushedBy.displayName}`,
+                value: `([\`${commit.commitId.substring(0, 7)}\`](${body.resource.repository.remoteUrl}/commit/${commit.commitId})) ${commit.comment}`,
                 inline: false,
-            })
-        })
-        this.embed.fields = fields
-        this.embed.author = {
-            name: this.body.resource.pushedBy.displayName,
-            icon_url: this.body.resource.pushedBy.imageUrl,
-        }
-        this.addMinimalMessage()
+            }))
+            output.addEmbed(
+                minimalMessage(body, {
+                    fields,
+                    author: {
+                        name: body.resource.pushedBy.displayName,
+                        icon_url: body.resource.pushedBy.imageUrl,
+                    },
+                }),
+            )
+        },
+        'tfvc.checkin'({ body }, output) {
+            output.addEmbed(
+                minimalMessage(body, {
+                    fields: [
+                        {
+                            name: `Check in from ${body.resource.checkedInBy.displayName}`,
+                            value: `([\`${body.resource.changesetId}\`](${body.resource.url})) ${body.resource.comment}`,
+                            inline: false,
+                        },
+                    ],
+                }),
+            )
+        },
+        'git.pullrequest.created': pullRequestHandler('Pull Request from '),
+        'git.pullrequest.merged': pullRequestHandler('Pull Request Merge Commit from '),
+        'git.pullrequest.updated': pullRequestHandler('Pull Request Updated by '),
+        'workitem.commented': minimalHandler,
+        'workitem.created': minimalHandler,
+        'workitem.deleted': minimalHandler,
+        'workitem.restored': minimalHandler,
+        'workitem.updated': minimalHandler,
+        'build.complete': minimalHandler,
+        'ms.vss-release.release-created-event': minimalHandler,
+        'ms.vss-release.release-abandoned-event': minimalHandler,
+        'ms.vss-release.deployment-approval-completed': minimalHandler,
+        'ms.vss-release.deployment-approval-pending-event': minimalHandler,
+        'ms.vss-release.deployment-completed-event': minimalHandler,
+        'ms.vss-release.deployment-started-event': minimalHandler,
+        'ms.vss-release.deplyoment-started-event': minimalHandler,
+    },
+})
+
+function pullRequestHandler(fieldLabel: string): ProviderMapper {
+    return ({ body }, output) => {
+        output.addEmbed(
+            minimalMessage(body, {
+                author: {
+                    name: body.resource.createdBy.displayName,
+                    icon_url: body.resource.createdBy.imageUrl,
+                },
+                fields: [
+                    {
+                        name: fieldLabel + body.resource.createdBy.displayName,
+                        value: `([\`${body.resource.title}\`](${body.resource.repository.remoteUrl})) ${body.resource.description}`,
+                        inline: false,
+                    },
+                ],
+            }),
+        )
     }
+}
 
-    // CHECK IN
-    public async tfvcCheckin(): Promise<void> {
-        this.embed.fields = [
-            {
-                name: 'Check in from ' + this.body.resource.checkedInBy.displayName,
-                value:
-                    '([`' +
-                    this.body.resource.changesetId +
-                    '`](' +
-                    this.body.resource.url +
-                    ')) ' +
-                    this.body.resource.comment,
-                inline: false,
-            },
-        ]
-        this.addMinimalMessage()
-    }
-
-    // PULL REQUEST
-    public async gitPullrequestCreated(): Promise<void> {
-        this.formatPullRequest('Pull Request from ')
-    }
-
-    // PULL REQUEST MERGE COMMIT
-    public async gitPullrequestMerged(): Promise<void> {
-        this.formatPullRequest('Pull Request Merge Commit from ')
-    }
-
-    // PULL REQUEST UPDATED
-    public async gitPullrequestUpdated(): Promise<void> {
-        this.formatPullRequest('Pull Request Updated by ')
-    }
-
-    private formatPullRequest(fieldLabel: string): void {
-        this.embed.author = this.extractCreatedByAuthor()
-        this.embed.fields = [
-            {
-                name: fieldLabel + this.body.resource.createdBy.displayName,
-                value:
-                    '([`' +
-                    this.body.resource.title +
-                    '`](' +
-                    this.body.resource.repository.remoteUrl +
-                    ')) ' +
-                    this.body.resource.description,
-                inline: false,
-            },
-        ]
-        this.addMinimalMessage()
-    }
-
-    // WORK ITEM COMMENTED ON
-    public async workitemCommented(): Promise<void> {
-        this.addMinimalMessage()
-    }
-
-    // WORK ITEM CREATED
-    public async workitemCreated(): Promise<void> {
-        this.addMinimalMessage()
-    }
-
-    // WORK ITEM DELETED
-    public async workitemDeleted(): Promise<void> {
-        this.addMinimalMessage()
-    }
-
-    // WORK ITEM RESTORED
-    public async workitemRestored(): Promise<void> {
-        this.addMinimalMessage()
-    }
-
-    // WORK ITEM UPDATED
-    public async workitemUpdated(): Promise<void> {
-        this.addMinimalMessage()
-    }
-
-    // BUILD COMPLETED
-    public async buildComplete(): Promise<void> {
-        this.addMinimalMessage()
-    }
-
-    // RELEASE CREATED
-    public async msVssReleaseReleaseCreatedEvent(): Promise<void> {
-        this.addMinimalMessage()
-    }
-
-    // RELEASE ABANDONED
-    public async msVssReleaseReleaseAbandonedEvent(): Promise<void> {
-        this.addMinimalMessage()
-    }
-
-    // RELEASE DEPLOYMENT APPROVAL COMPLETED
-    public async msVssReleaseDeploymentApprovalCompleted(): Promise<void> {
-        this.addMinimalMessage()
-    }
-
-    // RELEASE DEPLOYMENT APPROVAL PENDING
-    public async msVssReleaseDeploymentApprovalPendingEvent(): Promise<void> {
-        this.addMinimalMessage()
-    }
-
-    // RELEASE DEPLOYMENT COMPLETED
-    public async msVssReleaseDeploymentCompletedEvent(): Promise<void> {
-        this.addMinimalMessage()
-    }
-
-    // RELEASE DEPLOYMENT STARTED
-    public async msVssReleaseDeplyomentStartedEvent(): Promise<void> {
-        this.addMinimalMessage()
-    }
-
-    // Because carpal tunnel...
-    private addMinimalMessage(): void {
-        this.embed.title = this.body.message.markdown as string
-
-        if (this.embed.title.length > 256) {
-            this.embed.title = this.body.resource.title ?? this.body.message.markdown.substring(0, 256)
-        }
-
-        this.addEmbed(this.embed)
-    }
-
-    private extractCreatedByAuthor(): EmbedAuthor {
-        return {
-            name: this.body.resource.createdBy.displayName,
-            icon_url: this.body.resource.createdBy.imageUrl,
-        }
+function minimalMessage(body: Record<string, any>, embed: Embed = {}): Embed {
+    const markdown = String(body.message.markdown)
+    return {
+        ...embed,
+        title: markdown.length > 256 ? (body.resource.title ?? markdown.substring(0, 256)) : markdown,
     }
 }

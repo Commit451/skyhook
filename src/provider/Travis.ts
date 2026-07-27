@@ -1,34 +1,31 @@
 import type { Embed } from '../model/DiscordApi.ts'
-import { DirectParseProvider } from '../provider/BaseProvider.ts'
+import { defineProvider } from './Provider.ts'
+
+// States: https://github.com/travis-ci/travis-api/blob/master/lib/travis/model/build/states.rb#L25
+const STATUS_COLORS: Readonly<Record<string, number>> = {
+    passed: 0x39aa56,
+    failed: 0xdb4545,
+    errored: 0xdb4545,
+    canceled: 0x9d9d9d,
+}
 
 /**
  * https://docs.travis-ci.com/user/notifications/#Configuring-webhook-notifications
  */
-export class Travis extends DirectParseProvider {
-    // States https://github.com/travis-ci/travis-api/blob/master/lib/travis/model/build/states.rb#L25
-    private static STATUS_COLORS: Record<string, number> = {
-        passed: 0x39aa56,
-        failed: 0xdb4545,
-        errored: 0xdb4545,
-        canceled: 0x9d9d9d,
-    }
-
-    public getName(): string {
-        return 'Travis'
-    }
-
-    public async parseData(): Promise<void> {
-        this.setEmbedColor(0x39aa56)
+export const Travis = defineProvider({
+    path: 'travis',
+    name: 'Travis',
+    example: { body: 'travis/travis.json' },
+    defaults: { embedColor: 0x39aa56 },
+    map({ body }, output) {
         const embed: Embed = {}
-        let targetBody = this.body
-        if (this.body.payload != null && typeof this.body.payload === 'string') {
-            // Travis now sends data inside of a string payload property.
+        let targetBody = body
+        if (typeof body.payload === 'string') {
             try {
-                targetBody = JSON.parse(this.body.payload)
+                targetBody = JSON.parse(body.payload)
             } catch (error) {
-                this.logger.info('Malformed payload JSON from travis.')
-                this.logger.error(error)
-                targetBody = this.body
+                output.logger.info('Malformed payload JSON from travis.')
+                output.logger.error(error)
             }
         }
 
@@ -38,13 +35,14 @@ export class Travis extends DirectParseProvider {
         embed.description = `[\`${targetBody.commit.substring(0, 7)}\`](${targetBody.compare_url}) ${msg.length > 50 ? msg.substring(0, 47) + '...' : msg}`
 
         if (targetBody.state != null) {
-            if (Travis.STATUS_COLORS[targetBody.state] != null) {
-                this.setEmbedColor(Travis.STATUS_COLORS[targetBody.state])
+            const statusColor = STATUS_COLORS[targetBody.state]
+            if (statusColor != null) {
+                output.setEmbedColor(statusColor)
             } else {
-                this.logger.warn('Unknown Travis build state: ' + targetBody.state)
+                output.logger.warn('Unknown Travis build state: ' + targetBody.state)
             }
         }
 
-        this.addEmbed(embed)
-    }
-}
+        output.addEmbed(embed)
+    },
+})

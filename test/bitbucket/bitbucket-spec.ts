@@ -8,7 +8,7 @@ describe('/POST bitbucket', () => {
         const headers = {
             'x-event-key': 'repo:push',
         }
-        const res = await Tester.test(new BitBucket(), 'bitbucket.json', headers)
+        const res = await Tester.test(BitBucket, 'bitbucket.json', headers)
         assert.notStrictEqual(res, null)
         assert.ok(Array.isArray(res!.embeds))
         assert.strictEqual(res!.embeds.length, 1)
@@ -18,7 +18,7 @@ describe('/POST bitbucket', () => {
         const headers = {
             'x-event-key': 'repo:push',
         }
-        const res = await Tester.test(new BitBucket(), 'bitbucket-tag.json', headers)
+        const res = await Tester.test(BitBucket, 'bitbucket-tag.json', headers)
         assert.notStrictEqual(res, null)
         assert.ok(Array.isArray(res!.embeds))
         assert.strictEqual(res!.embeds.length, 1)
@@ -28,7 +28,7 @@ describe('/POST bitbucket', () => {
         const headers = {
             'x-event-key': 'repo:push',
         }
-        const res = await Tester.test(new BitBucket(), 'bitbucket-anonymous.json', headers)
+        const res = await Tester.test(BitBucket, 'bitbucket-anonymous.json', headers)
         assert.notStrictEqual(res, null)
         assert.ok(Array.isArray(res!.embeds))
         assert.strictEqual(res!.embeds.length, 1)

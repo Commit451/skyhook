@@ -1,8 +1,8 @@
 import type { Embed, EmbedField } from '../model/DiscordApi.ts'
 import { DISCORD_EMBED_LIMITS, fitLiteralEmbedFields } from '../util/DiscordEmbed.ts'
 import { cleanText, escapeDiscordMarkdownLiteral, humanizeWords, truncateText } from '../util/DiscordText.ts'
-import { canonicalizeIso8601Timestamp, isRecord } from '../util/WebhookValue.ts'
-import { DirectParseProvider } from './BaseProvider.ts'
+import { canonicalizeIso8601Timestamp, firstScalar, isRecord, scalarText } from '../util/WebhookValue.ts'
+import { defineProvider } from './Provider.ts'
 
 const EVENT_TYPE_PATTERN = /^[a-z][a-z0-9_]*(?:\.[a-z0-9_]+)+$/
 const DATA_TYPE_PATTERN = /^[A-Za-z][A-Za-z0-9_]*$/
@@ -18,33 +18,20 @@ const DATA_TYPE_PATTERN = /^[A-Za-z][A-Za-z0-9_]*$/
  * @see https://developer.squareup.com/docs/webhooks/overview
  * @see https://developer.squareup.com/docs/webhooks/step2subscribe#format-of-an-event-notification
  */
-export class Square extends DirectParseProvider {
-    public constructor() {
-        super()
-        this.setEmbedColor(0x006aff)
-        this.payload.username = 'Square'
-        this.payload.allowed_mentions = { parse: [] }
-    }
-
-    public getName(): string {
-        return 'Square'
-    }
-
-    public getPath(): string {
-        return 'square'
-    }
-
-    public async parseData(): Promise<void> {
-        if (!isRecord(this.body)) {
-            this.nullifyPayload()
-            return
-        }
-
-        const eventType = boundedEventType(this.body.type)
-        const eventId = boundedText(this.body.event_id, 128)
-        const merchantId = boundedText(this.body.merchant_id, 128)
-        const timestamp = canonicalizeIso8601Timestamp(this.body.created_at)
-        const data = isRecord(this.body.data) ? this.body.data : null
+export const Square = defineProvider({
+    path: 'square',
+    name: 'Square',
+    example: { body: 'square/square.json' },
+    defaults: {
+        username: 'Square',
+        embedColor: 0x006aff,
+    },
+    map({ body }, output) {
+        const eventType = boundedEventType(body.type)
+        const eventId = boundedText(body.event_id, 128)
+        const merchantId = boundedText(body.merchant_id, 128)
+        const timestamp = canonicalizeIso8601Timestamp(body.created_at)
+        const data = isRecord(body.data) ? body.data : null
         const dataType = boundedDataType(data?.type)
         const hasDataId = data != null && Object.hasOwn(data, 'id')
         const dataId = hasDataId ? boundedText(data.id, 512) : null
@@ -57,7 +44,7 @@ export class Square extends DirectParseProvider {
             dataType == null ||
             (hasDataId && dataId == null)
         ) {
-            this.nullifyPayload()
+            output.ignore()
             return
         }
 
@@ -67,10 +54,10 @@ export class Square extends DirectParseProvider {
             title: truncateText(escapeDiscordMarkdownLiteral(title), DISCORD_EMBED_LIMITS.title, true),
             timestamp,
         }
-        embed.fields = fitLiteralEmbedFields(embed, createFields(this.body, object, dataType, dataId))
-        this.addEmbed(embed)
-    }
-}
+        embed.fields = fitLiteralEmbedFields(embed, createFields(body, object, dataType, dataId))
+        output.addEmbed(embed)
+    },
+})
 
 function createTitle(eventType: string, object: Record<string, any> | null, dataType: string): string {
     const parts = eventType.split('.')
@@ -180,30 +167,6 @@ function boundedText(value: unknown, maxLength: number): string | null {
     }
     const text = cleanText(value, true)
     return text.length > 0 && text.length <= maxLength ? text : null
-}
-
-function firstScalar(...values: unknown[]): string | null {
-    for (const value of values) {
-        const text = scalarText(value)
-        if (text != null) {
-            return text
-        }
-    }
-    return null
-}
-
-function scalarText(value: unknown): string | null {
-    if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'boolean') {
-        return null
-    }
-    if (
-        typeof value === 'number' &&
-        (!Number.isFinite(value) || (Number.isInteger(value) && !Number.isSafeInteger(value)))
-    ) {
-        return null
-    }
-    const text = cleanText(String(value), false)
-    return text.length > 0 ? text : null
 }
 
 function humanizeSquareWords(value: string): string {

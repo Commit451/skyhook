@@ -1,8 +1,8 @@
 import type { Embed, EmbedField } from '../model/DiscordApi.ts'
-import { DirectParseProvider } from '../provider/BaseProvider.ts'
 import { DISCORD_EMBED_LIMITS, fitLiteralEmbedFields } from '../util/DiscordEmbed.ts'
-import { cleanText, humanizeWords, truncateText } from '../util/DiscordText.ts'
-import { canonicalizeIso8601Timestamp, isRecord } from '../util/WebhookValue.ts'
+import { humanizeWords, truncateText } from '../util/DiscordText.ts'
+import { canonicalizeIso8601Timestamp, isRecord, safeId, scalarText } from '../util/WebhookValue.ts'
+import { defineProvider, type ProviderOutput } from './Provider.ts'
 
 const ACTION_LABELS: Record<string, string> = {
     activate: 'activated',
@@ -71,24 +71,32 @@ const GENERIC_FIELD_KEYS = [
  * @see https://shopify.dev/docs/api/webhooks/latest
  * @see https://shopify.dev/docs/apps/build/webhooks/delivery-structure
  */
-export class Shopify extends DirectParseProvider {
-    constructor() {
-        super()
-        this.setEmbedColor(0x95bf47)
+export const Shopify = defineProvider({
+    path: 'shopify',
+    name: 'Shopify',
+    example: {
+        body: 'shopify/shopify.json',
+        headers: 'shopify/shopify.headers.json',
+    },
+    defaults: { embedColor: 0x95bf47 },
+    map({ body, headers }, output) {
+        new ShopifyMapper(body, headers).map(output)
+    },
+})
+
+class ShopifyMapper {
+    private readonly body: Record<string, any>
+    private readonly headers: Headers
+
+    public constructor(body: Record<string, any>, headers: Headers) {
+        this.body = body
+        this.headers = headers
     }
 
-    public getName(): string {
-        return 'Shopify'
-    }
-
-    public getPath(): string {
-        return 'shopify'
-    }
-
-    public async parseData(): Promise<void> {
+    public map(output: ProviderOutput): void {
         const topic = this.getHeader('x-shopify-topic').trim().toLowerCase()
-        if (topic.length === 0 || !isRecord(this.body)) {
-            this.nullifyPayload()
+        if (topic.length === 0) {
+            output.ignore()
             return
         }
 
@@ -126,23 +134,11 @@ export class Shopify extends DirectParseProvider {
         const fields = this.createFields(resourcePart, actionPart)
         embed.fields = fitLiteralEmbedFields(embed, fields)
 
-        this.payload.allowed_mentions = { parse: [] }
-        this.addEmbed(embed)
+        output.addEmbed(embed)
     }
 
     private getHeader(name: string): string {
-        if (this.headers == null) {
-            return ''
-        }
-        if (typeof this.headers.get === 'function') {
-            return String(this.headers.get(name) ?? '')
-        }
-        for (const [key, value] of Object.entries(this.headers)) {
-            if (key.toLowerCase() === name) {
-                return String(value ?? '')
-            }
-        }
-        return ''
+        return this.headers.get(name) ?? ''
     }
 
     private getShopDomain(): string | null {
@@ -350,26 +346,7 @@ function humanizeResource(resource: string): string {
     return humanizeWords(words.join('_'))
 }
 
-function safeId(value: unknown): string | null {
-    if (typeof value === 'string') {
-        const cleaned = cleanText(value, true)
-        return cleaned.length > 0 ? cleaned : null
-    }
-    if (typeof value === 'number' && Number.isSafeInteger(value)) {
-        return String(value)
-    }
-    return null
-}
-
 function safeAdminId(value: unknown): string | null {
     const id = safeId(value)
     return id != null && /^\d{1,32}$/.test(id) ? id : null
-}
-
-function scalarText(value: unknown): string | null {
-    if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'boolean') {
-        return null
-    }
-    const text = cleanText(String(value), false)
-    return text.length > 0 ? text : null
 }

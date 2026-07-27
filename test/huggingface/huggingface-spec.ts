@@ -20,14 +20,14 @@ const webhook = { id: 'webhook-id', version: 3 }
 
 describe('/POST huggingface', () => {
     it('uses the public provider name and URL path', () => {
-        const provider = new HuggingFace()
+        const provider = HuggingFace
 
-        assert.strictEqual(provider.getName(), 'Hugging Face')
-        assert.strictEqual(provider.getPath(), 'huggingface')
+        assert.strictEqual(provider.name, 'Hugging Face')
+        assert.strictEqual(provider.path, 'huggingface')
     })
 
     it('formats the documented pull request payload', async () => {
-        const res = await Tester.test(new HuggingFace(), 'huggingface.json')
+        const res = await Tester.test(HuggingFace, 'huggingface.json')
         const embed = res?.embeds?.[0]
 
         assert.strictEqual(res?.username, 'Hugging Face')
@@ -42,7 +42,7 @@ describe('/POST huggingface', () => {
     })
 
     it('summarizes updated branches and tags', async () => {
-        const res = await Tester.testWithBody(new HuggingFace(), {
+        const res = await Tester.testWithBody(HuggingFace, {
             event: { action: 'update', scope: 'repo.content' },
             repo,
             updatedRefs: [
@@ -88,7 +88,7 @@ describe('/POST huggingface', () => {
             newSha: '575db8b7a51b6f85eb06eee540738584589f131c',
         }))
 
-        const res = await Tester.testWithBody(new HuggingFace(), {
+        const res = await Tester.testWithBody(HuggingFace, {
             event: { action: 'update', scope: 'repo.content' },
             repo: longRepo,
             updatedRefs,
@@ -106,7 +106,7 @@ describe('/POST huggingface', () => {
     })
 
     it('formats repository configuration changes, including future narrowed scopes', async () => {
-        const res = await Tester.testWithBody(new HuggingFace(), {
+        const res = await Tester.testWithBody(HuggingFace, {
             event: { action: 'update', scope: 'repo.config.dois' },
             repo: { ...repo, private: true },
             updatedConfig: { private: true },
@@ -119,7 +119,7 @@ describe('/POST huggingface', () => {
     })
 
     it('keeps long pull request base refs within Discord field limits', async () => {
-        const res = await Tester.testWithBody(new HuggingFace(), {
+        const res = await Tester.testWithBody(HuggingFace, {
             event: { action: 'update', scope: 'discussion' },
             repo,
             discussion: {
@@ -141,7 +141,7 @@ describe('/POST huggingface', () => {
     })
 
     it('formats hidden discussion comments without exposing missing content', async () => {
-        const res = await Tester.testWithBody(new HuggingFace(), {
+        const res = await Tester.testWithBody(HuggingFace, {
             event: { action: 'update', scope: 'discussion.comment' },
             repo,
             discussion: {
@@ -172,7 +172,7 @@ describe('/POST huggingface', () => {
     })
 
     it('describes repository moves', async () => {
-        const res = await Tester.testWithBody(new HuggingFace(), {
+        const res = await Tester.testWithBody(HuggingFace, {
             event: { action: 'move', scope: 'repo' },
             repo: { ...repo, name: 'commit451/old-name' },
             movedTo: { name: 'commit451/new-name', owner: { id: 'owner-id' } },

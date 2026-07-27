@@ -1,7 +1,7 @@
 import { URL } from 'node:url'
 import type { Embed, EmbedAuthor, EmbedField } from '../model/DiscordApi.ts'
-import { TypeParseProvider } from '../provider/BaseProvider.ts'
 import { MarkdownUtil } from '../util/MarkdownUtil.ts'
+import { defineEventProvider, type ProviderHttp, type ProviderMapper, type ProviderOutput } from './Provider.ts'
 
 type Card = any
 type Board = any
@@ -9,10 +9,95 @@ type Attachment = any
 
 const PLUGIN_MANIFEST_TIMEOUT_MS = 10_000
 
+export const Trello = defineEventProvider({
+    path: 'trello',
+    name: 'Trello',
+    example: { body: 'trello/trello.json' },
+    defaults: { embedColor: 0x026aa7 },
+    http: {
+        allowedHosts: ['trello.com', 'www.trello.com', 'api.trello.com'],
+        timeoutMs: PLUGIN_MANIFEST_TIMEOUT_MS,
+        maxResponseBytes: 256_000,
+    },
+    event: ({ body }) => (typeof body.action?.type === 'string' ? body.action.type : null),
+    handlers: {
+        addAttachmentToCard: trelloHandler((mapper) => mapper.addAttachmentToCard()),
+        addBoardsPinnedToMember: trelloHandler((mapper) => mapper.addBoardsPinnedToMember()),
+        addChecklistToCard: trelloHandler((mapper) => mapper.addChecklistToCard()),
+        addLabelToCard: trelloHandler((mapper) => mapper.addLabelToCard()),
+        addMemberToCard: trelloHandler((mapper) => mapper.addMemberToCard()),
+        addMemberToBoard: trelloHandler((mapper) => mapper.addMemberToBoard()),
+        addMemberToOrganization: trelloHandler((mapper) => mapper.addMemberToOrganization()),
+        addToOrganizationBoard: trelloHandler((mapper) => mapper.addToOrganizationBoard()),
+        commentCard: trelloHandler((mapper) => mapper.commentCard()),
+        convertToCardFromCheckItem: trelloHandler((mapper) => mapper.convertToCardFromCheckItem()),
+        copyBoard: trelloHandler((mapper) => mapper.copyBoard()),
+        copyCard: trelloHandler((mapper) => mapper.copyCard()),
+        copyChecklist: trelloHandler((mapper) => mapper.copyChecklist()),
+        createLabel: trelloHandler((mapper) => mapper.createLabel()),
+        copyCommentCard: trelloHandler((mapper) => mapper.copyCommentCard()),
+        createBoard: trelloHandler((mapper) => mapper.createBoard()),
+        createBoardInvitation: trelloHandler((mapper) => mapper.createBoardInvitation()),
+        createBoardPreference: trelloHandler((mapper) => mapper.createBoardPreference()),
+        createCard: trelloHandler((mapper) => mapper.createCard()),
+        createCheckItem: trelloHandler((mapper) => mapper.createCheckItem()),
+        createChecklist: trelloHandler((mapper) => mapper.createChecklist()),
+        createList: trelloHandler((mapper) => mapper.createList()),
+        createOrganization: trelloHandler((mapper) => mapper.createOrganization()),
+        createOrganizationInvitation: trelloHandler((mapper) => mapper.createOrganizationInvitation()),
+        deleteAttachmentFromCard: trelloHandler((mapper) => mapper.deleteAttachmentFromCard()),
+        deleteBoardInvitation: trelloHandler((mapper) => mapper.deleteBoardInvitation()),
+        deleteCard: trelloHandler((mapper) => mapper.deleteCard()),
+        deleteCheckItem: trelloHandler((mapper) => mapper.deleteCheckItem()),
+        deleteLabel: trelloHandler((mapper) => mapper.deleteLabel()),
+        deleteOrganizationInvitation: trelloHandler((mapper) => mapper.deleteOrganizationInvitation()),
+        disablePlugin: trelloHandler((mapper) => mapper.disablePlugin()),
+        disable_plugin: trelloHandler((mapper) => mapper.disablePlugin()),
+        disablePowerUp: trelloHandler((mapper) => mapper.disablePowerUp()),
+        emailCard: trelloHandler((mapper) => mapper.emailCard()),
+        enablePlugin: trelloHandler((mapper) => mapper.enablePlugin()),
+        enable_plugin: trelloHandler((mapper) => mapper.enablePlugin()),
+        enablePowerUp: trelloHandler((mapper) => mapper.enablePowerUp()),
+        makeAdminOfBoard: trelloHandler((mapper) => mapper.makeAdminOfBoard()),
+        makeAdminOfOrganization: trelloHandler((mapper) => mapper.makeAdminOfOrganization()),
+        makeNormalMemberOfBoard: trelloHandler((mapper) => mapper.makeNormalMemberOfBoard()),
+        makeNormalMemberOfOrganization: trelloHandler((mapper) => mapper.makeNormalMemberOfOrganization()),
+        makeObserverOfBoard: trelloHandler((mapper) => mapper.makeObserverOfBoard()),
+        memberJoinedTrello: trelloHandler((mapper) => mapper.memberJoinedTrello()),
+        moveCardFromBoard: trelloHandler((mapper) => mapper.moveCardFromBoard()),
+        moveCardToBoard: trelloHandler((mapper) => mapper.moveCardToBoard()),
+        moveListFromBoard: trelloHandler((mapper) => mapper.moveListFromBoard()),
+        moveListToBoard: trelloHandler((mapper) => mapper.moveListToBoard()),
+        removeBoardsPinnedFromMember: trelloHandler((mapper) => mapper.removeBoardsPinnedFromMember()),
+        removeChecklistFromCard: trelloHandler((mapper) => mapper.removeChecklistFromCard()),
+        removeFromOrganizationBoard: trelloHandler((mapper) => mapper.removeFromOrganizationBoard()),
+        removeLabelFromCard: trelloHandler((mapper) => mapper.removeLabelFromCard()),
+        removeMemberFromCard: trelloHandler((mapper) => mapper.removeMemberFromCard()),
+        removeMemberFromBoard: trelloHandler((mapper) => mapper.removeMemberFromBoard()),
+        removeMemberFromOrganization: trelloHandler((mapper) => mapper.removeMemberFromOrganization()),
+        unconfirmedBoardInvitation: trelloHandler((mapper) => mapper.unconfirmedBoardInvitation()),
+        unconfirmedOrganizationInvitation: trelloHandler((mapper) => mapper.unconfirmedOrganizationInvitation()),
+        updateBoard: trelloHandler((mapper) => mapper.updateBoard()),
+        updateCard: trelloHandler((mapper) => mapper.updateCard()),
+        updateCheckItem: trelloHandler((mapper) => mapper.updateCheckItem()),
+        updateCheckItemStateOnCard: trelloHandler((mapper) => mapper.updateCheckItemStateOnCard()),
+        updateChecklist: trelloHandler((mapper) => mapper.updateChecklist()),
+        updateLabel: trelloHandler((mapper) => mapper.updateLabel()),
+        updateList: trelloHandler((mapper) => mapper.updateList()),
+        updateMember: trelloHandler((mapper) => mapper.updateMember()),
+        updateOrganization: trelloHandler((mapper) => mapper.updateOrganization()),
+        voteOnCard: trelloHandler((mapper) => mapper.voteOnCard()),
+    },
+})
+
+function trelloHandler(run: (mapper: TrelloMapper) => Promise<void>): ProviderMapper {
+    return ({ body, http }, output) => run(new TrelloMapper(body, output, http))
+}
+
 /**
  * https://developers.trello.com/apis/webhooks
  */
-export class Trello extends TypeParseProvider {
+class TrelloMapper {
     private static baseLink = 'https://trello.com/'
     private static baseAvatarUrl = 'https://trello-avatars.s3.amazonaws.com/'
     private static defTrelloColors: Record<string, number> = {
@@ -35,7 +120,7 @@ export class Trello extends TypeParseProvider {
     private static _addMemberThumbnail(avatarHash: string, embed: Embed): void {
         if (avatarHash != null && avatarHash !== 'null') {
             embed.thumbnail = {
-                url: Trello.baseAvatarUrl + avatarHash + '/170.png',
+                url: TrelloMapper.baseAvatarUrl + avatarHash + '/170.png',
             }
         }
     }
@@ -46,82 +131,16 @@ export class Trello extends TypeParseProvider {
 
     private action: any
     private model: any
+    private readonly body: Record<string, any>
+    private readonly output: ProviderOutput
+    private readonly http: ProviderHttp
 
-    public getName(): string {
-        return 'Trello'
-    }
-
-    public getType(): string | null {
-        return this.body.action.type
-    }
-
-    public knownTypes(): string[] {
-        return [
-            'addAttachmentToCard',
-            'addBoardsPinnedToMember',
-            'addChecklistToCard',
-            'addLabelToCard',
-            'addMemberToCard',
-            'addMemberToBoard',
-            'addMemberToOrganization',
-            'addToOrganizationBoard',
-            'commentCard',
-            'convertToCardFromCheckItem',
-            'copyBoard',
-            'copyCard',
-            'copyChecklist',
-            'createLabel',
-            'copyCommentCard',
-            'createBoard',
-            'createBoardInvitation',
-            'createBoardPreference',
-            'createCard',
-            'createCheckItem',
-            'createChecklist',
-            'createList',
-            'createOrganization',
-            'createOrganizationInvitation',
-            'deleteAttachmentFromCard',
-            'deleteBoardInvitation',
-            'deleteCard',
-            'deleteCheckItem',
-            'deleteLabel',
-            'deleteOrganizationInvitation',
-            'disablePlugin',
-            'disablePowerUp',
-            'emailCard',
-            'enablePlugin',
-            'enablePowerUp',
-            'makeAdminOfBoard',
-            'makeAdminOfOrganization',
-            'makeNormalMemberOfBoard',
-            'makeNormalMemberOfOrganization',
-            'makeObserverOfBoard',
-            'memberJoinedTrello',
-            'moveCardFromBoard',
-            'moveCardToBoard',
-            'moveListFromBoard',
-            'moveListToBoard',
-            'removeBoardsPinnedFromMember',
-            'removeChecklistFromCard',
-            'removeFromOrganizationBoard',
-            'removeLabelFromCard',
-            'removeMemberFromCard',
-            'removeMemberFromBoard',
-            'removeMemberFromOrganization',
-            'unconfirmedBoardInvitation',
-            'unconfirmedOrganizationInvitation',
-            'updateBoard',
-            'updateCard',
-            'updateCheckItem',
-            'updateCheckItemStateOnCard',
-            'updateChecklist',
-            'updateLabel',
-            'updateList',
-            'updateMember',
-            'updateOrganization',
-            'voteOnCard',
-        ]
+    public constructor(body: Record<string, any>, output: ProviderOutput, http: ProviderHttp) {
+        this.body = body
+        this.output = output
+        this.http = http
+        this.action = body.action
+        this.model = body.model
     }
 
     // Webhook Type Responses
@@ -131,13 +150,12 @@ export class Trello extends TypeParseProvider {
         embed.title = '[' + this.action.data.board.name + '] Added Attachment to "' + this.action.data.card.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
         this._formatAttachment(this.action.data.attachment, embed)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     // How to Trigger?
     public async addBoardsPinnedToMember(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
+        this.output.ignore()
     }
 
     public async addChecklistToCard(): Promise<void> {
@@ -145,7 +163,7 @@ export class Trello extends TypeParseProvider {
         embed.title = '[' + this.action.data.board.name + '] Added Checklist to "' + this.action.data.card.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
         embed.description = '`' + this.action.data.checklist.name + '` has been created.'
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async addLabelToCard(): Promise<void> {
@@ -153,7 +171,7 @@ export class Trello extends TypeParseProvider {
         embed.title = '[' + this.action.data.board.name + '] Added Label to "' + this.action.data.card.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
         this._formatLabel(this.action.data.text, this.action.data.value, embed)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async addMemberToCard(): Promise<void> {
@@ -162,18 +180,18 @@ export class Trello extends TypeParseProvider {
             embed.title = '[' + this.action.data.board.name + '] Joined "' + this.action.data.card.name + '"'
         } else {
             embed.title = '[' + this.action.data.board.name + '] Added User to "' + this.action.data.card.name + '"'
-            Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
+            TrelloMapper._addMemberThumbnail(this.action.member.avatarHash, embed)
             embed.description =
                 this.action.member.fullName +
                 ' ([`' +
                 this.action.member.username +
                 '`](' +
-                Trello.baseLink +
+                TrelloMapper.baseLink +
                 this.action.member.username +
                 '))'
         }
         embed.url = this._resolveFullCardURL(this.action.data.card)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async addMemberToBoard(): Promise<void> {
@@ -182,18 +200,18 @@ export class Trello extends TypeParseProvider {
             embed.title = 'Joined Board "' + this.action.data.board.name + '"'
         } else {
             embed.title = 'Added User to Board "' + this.action.data.board.name + '"'
-            Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
+            TrelloMapper._addMemberThumbnail(this.action.member.avatarHash, embed)
             embed.description =
                 this.action.member.fullName +
                 ' ([`' +
                 this.action.member.username +
                 '`](' +
-                Trello.baseLink +
+                TrelloMapper.baseLink +
                 this.action.member.username +
                 '))'
         }
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async addMemberToOrganization(): Promise<void> {
@@ -202,18 +220,18 @@ export class Trello extends TypeParseProvider {
             embed.title = 'Joined Organization "' + this.action.data.organization.name + '"'
         } else {
             embed.title = 'Added User to Organization "' + this.action.data.organization.name + '"'
-            Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
+            TrelloMapper._addMemberThumbnail(this.action.member.avatarHash, embed)
             embed.description =
                 this.action.member.fullName +
                 ' ([`' +
                 this.action.member.username +
                 '`](' +
-                Trello.baseLink +
+                TrelloMapper.baseLink +
                 this.action.member.username +
                 '))'
         }
         embed.url = this._resolveGenericURL(this.action.data.organization.id)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async addToOrganizationBoard(): Promise<void> {
@@ -226,15 +244,15 @@ export class Trello extends TypeParseProvider {
             this._resolveFullBoardURL(this.action.data.board) +
             ') has been created.'
         embed.url = this._resolveGenericURL(this.action.data.organization.id)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async commentCard(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Commented on Card "' + this.action.data.card.name + '"'
         embed.url = this._resolveFullCommentURL(this.action.data.card, this.action.id)
-        embed.description = Trello._formatLargeString(this.action.data.text)
-        this.addEmbed(embed)
+        embed.description = TrelloMapper._formatLargeString(this.action.data.text)
+        this.output.addEmbed(embed)
     }
 
     public async convertToCardFromCheckItem(): Promise<void> {
@@ -249,7 +267,7 @@ export class Trello extends TypeParseProvider {
             '`](' +
             this._resolveFullCardURL(this.action.data.cardSource) +
             ') has been converted to a card.'
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async copyBoard(): Promise<void> {
@@ -262,7 +280,7 @@ export class Trello extends TypeParseProvider {
             '` has been copied from [another board](' +
             this._resolveBoardURL(this.action.data.boardSource.id) +
             ').'
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async copyCard(): Promise<void> {
@@ -279,7 +297,7 @@ export class Trello extends TypeParseProvider {
             this._resolveFullCardURL(this.action.data.card) +
             ')'
         embed.url = this._resolveFullCardURL(this.action.data.card)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async copyChecklist(): Promise<void> {
@@ -288,7 +306,7 @@ export class Trello extends TypeParseProvider {
         embed.description =
             '`' + this.action.data.checklistSource.name + '` \uD83E\uDC6A `' + this.action.data.checklist.name + '`'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async createLabel(): Promise<void> {
@@ -296,32 +314,29 @@ export class Trello extends TypeParseProvider {
         embed.title = '[' + this.action.data.board.name + '] Created Label'
         this._formatLabel(this.action.data.label.name, this.action.data.label.color, embed)
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     // How to Trigger?
     public async copyCommentCard(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
+        this.output.ignore()
     }
 
     public async createBoard(): Promise<void> {
         const embed = this._preparePayload()
-        embed.title = 'Created Board "' + Trello._formatLargeString(this.action.data.board.name) + '"'
+        embed.title = 'Created Board "' + TrelloMapper._formatLargeString(this.action.data.board.name) + '"'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     // Won't Trigger?
     public async createBoardInvitation(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
+        this.output.ignore()
     }
 
     // How to Trigger?
     public async createBoardPreference(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
+        this.output.ignore()
     }
 
     public async createCard(): Promise<void> {
@@ -330,7 +345,7 @@ export class Trello extends TypeParseProvider {
         embed.url = this._resolveFullCardURL(this.action.data.card)
         embed.description =
             '`' + this.action.data.card.name + '` has been created in list `' + this.action.data.list.name + '`.'
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async createCheckItem(): Promise<void> {
@@ -343,13 +358,12 @@ export class Trello extends TypeParseProvider {
             '` was added to checklist `' +
             this.action.data.checklist.name +
             '`.'
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     // How to Trigger?
     public async createChecklist(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
+        this.output.ignore()
     }
 
     public async createList(): Promise<void> {
@@ -357,7 +371,7 @@ export class Trello extends TypeParseProvider {
         embed.title = '[' + this.action.data.board.name + '] Created List'
         embed.description = '`' + this.action.data.list.name + '` has been created.'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async createOrganization(): Promise<void> {
@@ -365,13 +379,12 @@ export class Trello extends TypeParseProvider {
         embed.title = 'Created Organization'
         embed.description = '`' + this.action.data.organization.name + '` has been created.'
         embed.url = this._resolveGenericURL(this.action.data.organization.id)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     // Won't Trigger?
     public async createOrganizationInvitation(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
+        this.output.ignore()
     }
 
     public async deleteAttachmentFromCard(): Promise<void> {
@@ -380,13 +393,12 @@ export class Trello extends TypeParseProvider {
             '[' + this.action.data.board.name + '] Removed Attachment from "' + this.action.data.card.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
         this._formatAttachment(this.action.data.attachment, embed)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     // Won't Trigger?
     public async deleteBoardInvitation(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
+        this.output.ignore()
     }
 
     public async deleteCard(): Promise<void> {
@@ -394,7 +406,7 @@ export class Trello extends TypeParseProvider {
         embed.title = '[' + this.action.data.board.name + '] Deleted Card'
         embed.description = 'A card was deleted from list `' + this.action.data.list.name + '`.'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async deleteCheckItem(): Promise<void> {
@@ -408,20 +420,19 @@ export class Trello extends TypeParseProvider {
             '` was removed from checklist `' +
             this.action.data.checklist.name +
             '`.'
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async deleteLabel(): Promise<void> {
         const embed = this._preparePayload()
         embed.title = '[' + this.action.data.board.name + '] Deleted Label'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     // Won't Trigger?
     public async deleteOrganizationInvitation(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
+        this.output.ignore()
     }
 
     public async disablePlugin(): Promise<void> {
@@ -430,14 +441,12 @@ export class Trello extends TypeParseProvider {
 
     // How to Trigger?
     public async disablePowerUp(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
+        this.output.ignore()
     }
 
     // How to Trigger?
     public async emailCard(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
+        this.output.ignore()
     }
 
     public async enablePlugin(): Promise<void> {
@@ -449,11 +458,7 @@ export class Trello extends TypeParseProvider {
         embed.url = this._resolveFullBoardURL(this.action.data.board)
         const url = this.action.data.plugin.url
         try {
-            const response = await fetch(url, { signal: AbortSignal.timeout(PLUGIN_MANIFEST_TIMEOUT_MS) })
-            if (!response.ok) {
-                throw new Error(`Request failed with status ${response.status}`)
-            }
-            const manifest = await response.json()
+            const manifest = await this.http.getJson<any>(url)
             const desc = MarkdownUtil._formatMarkdown(manifest.details, embed)
             embed.title = `[${this.action.data.board.name}] ${action} Plugin ${mark}`
             embed.fields = [
@@ -468,16 +473,15 @@ export class Trello extends TypeParseProvider {
             }
         } catch (err) {
             const diagnostics = err instanceof Error ? (err.stack ?? err.message) : String(err)
-            this.logger.warn(`[Trello Provider] Error while retrieving plugin manifest: ${diagnostics}`)
+            this.output.logger.warn(`[Trello Provider] Error while retrieving plugin manifest: ${diagnostics}`)
             embed.title = `[${this.action.data.board.name}] ${action} Plugin "${this.action.data.plugin.name}"`
         }
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     // How to Trigger?
     public async enablePowerUp(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
+        this.output.ignore()
     }
 
     public async makeAdminOfBoard(): Promise<void> {
@@ -488,12 +492,12 @@ export class Trello extends TypeParseProvider {
             ' ([`' +
             this.action.member.username +
             '`](' +
-            Trello.baseLink +
+            TrelloMapper.baseLink +
             this.action.member.username +
             '))'
-        Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
+        TrelloMapper._addMemberThumbnail(this.action.member.avatarHash, embed)
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async makeAdminOfOrganization(): Promise<void> {
@@ -504,12 +508,12 @@ export class Trello extends TypeParseProvider {
             ' ([`' +
             this.action.member.username +
             '`](' +
-            Trello.baseLink +
+            TrelloMapper.baseLink +
             this.action.member.username +
             '))'
-        Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
+        TrelloMapper._addMemberThumbnail(this.action.member.avatarHash, embed)
         embed.url = this._resolveGenericURL(this.action.data.organization.id)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async makeNormalMemberOfBoard(): Promise<void> {
@@ -520,12 +524,12 @@ export class Trello extends TypeParseProvider {
             ' ([`' +
             this.action.member.username +
             '`](' +
-            Trello.baseLink +
+            TrelloMapper.baseLink +
             this.action.member.username +
             '))'
-        Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
+        TrelloMapper._addMemberThumbnail(this.action.member.avatarHash, embed)
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async makeNormalMemberOfOrganization(): Promise<void> {
@@ -536,12 +540,12 @@ export class Trello extends TypeParseProvider {
             ' ([`' +
             this.action.member.username +
             '`](' +
-            Trello.baseLink +
+            TrelloMapper.baseLink +
             this.action.member.username +
             '))'
-        Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
+        TrelloMapper._addMemberThumbnail(this.action.member.avatarHash, embed)
         embed.url = this._resolveGenericURL(this.action.data.organization.id)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     // Unable to test, business class+ feature.
@@ -553,18 +557,17 @@ export class Trello extends TypeParseProvider {
             ' ([`' +
             this.action.member.username +
             '`](' +
-            Trello.baseLink +
+            TrelloMapper.baseLink +
             this.action.member.username +
             '))'
-        Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
+        TrelloMapper._addMemberThumbnail(this.action.member.avatarHash, embed)
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     // How to Trigger?
     public async memberJoinedTrello(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
+        this.output.ignore()
     }
 
     public async moveCardFromBoard(): Promise<void> {
@@ -581,7 +584,7 @@ export class Trello extends TypeParseProvider {
             this._resolveBoardURL(this.action.data.boardTarget.id) +
             ').'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async moveCardToBoard(): Promise<void> {
@@ -598,7 +601,7 @@ export class Trello extends TypeParseProvider {
             this._resolveBoardURL(this.action.data.boardSource.id) +
             ').'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async moveListFromBoard(): Promise<void> {
@@ -611,7 +614,7 @@ export class Trello extends TypeParseProvider {
             this._resolveBoardURL(this.action.data.boardTarget.id) +
             ').'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async moveListToBoard(): Promise<void> {
@@ -624,14 +627,14 @@ export class Trello extends TypeParseProvider {
             this._resolveBoardURL(this.action.data.boardSource.id) +
             ').'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     // How to Trigger?
     public async removeBoardsPinnedFromMember(): Promise<void> {
         const embed = this._preparePayload()
 
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async removeChecklistFromCard(): Promise<void> {
@@ -640,7 +643,7 @@ export class Trello extends TypeParseProvider {
             '[' + this.action.data.board.name + '] Removed Checklist from "' + this.action.data.card.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
         embed.description = '`' + this.action.data.checklist.name + '` has been removed.'
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async removeFromOrganizationBoard(): Promise<void> {
@@ -648,7 +651,7 @@ export class Trello extends TypeParseProvider {
         embed.title = 'Removed Board from "' + this.action.data.organization.name + '"'
         embed.description = '`' + this.action.data.board.name + '` has been deleted.'
         embed.url = this._resolveGenericURL(this.action.data.organization.id)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async removeLabelFromCard(): Promise<void> {
@@ -656,7 +659,7 @@ export class Trello extends TypeParseProvider {
         embed.title = '[' + this.action.data.board.name + '] Removed Label from "' + this.action.data.card.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
         this._formatLabel(this.action.data.text, this.action.data.value, embed)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async removeMemberFromCard(): Promise<void> {
@@ -665,18 +668,18 @@ export class Trello extends TypeParseProvider {
             embed.title = '[' + this.action.data.board.name + '] Left "' + this.action.data.card.name + '"'
         } else {
             embed.title = '[' + this.action.data.board.name + '] Removed User from "' + this.action.data.card.name + '"'
-            Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
+            TrelloMapper._addMemberThumbnail(this.action.member.avatarHash, embed)
             embed.description =
                 this.action.member.fullName +
                 ' ([`' +
                 this.action.member.username +
                 '`](' +
-                Trello.baseLink +
+                TrelloMapper.baseLink +
                 this.action.member.username +
                 '))'
         }
         embed.url = this._resolveFullCardURL(this.action.data.card)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async removeMemberFromBoard(): Promise<void> {
@@ -690,13 +693,13 @@ export class Trello extends TypeParseProvider {
                 ' ([`' +
                 this.action.member.username +
                 '`](' +
-                Trello.baseLink +
+                TrelloMapper.baseLink +
                 this.action.member.username +
                 '))'
-            Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
+            TrelloMapper._addMemberThumbnail(this.action.member.avatarHash, embed)
         }
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async removeMemberFromOrganization(): Promise<void> {
@@ -705,30 +708,28 @@ export class Trello extends TypeParseProvider {
             embed.title = 'Left Organization "' + this.action.data.organization.name + '"'
         } else {
             embed.title = 'Removed User from Organization "' + this.action.data.organization.name + '"'
-            Trello._addMemberThumbnail(this.action.member.avatarHash, embed)
+            TrelloMapper._addMemberThumbnail(this.action.member.avatarHash, embed)
             embed.description =
                 this.action.member.fullName +
                 ' ([`' +
                 this.action.member.username +
                 '`](' +
-                Trello.baseLink +
+                TrelloMapper.baseLink +
                 this.action.member.username +
                 '))'
         }
         embed.url = this._resolveGenericURL(this.action.data.organization.id)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     // How to Trigger?
     public async unconfirmedBoardInvitation(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
+        this.output.ignore()
     }
 
     // How to trigger?
     public async unconfirmedOrganizationInvitation(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
+        this.output.ignore()
     }
 
     public async updateBoard(): Promise<void> {
@@ -798,10 +799,11 @@ export class Trello extends TypeParseProvider {
                     }
                 } else if (old.prefs.background != null) {
                     const val =
-                        Trello.defTrelloColors[this.action.data.board.prefs.background] == null
+                        TrelloMapper.defTrelloColors[this.action.data.board.prefs.background] == null
                             ? 'image'
                             : this.action.data.board.prefs.background
-                    const oldVal = Trello.defTrelloColors[old.prefs.background] == null ? 'image' : old.prefs.background
+                    const oldVal =
+                        TrelloMapper.defTrelloColors[old.prefs.background] == null ? 'image' : old.prefs.background
                     field = {
                         name: 'Background',
                         value: '`' + oldVal + '` \uD83E\uDC6A `' + val + '`',
@@ -813,7 +815,7 @@ export class Trello extends TypeParseProvider {
         if (field != null) {
             embed.fields = [field]
         }
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async updateCard(): Promise<void> {
@@ -829,19 +831,19 @@ export class Trello extends TypeParseProvider {
             } else if (old.desc != null) {
                 if (!old.desc) {
                     embed.title = embed.title + 'Added Description to Card "' + this.action.data.card.name + '"'
-                    embed.description = Trello._formatLargeString(
+                    embed.description = TrelloMapper._formatLargeString(
                         MarkdownUtil._formatMarkdown(this.action.data.card.desc, embed),
                     )
                 } else if (!this.action.data.card.desc) {
                     embed.title = embed.title + 'Removed Description from Card "' + this.action.data.card.name + '"'
                     field = {
                         name: 'Old Value',
-                        value: Trello._formatLargeString(MarkdownUtil._formatMarkdown(old.desc, embed)),
+                        value: TrelloMapper._formatLargeString(MarkdownUtil._formatMarkdown(old.desc, embed)),
                         inline: false,
                     }
                 } else {
                     embed.title = embed.title + 'Updated Description of Card "' + this.action.data.card.name + '"'
-                    embed.description = Trello._formatLargeString(
+                    embed.description = TrelloMapper._formatLargeString(
                         MarkdownUtil._formatMarkdown(this.action.data.card.desc, embed),
                     )
                 }
@@ -882,7 +884,7 @@ export class Trello extends TypeParseProvider {
         if (field != null) {
             embed.fields = [field]
         }
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async updateCheckItem(): Promise<void> {
@@ -891,7 +893,7 @@ export class Trello extends TypeParseProvider {
             '[' + this.action.data.board.name + '] Renamed Item in Checklist "' + this.action.data.checklist.name + '"'
         embed.url = this._resolveFullCardURL(this.action.data.card)
         embed.description = '`' + this.action.data.old.name + '` \uD83E\uDC6A `' + this.action.data.checkItem.name + '`'
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async updateCheckItemStateOnCard(): Promise<void> {
@@ -913,7 +915,7 @@ export class Trello extends TypeParseProvider {
             this.action.data.checkItem.state +
             '`.'
         embed.url = this._resolveFullCardURL(this.action.data.card)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async updateChecklist(): Promise<void> {
@@ -921,12 +923,12 @@ export class Trello extends TypeParseProvider {
         embed.title = '[' + this.action.data.board.name + '] Renamed Checklist'
         embed.description =
             '`' +
-            Trello._formatLargeString(this.action.data.old.name) +
+            TrelloMapper._formatLargeString(this.action.data.old.name) +
             '` \uD83E\uDC6A `' +
-            Trello._formatLargeString(this.action.data.checklist.name) +
+            TrelloMapper._formatLargeString(this.action.data.checklist.name) +
             '`'
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async updateLabel(): Promise<void> {
@@ -988,7 +990,7 @@ export class Trello extends TypeParseProvider {
         if (field != null) {
             embed.fields = [field]
         }
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async updateList(): Promise<void> {
@@ -1005,13 +1007,12 @@ export class Trello extends TypeParseProvider {
             embed.description = '`' + this.action.data.old.name + '` \uD83E\uDC6A `' + this.action.data.list.name + '`'
         }
         embed.url = this._resolveFullBoardURL(this.action.data.board)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     // How to Trigger?
     public async updateMember(): Promise<void> {
-        this.nullifyPayload()
-        console.log('Not implemented')
+        this.output.ignore()
     }
 
     public async updateOrganization(): Promise<void> {
@@ -1059,22 +1060,22 @@ export class Trello extends TypeParseProvider {
             } else if (old.desc != null) {
                 if (!old.desc) {
                     embed.title = embed.title + 'Added Description to Organization'
-                    embed.description = Trello._formatLargeString(
+                    embed.description = TrelloMapper._formatLargeString(
                         MarkdownUtil._formatMarkdown(organization.desc, embed),
                     )
                 } else if (!organization.desc) {
                     embed.title = embed.title + 'Removed Description from Organization'
                     field = {
                         name: 'Old Value',
-                        value: Trello._formatLargeString(MarkdownUtil._formatMarkdown(old.desc, embed)),
+                        value: TrelloMapper._formatLargeString(MarkdownUtil._formatMarkdown(old.desc, embed)),
                         inline: false,
                     }
                 } else {
                     embed.title = embed.title + 'Changed Description of Organization'
                     embed.description =
-                        Trello._formatLargeString(MarkdownUtil._formatMarkdown(old.desc, embed)) +
+                        TrelloMapper._formatLargeString(MarkdownUtil._formatMarkdown(old.desc, embed)) +
                         '\n`\uD83E\uDC6B`\n' +
-                        Trello._formatLargeString(MarkdownUtil._formatMarkdown(organization.desc, embed))
+                        TrelloMapper._formatLargeString(MarkdownUtil._formatMarkdown(organization.desc, embed))
                 }
             }
         } else {
@@ -1085,7 +1086,7 @@ export class Trello extends TypeParseProvider {
         if (field != null) {
             embed.fields = [field]
         }
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     public async voteOnCard(): Promise<void> {
@@ -1098,12 +1099,12 @@ export class Trello extends TypeParseProvider {
                 '[' + this.action.data.board.name + '] Removed Vote on Card "' + this.action.data.card.name + '"'
         }
         embed.url = this._resolveFullCardURL(this.action.data.card)
-        this.addEmbed(embed)
+        this.output.addEmbed(embed)
     }
 
     private _resolveFullCardURL(card: Card): string {
         return (
-            Trello.baseLink +
+            TrelloMapper.baseLink +
             'c/' +
             card.shortLink +
             '/' +
@@ -1114,7 +1115,7 @@ export class Trello extends TypeParseProvider {
     }
 
     private _resolveFullBoardURL(board: Board): string {
-        return Trello.baseLink + 'b/' + board.shortLink + '/' + board.name.replace(/\s/g, '-').toLowerCase()
+        return TrelloMapper.baseLink + 'b/' + board.shortLink + '/' + board.name.replace(/\s/g, '-').toLowerCase()
     }
 
     private _resolveFullCommentURL(card: Card, commentId: string): string {
@@ -1122,11 +1123,11 @@ export class Trello extends TypeParseProvider {
     }
 
     private _resolveCardURL(id: string): string {
-        return Trello.baseLink + 'c/' + id
+        return TrelloMapper.baseLink + 'c/' + id
     }
 
     private _resolveBoardURL(id: string): string {
-        return Trello.baseLink + 'b/' + id
+        return TrelloMapper.baseLink + 'b/' + id
     }
 
     private _resolveCommentURL(cardID: string, commentId: string): string {
@@ -1134,7 +1135,7 @@ export class Trello extends TypeParseProvider {
     }
 
     private _resolveGenericURL(id: string): string {
-        return Trello.baseLink + id
+        return TrelloMapper.baseLink + id
     }
 
     private _formatAttachment(attachment: Attachment, embed: Embed): void {
@@ -1158,10 +1159,10 @@ export class Trello extends TypeParseProvider {
     }
 
     private _formatLabel(text: string, value: string, embed: Embed): void {
-        if (value && Trello.defTrelloColors[value] != null) {
-            embed.color = Trello.defTrelloColors[value]
+        if (value && TrelloMapper.defTrelloColors[value] != null) {
+            embed.color = TrelloMapper.defTrelloColors[value]
         } else {
-            embed.color = Trello.defTrelloColors.nocolor
+            embed.color = TrelloMapper.defTrelloColors.nocolor
         }
         if (text) {
             embed.description = '`' + text + '`'
@@ -1172,19 +1173,12 @@ export class Trello extends TypeParseProvider {
         const memberCreator = this.body.action.memberCreator
         return {
             name: memberCreator.fullName,
-            icon_url: Trello.baseAvatarUrl + memberCreator.avatarHash + '/170.png',
-            url: Trello.baseLink + memberCreator.username,
+            icon_url: TrelloMapper.baseAvatarUrl + memberCreator.avatarHash + '/170.png',
+            url: TrelloMapper.baseLink + memberCreator.username,
         }
     }
 
     private _preparePayload(): Embed {
-        this.action = this.body.action
-        this.model = this.body.model
-
-        // Testing code.
-        // console.info(this.body.action.type);
-        // console.info(this.action.data);
-
         const embed: Embed = {
             author: this._resolveUser(),
         }
@@ -1193,11 +1187,11 @@ export class Trello extends TypeParseProvider {
         if (
             this.model.prefs != null &&
             this.model.prefs.background != null &&
-            Trello.defTrelloColors[this.model.prefs.background] != null
+            TrelloMapper.defTrelloColors[this.model.prefs.background] != null
         ) {
-            embed.color = Trello.defTrelloColors[this.model.prefs.background]
+            embed.color = TrelloMapper.defTrelloColors[this.model.prefs.background]
         } else {
-            embed.color = Trello.defTrelloColors.trello
+            embed.color = TrelloMapper.defTrelloColors.trello
         }
 
         return embed

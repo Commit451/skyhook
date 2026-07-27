@@ -5,7 +5,7 @@ import { Tester } from '../Tester.ts'
 
 describe('/POST zendesk', () => {
     it('formats the documented ticket-created event payload', async () => {
-        const result = await Tester.test(new Zendesk(), 'zendesk.json')
+        const result = await Tester.test(Zendesk, 'zendesk.json')
         assert.notEqual(result, null)
         assert.deepEqual(result!.allowed_mentions, { parse: [] })
         assert.equal(result!.embeds?.length, 1)
@@ -25,7 +25,7 @@ describe('/POST zendesk', () => {
     })
 
     it('summarizes ticket field changes', async () => {
-        const result = await Tester.testWithBody(new Zendesk(), {
+        const result = await Tester.testWithBody(Zendesk, {
             account_id: 17839070,
             detail: {
                 id: '1244',
@@ -60,7 +60,7 @@ describe('/POST zendesk', () => {
     })
 
     it('formats ticket comments with author and visibility', async () => {
-        const result = await Tester.testWithBody(new Zendesk(), {
+        const result = await Tester.testWithBody(Zendesk, {
             account_id: 18501212,
             detail: {
                 id: '342757',
@@ -97,7 +97,7 @@ describe('/POST zendesk', () => {
     })
 
     it('handles standard event domains and future event types generically', async () => {
-        const result = await Tester.testWithBody(new Zendesk(), {
+        const result = await Tester.testWithBody(Zendesk, {
             account_id: 123456,
             detail: {
                 created_at: '2025-01-08T10:12:07Z',
@@ -119,7 +119,7 @@ describe('/POST zendesk', () => {
             { name: 'Group ID', value: '42', inline: true },
         ])
 
-        const futureResult = await Tester.testWithBody(new Zendesk(), {
+        const futureResult = await Tester.testWithBody(Zendesk, {
             account_id: 123456,
             detail: { id: 'abc' },
             event: { current: true, previous: false },
@@ -138,7 +138,7 @@ describe('/POST zendesk', () => {
     })
 
     it('accepts Zendesk event types that use the documented slash delimiter', async () => {
-        const result = await Tester.testWithBody(new Zendesk(), {
+        const result = await Tester.testWithBody(Zendesk, {
             account_id: 12514403,
             detail: { id: '6596848315901', role: 'END_USER' },
             event: { identity: { id: '42', type: 'email' } },
@@ -157,7 +157,7 @@ describe('/POST zendesk', () => {
     })
 
     it('formats messaging events with the message author and body', async () => {
-        const result = await Tester.testWithBody(new Zendesk(), {
+        const result = await Tester.testWithBody(Zendesk, {
             account_id: 123456,
             detail: { id: '9876' },
             event: {
@@ -181,7 +181,7 @@ describe('/POST zendesk', () => {
     })
 
     it('summarizes agent availability state changes', async () => {
-        const result = await Tester.testWithBody(new Zendesk(), {
+        const result = await Tester.testWithBody(Zendesk, {
             account_id: 2,
             detail: { account_id: '2', agent_id: '10011', version: '3' },
             event: {
@@ -205,7 +205,7 @@ describe('/POST zendesk', () => {
     })
 
     it('accepts the documented account subject for omnichannel configuration events', async () => {
-        const result = await Tester.testWithBody(new Zendesk(), {
+        const result = await Tester.testWithBody(Zendesk, {
             account_id: 2,
             detail: { account_id: 2 },
             event: { current_value: false, previous_value: true },
@@ -223,7 +223,7 @@ describe('/POST zendesk', () => {
     })
 
     it('summarizes standard list and custom-field changes without dumping nested metadata', async () => {
-        const result = await Tester.testWithBody(new Zendesk(), {
+        const result = await Tester.testWithBody(Zendesk, {
             account_id: 123456,
             detail: { id: '5158', status: 'OPEN', subject: 'Tagged ticket' },
             event: {
@@ -270,7 +270,7 @@ describe('/POST zendesk', () => {
             { type: 'zen:event-type:ticket.created', detail: null, event: {} },
             { ticket: { id: 123, subject: 'Custom trigger payload' } },
         ]) {
-            const result = await Tester.testWithBody(new Zendesk(), body)
+            const result = await Tester.testWithBody(Zendesk, body)
             assert.equal(result, null)
         }
     })
@@ -292,11 +292,11 @@ describe('/POST zendesk', () => {
             type: 'zen:event-type:organization.created',
             zendesk_event_version: '2022-06-20',
         }
-        const result = await Tester.testWithBody(new Zendesk(), body)
+        const result = await Tester.testWithBody(Zendesk, body)
         assert.notEqual(result, null)
         assert.deepEqual(result!.embeds![0].fields, [])
 
-        const invalidTimestampResult = await Tester.testWithBody(new Zendesk(), {
+        const invalidTimestampResult = await Tester.testWithBody(Zendesk, {
             ...body,
             time: '2025-02-31T00:00:00.000Z',
         })
@@ -305,7 +305,7 @@ describe('/POST zendesk', () => {
 
     it('stays within Discord embed limits for untrusted payload text', async () => {
         const longText = '@everyone [click](https://evil.example) ' + 'x'.repeat(7000)
-        const result = await Tester.testWithBody(new Zendesk(), {
+        const result = await Tester.testWithBody(Zendesk, {
             account_id: 123456,
             detail: {
                 description: longText,

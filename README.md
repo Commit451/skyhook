@@ -59,6 +59,7 @@ https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/provi
 - [Unity Cloud](https://build-api.cloud.unity3d.com/docs/1.0.0/index.html#operation-webhooks-intro) - `/unity`
 - [Uptime Robot](https://blog.uptimerobot.com/web-hook-alert-contacts-new-feature/) - `/uptimerobot`
 - [Zendesk](https://developer.zendesk.com/api-reference/webhooks/webhooks-api/webhooks/) - `/zendesk`
+<!-- provider-scaffold: supported-providers -->
 
 ## Contributing
 
@@ -68,6 +69,12 @@ If you wish to contribute, follow our [contributing guide](CONTRIBUTING.md).
 
 If you want to create a new provider please follow the examples shown at our
 small [documentation](docs/CreateNewProvider.md).
+
+To generate a registered provider, canonical fixture, and focused test in one step:
+
+```sh
+npm run provider:new -- newprovider NewProvider "New Provider" https://docs.example.com/webhooks
+```
 
 ## Testing Locally
 

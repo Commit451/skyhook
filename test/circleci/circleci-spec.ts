@@ -5,7 +5,7 @@ import { Tester } from '../Tester.ts'
 
 describe('/POST circleci', () => {
     it('build', async () => {
-        const res = await Tester.test(new CircleCi(), 'circleci.json', null)
+        const res = await Tester.test(CircleCi, 'circleci.json', null)
         assert.notStrictEqual(res, null)
         assert.ok(Array.isArray(res!.embeds))
         assert.strictEqual(res!.embeds.length, 1)

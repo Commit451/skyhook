@@ -5,9 +5,10 @@ import { Tester } from '../Tester.ts'
 
 describe('/POST codacy', () => {
     it('formats a commit exactly', async () => {
-        const res = await Tester.test(new Codacy(), 'codacy.json', null)
+        const res = await Tester.test(Codacy, 'codacy.json', null)
 
         assert.deepStrictEqual(res, {
+            allowed_mentions: { parse: [] },
             embeds: [
                 {
                     title: 'New Commit',
@@ -27,7 +28,7 @@ describe('/POST codacy', () => {
     })
 
     it('emits string field names and values', async () => {
-        const res = await Tester.test(new Codacy(), 'codacy.json', null)
+        const res = await Tester.test(Codacy, 'codacy.json', null)
         assert.notStrictEqual(res, null)
 
         for (const embed of res!.embeds ?? []) {

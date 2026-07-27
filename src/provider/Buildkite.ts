@@ -6,8 +6,15 @@ import {
     SKYHOOK_FOOTER_TEXT,
 } from '../util/DiscordEmbed.ts'
 import { cleanText, escapeDiscordMarkdownLiteral, humanizeWords, truncateText } from '../util/DiscordText.ts'
-import { canonicalizeIso8601Timestamp, isRecord } from '../util/WebhookValue.ts'
-import { DirectParseProvider } from './BaseProvider.ts'
+import {
+    firstScalar,
+    firstIso8601Timestamp as firstTimestamp,
+    isRecord,
+    safeIntegerText,
+    scalarText,
+    trustedHttpsUrl,
+} from '../util/WebhookValue.ts'
+import { defineProvider } from './Provider.ts'
 
 const BUILDKITE_GREEN = 0x14cc80
 const BUILDKITE_BLUE = 0x2196f3
@@ -32,75 +39,51 @@ interface ParsedEvent {
  *
  * @see https://buildkite.com/docs/apis/webhooks
  */
-export class Buildkite extends DirectParseProvider {
-    public constructor() {
-        super()
-        this.setEmbedColor(BUILDKITE_GREEN)
-        this.payload.username = 'Buildkite'
-        this.payload.allowed_mentions = { parse: [] }
-    }
-
-    public getName(): string {
-        return 'Buildkite'
-    }
-
-    public getPath(): string {
-        return 'buildkite'
-    }
-
-    public async parseData(): Promise<void> {
-        if (!isRecord(this.body)) {
-            this.nullifyPayload()
-            return
-        }
-
-        const event = boundedEvent(this.body.event)
-        const headerValue = getHeaderValue(this.headers, 'x-buildkite-event')
+export const Buildkite = defineProvider({
+    path: 'buildkite',
+    name: 'Buildkite',
+    example: {
+        body: 'buildkite/buildkite.json',
+        headers: 'buildkite/buildkite.headers.json',
+    },
+    defaults: {
+        username: 'Buildkite',
+        embedColor: BUILDKITE_GREEN,
+    },
+    map({ body, headers }, output) {
+        const event = boundedEvent(body.event)
+        const headerValue = getHeaderValue(headers, 'x-buildkite-event')
         const headerEvent = headerValue === undefined ? undefined : boundedEvent(headerValue)
         if (event == null || (headerValue !== undefined && headerEvent !== event)) {
-            this.nullifyPayload()
+            output.ignore()
             return
         }
 
-        const parsed = this.parseEvent(event)
+        const parsed = parseEvent(event, body)
         if (parsed == null) {
-            this.nullifyPayload()
+            output.ignore()
             return
         }
 
-        const author = senderAuthor(this.body.sender)
+        const author = senderAuthor(body.sender)
         if (author != null) {
             parsed.embed.author = author
         }
         parsed.embed.fields = fitEscapedFieldsWithinAggregateLimit(parsed.embed)
-        this.setEmbedColor(statusColor(parsed.status))
-        this.addEmbed(parsed.embed)
-    }
+        output.setEmbedColor(statusColor(parsed.status))
+        output.addEmbed(parsed.embed)
+    },
+})
 
-    private parseEvent(event: string): ParsedEvent | null {
-        if (event.startsWith('build.')) {
-            return parseBuildEvent(event, this.body)
-        }
-        if (event.startsWith('job.')) {
-            return parseJobEvent(event, this.body)
-        }
-        if (event.startsWith('agent.')) {
-            return parseAgentEvent(event, this.body)
-        }
-        if (event === 'cluster_token.registration_blocked') {
-            return parseBlockedRegistrationEvent(this.body)
-        }
-        if (event === 'ping') {
-            return parsePingEvent(this.body)
-        }
-        if (event.startsWith('package.')) {
-            return parsePackageEvent(event, this.body)
-        }
-        if (event.startsWith('workflow.')) {
-            return parseWorkflowEvent(event, this.body)
-        }
-        return parseGenericEvent(event, this.body)
-    }
+function parseEvent(event: string, body: Record<string, any>): ParsedEvent | null {
+    if (event.startsWith('build.')) return parseBuildEvent(event, body)
+    if (event.startsWith('job.')) return parseJobEvent(event, body)
+    if (event.startsWith('agent.')) return parseAgentEvent(event, body)
+    if (event === 'cluster_token.registration_blocked') return parseBlockedRegistrationEvent(body)
+    if (event === 'ping') return parsePingEvent(body)
+    if (event.startsWith('package.')) return parsePackageEvent(event, body)
+    if (event.startsWith('workflow.')) return parseWorkflowEvent(event, body)
+    return parseGenericEvent(event, body)
 }
 
 function parseBuildEvent(event: string, body: Record<string, any>): ParsedEvent | null {
@@ -379,16 +362,6 @@ function agentTimestamp(action: string, agent: Record<string, any>): string | nu
     return firstTimestamp(timestampByAction[action], agent.created_at)
 }
 
-function firstTimestamp(...values: unknown[]): string | null {
-    for (const value of values) {
-        const timestamp = canonicalizeIso8601Timestamp(value)
-        if (timestamp != null) {
-            return timestamp
-        }
-    }
-    return null
-}
-
 function setTrustedUrl(embed: Embed, ...values: unknown[]): void {
     for (const value of values) {
         const url = trustedBuildkiteUrl(value)
@@ -400,21 +373,11 @@ function setTrustedUrl(embed: Embed, ...values: unknown[]): void {
 }
 
 function trustedBuildkiteUrl(value: unknown): string | null {
-    if (typeof value !== 'string' || value.length === 0 || value.length > MAX_URL_CHARACTERS) {
-        return null
-    }
-    try {
-        const url = new URL(value)
-        if (
-            url.protocol !== 'https:' ||
-            (url.hostname !== 'buildkite.com' && !url.hostname.endsWith('.buildkite.com'))
-        ) {
-            return null
-        }
-        return url.href.length <= MAX_URL_CHARACTERS ? url.href : null
-    } catch {
-        return null
-    }
+    return trustedHttpsUrl(value, {
+        allowedHosts: ['buildkite.com'],
+        allowSubdomains: true,
+        maxLength: MAX_URL_CHARACTERS,
+    })
 }
 
 function getHeaderValue(headers: unknown, name: string): unknown | undefined {
@@ -450,36 +413,8 @@ function boundedText(value: unknown, maxLength: number, singleLine: boolean): st
     return text.length > 0 && text.length <= maxLength ? text : null
 }
 
-function scalarText(value: unknown): string | null {
-    if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'boolean') {
-        return null
-    }
-    if (
-        typeof value === 'number' &&
-        (!Number.isFinite(value) || (Number.isInteger(value) && !Number.isSafeInteger(value)))
-    ) {
-        return null
-    }
-    const text = cleanText(String(value), false)
-    return text.length === 0 ? null : text
-}
-
-function firstScalar(...values: unknown[]): string | null {
-    for (const value of values) {
-        const result = scalarText(value)
-        if (result != null) {
-            return result
-        }
-    }
-    return null
-}
-
-function safeIntegerText(value: unknown): string | null {
-    return Number.isSafeInteger(value) ? String(value) : null
-}
-
 function positiveIntegerText(value: unknown): string | null {
-    return Number.isSafeInteger(value) && Number(value) > 0 ? String(value) : null
+    return safeIntegerText(value, true)
 }
 
 function literal(value: string, maxLength: number, singleLine: boolean): string {
