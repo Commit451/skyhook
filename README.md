@@ -6,9 +6,8 @@ Parses webhooks and forwards them in the proper format to Discord.
 
 ## Setup
 
-You can use the [site](https://skyhookapi.com) to create the right webhook link and send a test
-notification to Discord before configuring your provider. If you want to manually create the link,
-here are the steps:
+You can use the [site](https://skyhookapi.com) to create the right webhook link and send a test notification to Discord
+before configuring your provider. If you want to manually create the link, here are the steps:
 
 1. Create a webhook in Discord (Server Settings -> Webhooks -> Create Webhook)
 2. Copy the webhook url
@@ -60,35 +59,6 @@ https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/provi
 - [Uptime Robot](https://blog.uptimerobot.com/web-hook-alert-contacts-new-feature/) - `/uptimerobot`
 - [Zendesk](https://developer.zendesk.com/api-reference/webhooks/webhooks-api/webhooks/) - `/zendesk`
 
-### Linear setup
-
-Create a webhook in Linear's API settings and use the generated `/linear` URL as its endpoint. You can subscribe the webhook to all public teams or one team and select any supported resource types. Skyhook formats Linear data-change events (including issues, comments, projects, cycles, documents, initiatives, customers, and users) as well as Issue SLA and OAuth app revocation events.
-
-Linear signatures use a secret that belongs to the configured webhook. Skyhook's generated URL does not include or store that secret, so Skyhook cannot verify `Linear-Signature`; all incoming values are treated as untrusted display data and Discord mentions are disabled.
-
-### Square setup
-
-Create a subscription in the Square Developer Console and use the generated `/square` URL as its notification URL. Select any supported Square webhook events; Skyhook formats Square's common event envelope, including current and future event families, into a bounded Discord notification.
-
-Square signatures require the subscription's signature key, the exact notification URL, and the raw request body. Skyhook does not store that key and therefore cannot verify `x-square-hmacsha256-signature`; all incoming values are treated as untrusted display data and Discord mentions are disabled.
-
-### Zendesk setup
-
-Use the generated `/zendesk` URL as the endpoint for a Zendesk webhook that subscribes directly to Zendesk events. Configure the webhook to use `POST` with the `json` request format, then select the event subscriptions you want delivered to Discord. Skyhook supports the standard Zendesk event schema across ticket, user, organization, article, and future event domains.
-
-Zendesk trigger and automation webhooks are not automatically parsed because their request payload is administrator-defined. Connect the webhook through event subscriptions instead.
-
-If you want support for a new provider, just create a pull request and add it!  
-Alternatively, a new provider can also be requested by creating an [issue](https://github.com/Commit451/skyhook/issues).
-
-### Square setup
-
-Use the generated `/square` URL as the endpoint for a Square webhook subscription. In your Square Developer Dashboard, create a subscription that delivers event notifications for the event types you want (such as `payment.created`, `order.created`, `customer.created`, `refund.created`, and so on).
-
-Square signs each delivery with an HMAC signature delivered via the `x-square-hmacsha256-signature` header, using a signature key that is specific to the configured webhook. Skyhook's generated URL does not include or store that signature key, so Skyhook cannot verify Square signatures; all incoming payload values are treated as untrusted display data and Discord mentions are disabled.
-
-The type of each event is read from the top-level `type` field (for example `payment.created`). Skyhook formats the most common Square event types — payments, refunds, orders, customers, disputes, payouts, invoices, subscriptions, gift cards, and more — into resource-specific Discord notifications. Any Square event type that does not have a dedicated handler falls back to a generic summary so you always see a notification.
-
 ## Contributing
 
 If you wish to contribute, follow our [contributing guide](CONTRIBUTING.md).
@@ -133,11 +103,6 @@ docker run -it --rm -p 8080:8080 commit451/skyhook
 ## Deploying
 
 - [Docker](docs/docker)
-
-## Thanks
-
-Special thanks to all our amazing contributors. skyhookapi.com is hosted for free for you, so if you feel so
-inclined, [buy a coffee!](https://ko-fi.com/jawnnypoo)
 
 ## License
 
