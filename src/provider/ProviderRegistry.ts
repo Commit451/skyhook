@@ -21,6 +21,7 @@ import { Patreon } from './Patreon.ts'
 import { Pingdom } from './Pingdom.ts'
 import { Rollbar } from './Rollbar.ts'
 import { Shopify } from './Shopify.ts'
+import { Square } from './Square.ts'
 import { Travis } from './Travis.ts'
 import { Trello } from './Trello.ts'
 import { Unity } from './Unity.ts'
@@ -234,6 +235,12 @@ const providerDefinitions: readonly ProviderDefinition[] = [
             body: 'shopify/shopify.json',
             headers: 'shopify/shopify.headers.json',
         },
+    },
+    {
+        path: 'square',
+        name: 'Square',
+        provider: Square,
+        example: { body: 'square/square.json' },
     },
     {
         path: 'travis',

@@ -52,6 +52,7 @@ https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/provi
 - [Pingdom](https://www.pingdom.com/resources/webhooks) - `/pingdom`
 - [Rollbar](https://docs.rollbar.com/docs/webhooks) - `/rollbar`
 - [Shopify](https://shopify.dev/docs/api/webhooks/latest) - `/shopify`
+- [Square](https://developer.squareup.com/docs/webhooks/overview) - `/square`
 - [Travis](https://docs.travis-ci.com/user/notifications/#Webhooks-Delivery-Format) - `/travis`
 - [Trello](https://developers.trello.com/apis/webhooks) - `/trello`
 - [Unity Cloud](https://build-api.cloud.unity3d.com/docs/1.0.0/index.html#operation-webhooks-intro) - `/unity`
@@ -64,6 +65,12 @@ https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/provi
 Create a webhook in Linear's API settings and use the generated `/linear` URL as its endpoint. You can subscribe the webhook to all public teams or one team and select any supported resource types. Skyhook formats Linear data-change events (including issues, comments, projects, cycles, documents, initiatives, customers, and users) as well as Issue SLA and OAuth app revocation events.
 
 Linear signatures use a secret that belongs to the configured webhook. Skyhook's generated URL does not include or store that secret, so Skyhook cannot verify `Linear-Signature`; all incoming values are treated as untrusted display data and Discord mentions are disabled.
+
+### Square setup
+
+Create a subscription in the Square Developer Console and use the generated `/square` URL as its notification URL. Select any supported Square webhook events; Skyhook formats Square's common event envelope, including current and future event families, into a bounded Discord notification.
+
+Square signatures require the subscription's signature key, the exact notification URL, and the raw request body. Skyhook does not store that key and therefore cannot verify `x-square-hmacsha256-signature`; all incoming values are treated as untrusted display data and Discord mentions are disabled.
 
 ### Zendesk setup
 
