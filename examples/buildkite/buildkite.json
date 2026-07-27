@@ -1,0 +1,29 @@
+{
+  "event": "build.finished",
+  "build": {
+    "id": "01908131-7d9f-495e-a17b-80ed31276810",
+    "web_url": "https://buildkite.com/acme-inc/my-pipeline/builds/27",
+    "number": 27,
+    "state": "passed",
+    "blocked": false,
+    "message": "Add Buildkite webhook support",
+    "commit": "a1b2c3d4e5f678901234567890abcdef12345678",
+    "branch": "main",
+    "source": "webhook",
+    "created_at": "2026-07-27T14:20:00.000Z",
+    "scheduled_at": "2026-07-27T14:20:01.000Z",
+    "started_at": "2026-07-27T14:20:05.000Z",
+    "finished_at": "2026-07-27T14:22:30.123Z"
+  },
+  "pipeline": {
+    "id": "849411f9-9e6d-4739-a0d8-e247088e9b52",
+    "web_url": "https://buildkite.com/acme-inc/my-pipeline",
+    "name": "My Pipeline",
+    "slug": "my-pipeline",
+    "repository": "git@github.com:acme-inc/my-pipeline.git"
+  },
+  "sender": {
+    "id": "8a7693f8-dbae-4783-9137-84090fce9045",
+    "name": "Buildkite User"
+  }
+}

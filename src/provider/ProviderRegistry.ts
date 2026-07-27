@@ -5,6 +5,7 @@ import { Basecamp } from './Basecamp.ts'
 import type { BaseProvider } from './BaseProvider.ts'
 import { BitBucketServer } from './BitBucketServer.ts'
 import { BitBucket } from './Bitbucket.ts'
+import { Buildkite } from './Buildkite.ts'
 import { CircleCi } from './CircleCi.ts'
 import { Codacy } from './Codacy.ts'
 import { Confluence } from './Confluence.ts'
@@ -129,6 +130,15 @@ const providerDefinitions: readonly ProviderDefinition[] = [
         example: {
             body: 'bitbucketserver/bitbucketserver.json',
             headers: 'bitbucketserver/bitbucketserver.headers.json',
+        },
+    },
+    {
+        path: 'buildkite',
+        name: 'Buildkite',
+        provider: Buildkite,
+        example: {
+            body: 'buildkite/buildkite.json',
+            headers: 'buildkite/buildkite.headers.json',
         },
     },
     {

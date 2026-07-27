@@ -23,6 +23,12 @@ test('supported providers are rendered alphabetically by display name', () => {
     assert.deepEqual(names, alphabetizedNames)
     assert.ok(names.includes('Linear'), 'Linear should appear in the supported-provider grid')
     assert.ok(existsSync(new URL('../public/providers/linear.svg', import.meta.url)), 'Linear should have a logo asset')
+    assert.ok(names.includes('Buildkite'), 'Buildkite should appear in the supported-provider grid')
+    assert.match(providerSection[1], /title="\/buildkite"/, 'Buildkite should use the /buildkite endpoint')
+    assert.ok(
+        existsSync(new URL('../public/providers/buildkite.svg', import.meta.url)),
+        'Buildkite should have a logo asset',
+    )
     assert.ok(names.includes('Square'), 'Square should appear in the supported-provider grid')
     assert.match(providerSection[1], /title="\/square"/, 'Square should use the /square endpoint')
     assert.ok(names.includes('Azure DevOps'), 'Azure DevOps should appear in the supported-provider grid')

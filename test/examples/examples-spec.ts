@@ -24,6 +24,7 @@ const expectedProviderPaths = [
     'basecamp',
     'bitbucket',
     'bitbucketserver',
+    'buildkite',
     'circleci',
     'codacy',
     'confluence',
