@@ -29,6 +29,7 @@ https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/provi
 
 ## Supported Providers
 
+- [Azure DevOps](https://learn.microsoft.com/en-us/azure/devops/service-hooks/events?view=azure-devops) - `/azure`
 - [AppCenter](https://learn.microsoft.com/en-us/appcenter/dashboard/webhooks/) - `/appcenter`
 - [AppVeyor](https://www.appveyor.com/docs/notifications/#webhook-payload-default) - `/appveyor`
 - [Basecamp 3](https://github.com/basecamp/bc3-api/blob/master/sections/webhooks.md) - `/basecamp`
@@ -52,11 +53,11 @@ https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/provi
 - [Pingdom](https://www.pingdom.com/resources/webhooks) - `/pingdom`
 - [Rollbar](https://docs.rollbar.com/docs/webhooks) - `/rollbar`
 - [Shopify](https://shopify.dev/docs/api/webhooks/latest) - `/shopify`
+- [Square](https://developer.squareup.com/docs/webhooks/overview) - `/square`
 - [Travis](https://docs.travis-ci.com/user/notifications/#Webhooks-Delivery-Format) - `/travis`
 - [Trello](https://developers.trello.com/apis/webhooks) - `/trello`
 - [Unity Cloud](https://build-api.cloud.unity3d.com/docs/1.0.0/index.html#operation-webhooks-intro) - `/unity`
 - [Uptime Robot](https://blog.uptimerobot.com/web-hook-alert-contacts-new-feature/) - `/uptimerobot`
-- [Azure DevOps](https://learn.microsoft.com/en-us/azure/devops/service-hooks/events?view=azure-devops) - `/azure`
 - [Zendesk](https://developer.zendesk.com/api-reference/webhooks/webhooks-api/webhooks/) - `/zendesk`
 
 ### Linear setup
@@ -73,6 +74,14 @@ Zendesk trigger and automation webhooks are not automatically parsed because the
 
 If you want support for a new provider, just create a pull request and add it!  
 Alternatively, a new provider can also be requested by creating an [issue](https://github.com/Commit451/skyhook/issues).
+
+### Square setup
+
+Use the generated `/square` URL as the endpoint for a Square webhook subscription. In your Square Developer Dashboard, create a subscription that delivers event notifications for the event types you want (such as `payment.created`, `order.created`, `customer.created`, `refund.created`, and so on).
+
+Square signs each delivery with an HMAC signature delivered via the `x-square-hmacsha256-signature` header, using a signature key that is specific to the configured webhook. Skyhook's generated URL does not include or store that signature key, so Skyhook cannot verify Square signatures; all incoming payload values are treated as untrusted display data and Discord mentions are disabled.
+
+The type of each event is read from the top-level `type` field (for example `payment.created`). Skyhook formats the most common Square event types — payments, refunds, orders, customers, disputes, payouts, invoices, subscriptions, gift cards, and more — into resource-specific Discord notifications. Any Square event type that does not have a dedicated handler falls back to a generic summary so you always see a notification.
 
 ## Contributing
 
