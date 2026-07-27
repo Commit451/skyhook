@@ -60,18 +60,6 @@ https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/provi
 - [Uptime Robot](https://blog.uptimerobot.com/web-hook-alert-contacts-new-feature/) - `/uptimerobot`
 - [Zendesk](https://developer.zendesk.com/api-reference/webhooks/webhooks-api/webhooks/) - `/zendesk`
 
-### Buildkite setup
-
-Create a Buildkite webhook and use the generated `/buildkite` URL as its endpoint. Skyhook formats Pipelines build,
-job, agent, ping, and blocked agent-registration events, Package Registries package events, and the documented Test
-Engine `workflow.alarm` envelope. Other well-formed future Buildkite event families receive a bounded generic
-notification instead of being silently dropped.
-
-Buildkite can authenticate deliveries with a plaintext token or an HMAC signature over the raw request body.
-Skyhook's generated URL does not include or store the configured token, so Skyhook cannot authenticate either form;
-all incoming values are treated as untrusted display data, links are limited to Buildkite hosts, and Discord mentions
-are disabled.
-
 ## Contributing
 
 If you wish to contribute, follow our [contributing guide](CONTRIBUTING.md).
