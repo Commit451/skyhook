@@ -6,7 +6,6 @@ const DISCORD_HOST = 'discord.com'
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector<T>(sel)
 
 const providerSelect = $<HTMLSelectElement>('#provider')!
-const providerWarning = $<HTMLParagraphElement>('#provider-warning')!
 const urlField = $<HTMLDivElement>('#url-field')!
 const urlInput = $<HTMLInputElement>('#discord-url')!
 const urlError = $<HTMLDivElement>('#url-error')!
@@ -19,7 +18,6 @@ let toastTimer: number | undefined
 let testHandler: ((e: MouseEvent) => void) | null = null
 
 urlInput.addEventListener('input', () => clearError())
-providerSelect.addEventListener('change', updateProviderWarning)
 
 generateBtn.addEventListener('click', generate)
 
@@ -37,7 +35,6 @@ async function loadProviders(): Promise<void> {
         failed.textContent = 'Failed to load providers. Refresh to try again.'
         providerSelect.replaceChildren(failed)
         providerSelect.disabled = true
-        updateProviderWarning()
         showToast('Something went wrong')
     }
 }
@@ -58,11 +55,6 @@ function renderProviders(providers: ProviderInfo[]): void {
 
     providerSelect.replaceChildren(placeholder, ...options)
     providerSelect.disabled = false
-    updateProviderWarning()
-}
-
-function updateProviderWarning(): void {
-    providerWarning.hidden = providerSelect.value !== 'stripe'
 }
 
 function generate(): void {

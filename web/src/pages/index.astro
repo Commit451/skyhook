@@ -67,10 +67,6 @@ const faqs = [
         a: 'No. skyhook is a hosted service, so there is no Discord bot to run and no code to write. You generate a URL, paste it into your provider, and notifications start arriving in your channel.',
     },
     {
-        q: 'Can I use Stripe notifications for billing automation?',
-        a: "No. skyhook's Stripe integration is for informational Discord notifications only. The public relay doesn't know your endpoint-specific signing secret, so it can't verify Stripe-Signature. Use an authenticated backend for fulfillment, entitlements and billing state.",
-    },
-    {
         q: 'Does skyhook work with GitHub?',
         a: 'GitHub can already post to Discord natively — just add /github to the end of your Discord webhook URL. skyhook focuses on the many services that do not have built-in Discord support.',
     },
@@ -366,11 +362,6 @@ const structuredData = [
                         <select id="provider" disabled>
                             <option value="">Loading…</option>
                         </select>
-                        <p id="provider-warning" class="provider-warning" role="note" hidden>
-                            Stripe notifications are informational only. Skyhook cannot verify the endpoint-specific
-                            <code>Stripe-Signature</code>, so do not use this URL for fulfillment, entitlements, or
-                            billing state.
-                        </p>
                     </div>
 
                     <button id="generate" class="primary" type="button">Generate URL</button>

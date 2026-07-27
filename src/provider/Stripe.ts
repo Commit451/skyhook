@@ -80,10 +80,6 @@ const CHECKOUT_SESSION_AMOUNT_FIELDS = [
 /**
  * Converts Stripe snapshot Event objects and v2 thin event notifications into bounded Discord embeds.
  *
- * Stripe requires webhook signature verification over the exact raw body using an endpoint-specific secret.
- * Skyhook neither possesses that secret nor dispatches the untouched raw body to providers, so this adapter cannot
- * verify Stripe-Signature. It is suitable for informational notifications only and treats every value as untrusted.
- *
  * @see https://docs.stripe.com/webhooks
  * @see https://docs.stripe.com/api/events/object
  * @see https://docs.stripe.com/event-destinations#events-overview

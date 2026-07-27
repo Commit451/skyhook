@@ -12,7 +12,6 @@ test('supported providers are rendered alphabetically by display name', () => {
     })
 
     const html = readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8')
-    const formScript = readFileSync(new URL('../src/scripts/form.ts', import.meta.url), 'utf8')
     const providerSection = html.match(/<div class="provider-grid">([\s\S]*?)<\/div>\s*<p class="provider-note">/)
     assert.ok(providerSection, 'provider grid should be present in the built page')
 
@@ -35,16 +34,6 @@ test('supported providers are rendered alphabetically by display name', () => {
     assert.ok(names.includes('Stripe'), 'Stripe should appear in the supported-provider grid')
     assert.match(providerSection[1], /title="\/stripe"/, 'Stripe should use the /stripe endpoint')
     assert.ok(existsSync(new URL('../public/providers/stripe.svg', import.meta.url)), 'Stripe should have a logo asset')
-    assert.match(
-        html,
-        /id="provider-warning"[^>]*hidden[^>]*>[\s\S]*?Stripe-Signature[\s\S]*?<\/p>/,
-        'the generator should include a hidden Stripe-specific authentication warning',
-    )
-    assert.match(
-        formScript,
-        /providerWarning\.hidden = providerSelect\.value !== 'stripe'/,
-        'the Stripe warning should become visible when Stripe is selected',
-    )
     assert.ok(names.includes('Azure DevOps'), 'Azure DevOps should appear in the supported-provider grid')
     assert.match(providerSection[1], /title="\/azure"/, 'Azure DevOps should use the /azure endpoint')
     assert.doesNotMatch(providerSection[1], /title="\/vsts"/, 'the retired /vsts endpoint should not be shown')
