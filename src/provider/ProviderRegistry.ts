@@ -20,6 +20,7 @@ import { NewRelic } from './NewRelic.ts'
 import { Patreon } from './Patreon.ts'
 import { Pingdom } from './Pingdom.ts'
 import type { ProviderDefinition } from './Provider.ts'
+import { RevenueCat } from './RevenueCat.ts'
 import { Rollbar } from './Rollbar.ts'
 import { Shopify } from './Shopify.ts'
 import { Square } from './Square.ts'
@@ -89,6 +90,7 @@ const providerDefinitions: readonly ProviderDefinition[] = [
     NewRelic,
     Patreon,
     Pingdom,
+    RevenueCat,
     Rollbar,
     Shopify,
     Square,

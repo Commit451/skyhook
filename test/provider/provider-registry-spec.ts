@@ -57,6 +57,7 @@ const expectedMetadata = [
         example: { body: 'patreon/patreon-member-create.json', headers: 'patreon/patreon.headers.json' },
     },
     { path: 'pingdom', name: 'Pingdom', example: { body: 'pingdom/pingdom.json' } },
+    { path: 'revenuecat', name: 'RevenueCat', example: { body: 'revenuecat/revenuecat.json' } },
     { path: 'rollbar', name: 'Rollbar', example: { body: 'rollbar/rollbar.json' } },
     {
         path: 'shopify',

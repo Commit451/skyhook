@@ -12,6 +12,18 @@
 
 Buildkite is a trademark of Buildkite Pty Ltd. The icon is used only to identify the supported provider.
 
+## Simple Icons — RevenueCat icon
+
+- File: `web/public/providers/revenuecat.svg`
+- Project: Simple Icons
+- Source: https://github.com/simple-icons/simple-icons/blob/25d6e5b39bc55bc446e147700294628af1734f7e/icons/revenuecat.svg
+- Revision: `25d6e5b39bc55bc446e147700294628af1734f7e`
+- Imported size: 1497 bytes
+- Imported SHA-256: `1e224d9067e9b9b2e7366d4f38c1670d5c6131baf9b408a1a6039a8c8f285156`
+- License: CC0 1.0 Universal; a copy is included at `web/public/providers/LICENSE.simple-icons.md`
+
+RevenueCat is a trademark of RevenueCat, Inc. The icon is used only to identify the supported provider.
+
 ## Simple Icons — Stripe icon
 
 - File: `web/public/providers/stripe.svg`
