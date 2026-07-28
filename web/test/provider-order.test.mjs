@@ -34,6 +34,12 @@ test('supported providers are rendered alphabetically by display name', () => {
     assert.ok(names.includes('Stripe'), 'Stripe should appear in the supported-provider grid')
     assert.match(providerSection[1], /title="\/stripe"/, 'Stripe should use the /stripe endpoint')
     assert.ok(existsSync(new URL('../public/providers/stripe.svg', import.meta.url)), 'Stripe should have a logo asset')
+    assert.ok(names.includes('RevenueCat'), 'RevenueCat should appear in the supported-provider grid')
+    assert.match(providerSection[1], /title="\/revenuecat"/, 'RevenueCat should use the /revenuecat endpoint')
+    assert.ok(
+        existsSync(new URL('../public/providers/revenuecat.svg', import.meta.url)),
+        'RevenueCat should have a logo asset',
+    )
     assert.ok(names.includes('Azure DevOps'), 'Azure DevOps should appear in the supported-provider grid')
     assert.match(providerSection[1], /title="\/azure"/, 'Azure DevOps should use the /azure endpoint')
     assert.doesNotMatch(providerSection[1], /title="\/vsts"/, 'the retired /vsts endpoint should not be shown')

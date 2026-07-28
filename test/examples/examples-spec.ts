@@ -34,6 +34,7 @@ const expectedProviderPaths = [
     'newrelic',
     'patreon',
     'pingdom',
+    'revenuecat',
     'rollbar',
     'shopify',
     'square',

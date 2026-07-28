@@ -51,6 +51,7 @@ https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/provi
   `/newrelic`
 - [Patreon](https://www.patreon.com/platform/documentation/webhooks) - `/patreon`
 - [Pingdom](https://www.pingdom.com/resources/webhooks) - `/pingdom`
+- [RevenueCat](https://www.revenuecat.com/docs/integrations/webhooks) - `/revenuecat`
 - [Rollbar](https://docs.rollbar.com/docs/webhooks) - `/rollbar`
 - [Shopify](https://shopify.dev/docs/api/webhooks/latest) - `/shopify`
 - [Square](https://developer.squareup.com/docs/webhooks/overview) - `/square`
