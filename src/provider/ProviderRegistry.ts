@@ -23,6 +23,7 @@ import type { ProviderDefinition } from './Provider.ts'
 import { Rollbar } from './Rollbar.ts'
 import { Shopify } from './Shopify.ts'
 import { Square } from './Square.ts'
+import { Stripe } from './Stripe.ts'
 import { Travis } from './Travis.ts'
 import { Trello } from './Trello.ts'
 import { Unity } from './Unity.ts'
@@ -91,6 +92,7 @@ const providerDefinitions: readonly ProviderDefinition[] = [
     Rollbar,
     Shopify,
     Square,
+    Stripe,
     Travis,
     Trello,
     Unity,

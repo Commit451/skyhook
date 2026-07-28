@@ -31,6 +31,7 @@ const providers: Provider[] = [
     { name: 'Rollbar', slug: 'rollbar', color: '#5c7cf5' },
     { name: 'Shopify', slug: 'shopify', color: '#95bf47' },
     { name: 'Square', slug: 'square', color: '#006aff', monogram: 'SQ' },
+    { name: 'Stripe', slug: 'stripe', color: '#635bff' },
     { name: 'Travis CI', slug: 'travis', color: '#3eaaaf' },
     { name: 'Trello', slug: 'trello', color: '#2684ff' },
     { name: 'Unity Cloud', slug: 'unity', color: '#e8e8e8' },
@@ -48,9 +49,9 @@ const year = new Date().getFullYear()
 const SITE = Astro.site ?? new URL('https://www.skyhookapi.com')
 const canonical = new URL(base, SITE).href
 const ogImage = new URL(`${base}og.png`, SITE).href
-const pageTitle = 'skyhook — Discord Notifications for Shopify, GitLab, Jira & 20+ Tools'
+const pageTitle = 'skyhook — Discord Notifications for Stripe, Shopify, GitLab & 20+ Tools'
 const pageDescription =
-    'skyhook turns webhooks from Shopify, GitLab, Hugging Face, Jira, Docker Hub, CI tools and 20+ other services into clean, native Discord notifications — no bot to host, no code to write.'
+    'skyhook turns webhooks from Stripe, Shopify, GitLab, Hugging Face, Jira, Docker Hub, CI tools and 20+ other services into clean, native Discord notifications — no bot to host, no code to write.'
 
 const faqs = [
     {
@@ -59,7 +60,7 @@ const faqs = [
     },
     {
         q: 'Which services does skyhook support?',
-        a: `${providers.length} and counting — including Buildkite, Shopify, Square, Zendesk, Linear, GitLab, Hugging Face, Jira, Confluence, Bitbucket, Docker Hub, Travis CI, CircleCI, Jenkins, Heroku, New Relic, Rollbar, Pingdom, Uptime Robot, Trello, Patreon and Azure DevOps.`,
+        a: `${providers.length} and counting — including Stripe, Buildkite, Shopify, Square, Zendesk, Linear, GitLab, Hugging Face, Jira, Confluence, Bitbucket, Docker Hub, Travis CI, CircleCI, Jenkins, Heroku, New Relic, Rollbar, Pingdom, Uptime Robot, Trello, Patreon and Azure DevOps.`,
     },
     {
         q: 'Do I need to host a bot or write any code?',
@@ -160,7 +161,7 @@ const structuredData = [
             <div class="hero-copy">
                 <h1>Turn webhooks into <span class="accent">beautiful Discord notifications</span>.</h1>
                 <p class="lead">
-                    skyhook translates webhooks from Shopify, GitLab, Hugging Face, Jira, Docker Hub and 20+ other
+                    skyhook translates webhooks from Stripe, Shopify, GitLab, Hugging Face, Jira, Docker Hub and 20+ other
                     services into clean, native Discord notifications. No bot to host, no code to write — generate a
                     URL, paste it into your provider, and you're done.
                 </p>
@@ -287,7 +288,7 @@ const structuredData = [
                     <span class="eyebrow">Supported providers</span>
                     <h2>Discord notifications for the tools you already use</h2>
                     <p>
-                        From GitLab pushes and Jira issues to Docker Hub builds, CI results, and Pingdom or Uptime
+                        From Stripe payments, GitLab pushes, and Jira issues to Docker Hub builds, CI results, and Pingdom or Uptime
                         Robot alerts — skyhook delivers a clean Discord notification for every event, across {providers.length}
                         {' '}services and counting.
                     </p>

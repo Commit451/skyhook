@@ -54,6 +54,7 @@ https://skyhookapi.com/api/webhooks/firstPartOfWebhook/secondPartOfWebhook/provi
 - [Rollbar](https://docs.rollbar.com/docs/webhooks) - `/rollbar`
 - [Shopify](https://shopify.dev/docs/api/webhooks/latest) - `/shopify`
 - [Square](https://developer.squareup.com/docs/webhooks/overview) - `/square`
+- [Stripe](https://docs.stripe.com/webhooks) - `/stripe`
 - [Travis](https://docs.travis-ci.com/user/notifications/#Webhooks-Delivery-Format) - `/travis`
 - [Trello](https://developers.trello.com/apis/webhooks) - `/trello`
 - [Unity Cloud](https://build-api.cloud.unity3d.com/docs/1.0.0/index.html#operation-webhooks-intro) - `/unity`
