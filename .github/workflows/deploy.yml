@@ -19,6 +19,12 @@ on:
     branches:
     - 'main'
 
+# Cloud Run service updates must not overlap. Let an active deployment finish
+# rather than cancelling it while Google Cloud is still updating the service.
+concurrency:
+  group: cloud-run-skyhookapi-us-central1-skyhook
+  cancel-in-progress: false
+
 env:
   PROJECT_ID: 'skyhookapi'
   SERVICE: 'skyhook'
